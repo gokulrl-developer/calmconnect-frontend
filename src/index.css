@@ -1,0 +1,259 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------- BASE ---------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply transition-colors duration-300;
+    @apply bg-background text-foreground;
+  }
+
+  /* User Role - Theme Variables */
+  :root {
+    /* Base Colors - Professional with dim background */
+    --background: 0 0% 94%;
+    --foreground: 0 0% 15%;
+
+    /* Card Components */
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 15%;
+
+    /* Popover Components */
+    --popover: 0 0% 98%;
+    --popover-foreground: 0 0% 20%;
+
+    /* Primary */
+    --primary: 0 0% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 0 0% 85%;
+    --primary-dark: 0 0% 15%;
+
+    /* Secondary */
+    --secondary: 0 0% 65%;
+    --secondary-foreground: 0 0% 15%;
+    --secondary-light: 0 0% 90%;
+
+    /* Tertiary */
+    --tertiary: 0 0% 45%;
+    --tertiary-foreground: 0 0% 98%;
+
+    /* Muted */
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 45%;
+
+    /* Accent */
+    --accent: 0 0% 88%;
+    --accent-foreground: 0 0% 15%;
+
+    /* Status */
+    --success: 120 50% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 45 85% 55%;
+    --warning-foreground: 0 0% 15%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Border and Input */
+    --border: 0 0% 85%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 25%;
+
+    /* Glass Effect */
+    --glass-bg: 0 0% 98%;
+    --glass-border: 0 0% 80%;
+    --glass-shadow: 0 0% 30%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 25%), hsl(0 0% 45%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 65%), hsl(0 0% 75%));
+    --gradient-background: linear-gradient(180deg, hsl(0 0% 94%), hsl(0 0% 96%));
+    --gradient-glass: linear-gradient(145deg, hsla(0 0% 98% / 0.95), hsla(0 0% 96% / 0.8));
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px hsla(0 0% 0% / 0.15);
+    --shadow-md: 0 6px 20px hsla(0 0% 0% / 0.2);
+    --shadow-lg: 0 12px 32px hsla(0 0% 0% / 0.25);
+    --shadow-glass: 0 16px 48px hsla(0 0% 0% / 0.18);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 4px;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Dark Theme Variables */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 0% 85%;
+    --primary-foreground: 0 0% 8%;
+    --primary-light: 0 0% 75%;
+    --primary-dark: 0 0% 65%;
+    --secondary: 0 0% 55%;
+    --secondary-foreground: 0 0% 8%;
+    --secondary-light: 0 0% 80%;
+    --tertiary: 0 0% 45%;
+    --tertiary-foreground: 0 0% 95%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 95%;
+    --success: 120 50% 55%;
+    --success-foreground: 0 0% 8%;
+    --warning: 45 85% 65%;
+    --warning-foreground: 0 0% 8%;
+    --destructive: 0 75% 65%;
+    --destructive-foreground: 0 0% 8%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 85%;
+    --glass-bg: 0 0% 12%;
+    --glass-border: 0 0% 25%;
+    --glass-shadow: 0 0% 5%;
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 85%), hsl(0 0% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 55%), hsl(0 0% 65%));
+    --gradient-background: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 10%));
+    --gradient-glass: linear-gradient(135deg, hsla(0 0% 12% / 0.8), hsla(0 0% 15% / 0.6));
+    --shadow-sm: 0 2px 4px hsla(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 12px hsla(0 0% 0% / 0.4);
+    --shadow-lg: 0 8px 24px hsla(0 0% 0% / 0.5);
+    --shadow-glass: 0 8px 32px hsla(0 0% 0% / 0.3);
+  }
+
+  /* Psychologist side - improve text contrast */
+  .light {
+    --tw-text-opacity: 1;
+  }
+
+  .text-gray-900 { color: rgb(17 24 39) !important; }
+  .text-gray-800 { color: rgb(31 41 55) !important; }
+  .text-gray-700 { color: rgb(55 65 81) !important; }
+  .text-gray-600 { color: rgb(75 85 99) !important; }
+
+  .dark .text-gray-900 { color: rgb(243 244 246) !important; }
+  .dark .text-gray-800 { color: rgb(229 231 235) !important; }
+  .dark .text-gray-700 { color: rgb(209 213 219) !important; }
+  .dark .text-gray-600 { color: rgb(156 163 175) !important; }
+
+  * {
+    @apply border-border;
+  }
+}
+
+/* ---------------- COMPONENTS ---------------- */
+@layer components {
+  /* Admin - glass card */
+  .glass-card {
+    @apply backdrop-blur-md bg-white/70 dark:bg-gray-800/70 border border-white/20 dark:border-gray-700/20 rounded-xl shadow-lg;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Psychologist - glassmorphism */
+  .glassmorphism {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+
+  .dark .glassmorphism {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Animations (Admin + Psychologist) */
+  .animate-in { animation: slideIn 0.3s ease-out; }
+  .fade-in { animation: fadeIn 0.3s ease-out; }
+  .slide-in-from-bottom-4 { animation: slideInFromBottom 0.3s ease-out; }
+  .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+  .animate-slide-up { animation: slideUp 0.6s ease-out; }
+
+  /* Pulse glow */
+  .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+}
+
+/* ---------------- UTILITIES ---------------- */
+@layer utilities {
+  .text-shadow { text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+  .backdrop-blur-strong {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromBottom {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(107, 114, 128, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(107, 114, 128, 0.8); }
+}
+
+/* ---------------- MISC ---------------- */
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { @apply bg-gray-100 dark:bg-gray-800; }
+::-webkit-scrollbar-thumb { @apply bg-gray-300 dark:bg-gray-600 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-gray-400 dark:bg-gray-500; }
+
+/* Interactive elements */
+button, input, select, textarea { @apply transition-all duration-300; }
+button:focus, input:focus, select:focus, textarea:focus {
+  @apply outline-none ring-2 ring-gray-500 ring-opacity-50;
+}
+
+/* Hover helpers */
+.hover\:shadow-xl:hover { @apply shadow-2xl; }
+.hover\:scale-\[1\.02\]:hover { transform: scale(1.02); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
