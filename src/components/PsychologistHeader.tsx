@@ -6,7 +6,7 @@ const psychologistHeader: React.FC = () => {
     <header className="fixed top-0 left-64 right-0 h-16 glass-card border-b border-white/20 z-30">
       <div className="flex items-center justify-between h-full px-6">
         <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-800">Psychologist Dashboard</h2>
+          <h2 className="text-lg font-semibold text-gray-800">Psychologist</h2>
         </div>
 
         <div className="flex items-center space-x-4">
