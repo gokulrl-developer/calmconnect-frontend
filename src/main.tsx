@@ -10,6 +10,7 @@ import { setupAxiosInterceptors } from './services/axiosInstance.ts';
 import { logOut } from './services/authService.ts';
 
 setupAxiosInterceptors(async () => {
+  console.log("axios instance")
   try{
     const isAuthenticated=store.getState().auth?.isAuthenticated;
     if(isAuthenticated===true){

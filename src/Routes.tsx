@@ -22,6 +22,8 @@ import Landing from "./pages/Landing";
 import GoogleCallback from "./pages/GoogleCallBack";
 import Unauthorised from "./pages/Unauthorised";
 import ForgotPassword from "./pages/ForgotPassword";
+import CreateRule from "./pages/psychologist/CreateRule";
+import Availability from "./pages/psychologist/Availability";
 
 function AppRoutes() {
   return (
@@ -120,6 +122,18 @@ function AppRoutes() {
             <Route
               path="/psychologist/dashboard"
               element={<PsychologistDashboard />}
+            />
+          </Route>
+           <Route element={<PsychologistLayout />}>
+            <Route
+              path="/psychologist/availability"
+              element={<Availability />}
+            />
+          </Route>
+          <Route element={<PsychologistLayout />}>
+            <Route
+              path="/psychologist/create-rule"
+              element={<CreateRule />}
             />
           </Route>
         </Route>

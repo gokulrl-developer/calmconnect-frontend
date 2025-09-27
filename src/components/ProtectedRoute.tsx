@@ -1,4 +1,3 @@
-import React from 'react'
 import { useAppSelector } from '../hooks/customReduxHooks'
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -9,8 +8,11 @@ const ProtectedRoute = ({allowedRole,isVerifiedPsychRoute}:{allowedRole:string,i
        if(role !=="psychologist" || isVerifiedPsychRoute===isVerified){
            return <Outlet/>
        }else{
-         console.log("navigating to unauthorised");
-           return <Navigate to="/unauthorised" replace/>
+        if(isVerified===true){
+          return <Navigate to="/psychologist/dashboard" replace/>
+        }else{
+          return <Navigate to="/psychologist/application" replace/>
+        }
         }
        }else{
       return <Navigate to="/unauthorised" replace/>
@@ -20,4 +22,4 @@ const ProtectedRoute = ({allowedRole,isVerifiedPsychRoute}:{allowedRole:string,i
   }
 }
 
-export default ProtectedRoute
+export default ProtectedRoute;
