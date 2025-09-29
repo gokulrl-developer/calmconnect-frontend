@@ -11,7 +11,8 @@ import {
   HelpCircle,
   Bell,
   User,
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../hooks/customReduxHooks';
 import { logOut } from '../services/authService';
@@ -37,7 +38,8 @@ export default function UserSidebar() {
     
 
   const navItems = isAuthenticated && role === 'user' ? [
-    { path: '/user/book', label: 'Book Session', icon: Calendar },
+    { path: '/user/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/user/psychologists', label: 'Book Session', icon: Calendar },
     { path: '/user/sessions', label: 'My Sessions', icon: Target },
     { path: '/user/transactions', label: 'Transactions', icon: CreditCard },
     { path: '/user/treatment-plans', label: 'Treatment Plans', icon: FileText },

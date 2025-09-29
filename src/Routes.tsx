@@ -24,6 +24,8 @@ import Unauthorised from "./pages/Unauthorised";
 import ForgotPassword from "./pages/ForgotPassword";
 import CreateRule from "./pages/psychologist/CreateRule";
 import Availability from "./pages/psychologist/Availability";
+import BookSession from "./pages/user/PsychologistListing";
+import PsychologistDetails from "./pages/user/PsychologistDetails";
 
 function AppRoutes() {
   return (
@@ -60,6 +62,12 @@ function AppRoutes() {
         >
           <Route element={<UserLayout />}>
             <Route path="/user/dashboard" element={<UserDashboard />} />
+          </Route>
+          <Route element={<UserLayout />}>
+            <Route path="/user/psychologists" element={<BookSession />} />
+          </Route>
+          <Route element={<UserLayout />}>
+            <Route path="/user/psychologist-details" element={<PsychologistDetails />} />
           </Route>
         </Route>
 

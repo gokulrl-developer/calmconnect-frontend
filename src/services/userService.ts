@@ -1,3 +1,5 @@
+import type { ListPsychSummary, PsychDetails } from "../types/api/user.types";
+import type paginationData from "../types/pagination.types";
 import axiosInstance from "./axiosInstance";
 
 
@@ -11,5 +13,15 @@ interface DashboardData{
 export const fetchDashboard = () =>
   axiosInstance
     .get<DashboardData>("/user/dashboard")
+    .then((res) => res);
+
+export const fetchPsychologistsByUser = (params:string) =>
+  axiosInstance
+    .get<{psychologists:ListPsychSummary[],paginationData:paginationData}>(`/user/psychologists?${params}`)
+    .then((res) => res);
+    
+export const fetchPsychDetailsByUser = (params:string) =>
+  axiosInstance
+    .get<PsychDetails>(`/user/psychologist-details?${params}`)
     .then((res) => res);
 
