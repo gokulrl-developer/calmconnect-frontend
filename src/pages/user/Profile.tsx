@@ -7,7 +7,7 @@ import {
   updateUserProfile,
 } from "../../services/userService";
 import { toast } from "sonner";
-import type { UserProfile } from "../../types/components/userProfile.types";
+import type { UserProfile } from "../../types/components/user.types";
 
 const UserProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);

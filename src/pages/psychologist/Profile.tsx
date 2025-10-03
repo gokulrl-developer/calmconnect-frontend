@@ -7,7 +7,7 @@ import {
   updatePsychProfile,
 } from "../../services/psychologistService";
 import { toast } from "sonner";
-import type { PsychProfile } from "../../types/components/psychProfile.types";
+import type { PsychProfile } from "../../types/components/psychologist.types";
 
 const PsychologistProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
