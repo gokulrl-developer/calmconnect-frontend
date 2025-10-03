@@ -39,6 +39,7 @@ export default function UserSidebar() {
 
   const navItems = isAuthenticated && role === 'user' ? [
     { path: '/user/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/user/profile', label: 'Profile', icon: LayoutDashboard },
     { path: '/user/psychologists', label: 'Book Session', icon: Calendar },
     { path: '/user/sessions', label: 'My Sessions', icon: Target },
     { path: '/user/transactions', label: 'Transactions', icon: CreditCard },

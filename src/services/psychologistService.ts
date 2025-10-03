@@ -1,3 +1,4 @@
+import type { PsychProfile } from "../types/api/psychologist.types";
 import type { AvailabilityRule, AvailabilityRuleSummary, Slot } from "../types/domain/AvailabiliityRule.types";
 import axiosInstance from "./axiosInstance";
 
@@ -81,4 +82,17 @@ export const fetchDailyAvailability=(date:string)=>
   export const fetchAvailabilityRuleDetails=(ruleId:string)=>
     axiosInstance
   .get<{availabilityRule:AvailabilityRule}>(`/psychologist/availabilityRule/${ruleId}`)
+  .then((res)=>res)
+  
+  export const fetchPsychProfile=()=>
+    axiosInstance
+  .get<PsychProfile>(`/psychologist/profile`)
+  .then((res)=>res)
+
+  export const updatePsychProfile=(formData:FormData)=>
+    axiosInstance
+  .patch<{message:string}>(`/psychologist/profile`,formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      }})
   .then((res)=>res)

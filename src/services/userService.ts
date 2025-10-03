@@ -1,4 +1,4 @@
-import type { ListPsychSummary, PsychDetails } from "../types/api/user.types";
+import type { ListPsychSummary, PsychDetails, UserProfile } from "../types/api/user.types";
 import type paginationData from "../types/pagination.types";
 import axiosInstance from "./axiosInstance";
 
@@ -25,3 +25,15 @@ export const fetchPsychDetailsByUser = (params:string) =>
     .get<PsychDetails>(`/user/psychologist-details?${params}`)
     .then((res) => res);
 
+export const fetchUserProfile=()=>
+    axiosInstance
+  .get<UserProfile>(`/user/profile`)
+  .then((res)=>res)
+
+  export const updateUserProfile=(formData:FormData)=>
+    axiosInstance
+  .patch<{message:string}>(`/user/profile`,formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      }})
+  .then((res)=>res)

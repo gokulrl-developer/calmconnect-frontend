@@ -22,3 +22,15 @@ export interface PsychDetails{
   hourlyFees: number;
   quickSlotFees: number;
 }
+
+export interface UserProfile{
+   profile: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    gender?: 'male' | 'female' | 'others';
+    dob?: Date;
+    profilePicture?: string;
+    address?: string;
+  };
+}

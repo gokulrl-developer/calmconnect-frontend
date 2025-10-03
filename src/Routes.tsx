@@ -3,17 +3,25 @@ import { Toaster } from "sonner";
 import ErrorWatcher from "./components/ErrorWatcher";
 import UserLayout from "./components/UserLayout";
 import UserDashboard from "./pages/user/Dashboard";
+import BookSession from "./pages/user/PsychologistListing";
+import PsychologistDetails from "./pages/user/PsychologistDetails";
+
 import AdminLayout from "./components/AdminLayout";
-import AdminApplicationDetails from "./pages/admin/ApplicationDetails";
-import AdminApplications from "./pages/admin/Applications";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminApplications from "./pages/admin/Applications";
+import AdminApplicationDetails from "./pages/admin/ApplicationDetails";
+import AdminUsers from "./pages/admin/Users";
+import AdminUserDetails from "./pages/admin/UserDetails";
 import AdminPsychologists from "./pages/admin/Psychologists";
 import AdminPsychologistDetails from "./pages/admin/PsychologistDetails";
-import AdminUserDetails from "./pages/admin/UserDetails";
-import AdminUsers from "./pages/admin/Users";
+
 import PsychologistLayout from "./components/PsychologistLayout";
 import PsychologistDashboard from "./pages/psychologist/Dashboard";
 import PsychologistApplication from "./pages/psychologist/Application";
+import Availability from "./pages/psychologist/Availability";
+import CreateRule from "./pages/psychologist/CreateRule";
+import PsychologistProfile from "./pages/psychologist/Profile";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
 import SignUp from "./pages/SignUp";
@@ -22,10 +30,7 @@ import Landing from "./pages/Landing";
 import GoogleCallback from "./pages/GoogleCallBack";
 import Unauthorised from "./pages/Unauthorised";
 import ForgotPassword from "./pages/ForgotPassword";
-import CreateRule from "./pages/psychologist/CreateRule";
-import Availability from "./pages/psychologist/Availability";
-import BookSession from "./pages/user/PsychologistListing";
-import PsychologistDetails from "./pages/user/PsychologistDetails";
+import UserProfile from "./pages/user/Profile";
 
 function AppRoutes() {
   return (
@@ -33,7 +38,6 @@ function AppRoutes() {
       <Toaster position="top-right" richColors closeButton />
       <ErrorWatcher />
 
-      {/* Routes */}
       <Routes>
         {/* Common Routes */}
         <Route path="/unauthorised" element={<Unauthorised />} />
@@ -43,106 +47,56 @@ function AppRoutes() {
         <Route element={<GuestRoute />}>
           <Route path="/" element={<Landing />} />
           <Route path="/user/login" element={<Login role="user" />} />
-          <Route
-            path="/psychologist/login"
-            element={<Login role="psychologist" />}
-          />
+          <Route path="/psychologist/login" element={<Login role="psychologist" />} />
           <Route path="/admin/login" element={<Login role="admin" />} />
           <Route path="/user/sign-up" element={<SignUp />} />
           <Route path="/psychologist/sign-up" element={<SignUp />} />
-          <Route path="/psychologist/forgot-password" element={<ForgotPassword role="psychologist" />} />
+          <Route
+            path="/psychologist/forgot-password"
+            element={<ForgotPassword role="psychologist" />}
+          />
           <Route path="/user/forgot-password" element={<ForgotPassword role="user" />} />
         </Route>
 
         {/* User Routes */}
-        <Route
-          element={
-            <ProtectedRoute allowedRole={"user"} isVerifiedPsychRoute={false} />
-          }
-        >
+        <Route element={<ProtectedRoute allowedRole="user" isVerifiedPsychRoute={false} />}>
           <Route element={<UserLayout />}>
             <Route path="/user/dashboard" element={<UserDashboard />} />
-          </Route>
-          <Route element={<UserLayout />}>
+            <Route path="/user/profile" element={<UserProfile />} />
             <Route path="/user/psychologists" element={<BookSession />} />
-          </Route>
-          <Route element={<UserLayout />}>
             <Route path="/user/psychologist-details" element={<PsychologistDetails />} />
           </Route>
         </Route>
 
         {/* Admin Routes */}
-        <Route
-          element={
-            <ProtectedRoute
-              allowedRole={"admin"}
-              isVerifiedPsychRoute={false}
-            />
-          }
-        >
+        <Route element={<ProtectedRoute allowedRole="admin" isVerifiedPsychRoute={false} />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/applications" element={<AdminApplications />} />
-            <Route
-              path="/admin/application-details/:applicationId"
-              element={<AdminApplicationDetails />}
-            />
+            <Route path="/admin/application-details/:applicationId" element={<AdminApplicationDetails />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/user-details" element={<AdminUserDetails />} />
-            <Route
-              path="/admin/psychologists"
-              element={<AdminPsychologists />}
-            />
-            <Route
-              path="/admin/psychologist-details"
-              element={<AdminPsychologistDetails />}
-            />
+            <Route path="/admin/psychologists" element={<AdminPsychologists />} />
+            <Route path="/admin/psychologist-details" element={<AdminPsychologistDetails />} />
           </Route>
         </Route>
-
-        {/* Psychologist Routes */}
 
         {/* Unverified Psychologist Routes */}
         <Route
-          element={
-            <ProtectedRoute
-              allowedRole={"psychologist"}
-              isVerifiedPsychRoute={false}
-            />
-          }
+          element={<ProtectedRoute allowedRole="psychologist" isVerifiedPsychRoute={false} />}
         >
-          <Route
-            path="/psychologist/application"
-            element={<PsychologistApplication />}
-          />
+          <Route path="/psychologist/application" element={<PsychologistApplication />} />
         </Route>
 
-        {/* Verrified Psychologist Routes */}
+        {/* Verified Psychologist Routes */}
         <Route
-          element={
-            <ProtectedRoute
-              allowedRole={"psychologist"}
-              isVerifiedPsychRoute={true}
-            />
-          }
+          element={<ProtectedRoute allowedRole="psychologist" isVerifiedPsychRoute={true} />}
         >
           <Route element={<PsychologistLayout />}>
-            <Route
-              path="/psychologist/dashboard"
-              element={<PsychologistDashboard />}
-            />
-          </Route>
-           <Route element={<PsychologistLayout />}>
-            <Route
-              path="/psychologist/availability"
-              element={<Availability />}
-            />
-          </Route>
-          <Route element={<PsychologistLayout />}>
-            <Route
-              path="/psychologist/create-rule"
-              element={<CreateRule />}
-            />
+            <Route path="/psychologist/dashboard" element={<PsychologistDashboard />} />
+            <Route path="/psychologist/availability" element={<Availability />} />
+            <Route path="/psychologist/create-rule" element={<CreateRule />} />
+            <Route path="/psychologist/profile" element={<PsychologistProfile />} />
           </Route>
         </Route>
       </Routes>
