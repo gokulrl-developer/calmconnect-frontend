@@ -5,7 +5,7 @@ profile: {
     email: string;
     gender?: 'male' | 'female' | 'others';
     dob?: Date;
-    profilePicture?: string;
+    profilePicture?: string | File;
     address?: string;
     languages?: string;
     specializations?: string[];
@@ -15,5 +15,3 @@ profile: {
     quickSlotHourlyFees?: number;
   }
 }
-
-
