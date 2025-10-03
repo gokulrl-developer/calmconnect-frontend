@@ -1,3 +1,5 @@
+
+
 export interface UserProfile{
    profile: {
     firstName: string;
@@ -8,4 +10,12 @@ export interface UserProfile{
     profilePicture?: string | File;
     address?: string;
   };
+}
+
+export interface CheckoutData {
+  startTime: string;
+  endTime: string;
+  durationInMins: number;
+  quickSlot: boolean;
+  fees: number;
 }

@@ -4,7 +4,16 @@ import axios from "axios";
 import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
 import { format } from "date-fns";
-import { fetchPsychDetailsByUser } from "../../services/userService";
+import {
+  createOrder,
+  fetchCheckoutData,
+  fetchPsychDetailsByUser,
+  verifyPayment,
+} from "../../services/userService";
+import Modal from "../../components/UI/Modal";
+import type { CheckoutData } from "../../types/components/user.types";
+import { toast } from "sonner";
+declare var Razorpay: any;
 
 // Backend DTO
 export interface Slot {
@@ -31,29 +40,32 @@ const PsychologistDetails: React.FC = () => {
   const location = useLocation();
 
   const psychId = new URLSearchParams(location.search).get("psychId");
-  const [selectedDate, setSelectedDate] = useState<Date>(
-    new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [psychologist, setPsychologist] = useState<Omit<
     PsychDetails,
-    "availableSlots" | "psychId"
+    "availableSlots"
   > | null>(null);
   const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<string>("new Date()");
+  const [selectedSlot, setSelectedSlot] = useState<string>("");
+  const [checkoutData, setCheckoutData] = useState<CheckoutData>(
+    {} as CheckoutData
+  );
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
 
   // --- Fetch Psychologist Details ---
   const fetchPsychologistDetails = async (date: Date) => {
     if (!psychId) return;
     try {
       const params = new URLSearchParams();
-      params.append("date",date.toISOString());
+      params.append("date", date.toISOString());
       params.append("psychId", psychId);
       const res = await fetchPsychDetailsByUser(params.toString());
-      console.log(res.data);
       if (res.data) {
-        let data=res.data
+        let data = res.data;
         setAvailableSlots(data.availableSlots);
-        const { availableSlots: _, psychId: __, ...psychInfo } = data;
+        const { availableSlots: _, ...psychInfo } = data;
         setPsychologist(psychInfo);
       }
     } catch (error) {
@@ -65,19 +77,87 @@ const PsychologistDetails: React.FC = () => {
     fetchPsychologistDetails(selectedDate);
   }, [psychId, selectedDate]);
 
-  const handleSlotClick = (slot: string) => {
+  const handleSlotClick = async (slot: string) => {
     setSelectedSlot(slot);
-    navigate("/user/payment", {
-      state: {
-        psychologist,
-        date: selectedDate,
-        time: slot,
-        amount: psychologist?.hourlyFees,
-      },
+    const result = await fetchCheckoutData({
+      startTime: slot,
+      date: selectedDate.toISOString(),
+      psychId: psychologist!.psychId,
     });
+    if (result.data) {
+      console.log(result.data);
+      setCheckoutData({ ...result.data.data });
+      setShowCheckoutModal(true);
+    }
   };
 
-  // Dummy reviews (stay as they are)
+  async function handleProceedPayment() {
+    try {
+      const result = await createOrder({
+        startTime: selectedSlot,
+        date: selectedDate.toISOString(),
+        psychId: psychologist!.psychId,
+      });
+
+      if (result.data) {
+        handlePayment(
+          result.data.data.providerOrderId,
+          result.data.data.amount,
+          result.data.data.sessionId
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handlePayment(
+    orderId: string,
+    amount: number,
+    sessionId: string
+  ) {
+    try {
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+      const options = {
+        key: razorpayKey,
+        amount: amount,
+        currency: "INR",
+        name: "CalmConnect",
+        description: "Therapy Session Payment",
+        order_id: orderId,
+        handler: async function (response: any) {
+          console.log("Payment successful:", response);
+          try {
+            const result = await verifyPayment({
+              providerPaymentId: response.razorpay_payment_id,
+              providerOrderId: response.razorpay_order_id,
+              signature: response.razorpay_signature,
+              sessionId,
+            });
+            if (result.data) {
+              toast(result.data.message);
+              setShowCheckoutModal(false)
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        },
+        prefill: {
+          name: "change later",
+          email: "change later",
+        },
+        theme: {
+          color: "#6366F1",
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Payment error:", err);
+    }
+  }
+
   const reviews = [
     {
       id: 1,
@@ -207,10 +287,9 @@ const PsychologistDetails: React.FC = () => {
                   availableSlots.map((slot, i) => (
                     <button
                       key={i}
-                      onClick={() =>
-                        handleSlotClick(`${slot.startTime}-${slot.endTime}`)
-                      }
-                      className="p-2 text-sm border border-border rounded-lg hover:border-primary hover:bg-primary/10 transition-colors"
+                      onClick={() => handleSlotClick(`${slot.startTime}`)}
+                      className={slot.quick===false?"p-2 text-sm border border-border rounded-lg hover:border-primary hover:bg-primary/10 transition-colors":
+                        "p-2 text-sm border border-border bg-yellow-300 hover:bg-yellow-400 rounded-lg hover:border-primary hover:bg-primary/10 transition-colors"}
                     >
                       {`${slot.startTime} - ${slot.endTime}`}
                     </button>
@@ -255,6 +334,83 @@ const PsychologistDetails: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Checkout modal */}
+
+      <Modal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        title="Checkout Data"
+      >
+        <div className="flex flex-col space-y-4 m-5">
+          {/* Checkout Info */}
+          <div className="flex flex-col space-y-2 w-full">
+            <div className="flex justify-between text-md text-foreground">
+              <span>Start Time:</span>
+              <span>
+                {checkoutData.startTime
+                  ? new Date(checkoutData.startTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex justify-between text-md text-foreground">
+              <span>End Time:</span>
+              <span>
+                {checkoutData.endTime
+                  ? new Date(checkoutData.endTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex justify-between text-md text-foreground">
+              <span>Duration:</span>
+              <span>{checkoutData.durationInMins} mins</span>
+            </div>
+            <div className="flex justify-between text-md text-foreground">
+              <span>Quick Slot:</span>
+              <span>{checkoutData.quickSlot ? "Yes" : "No"}</span>
+            </div>
+            <div className="flex justify-between text-md text-foreground">
+              <span>Fees:</span>
+              <span>₹{checkoutData.fees}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col space-y-1 w-full">
+            <label
+              htmlFor="paymentMethod"
+              className="text-sm text-gray-700 dark:text-gray-300"
+            >
+              Select Payment Method
+            </label>
+            <select
+              id="paymentMethod"
+              value={selectedPaymentMethod}
+              onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white bg-white dark:bg-gray-700"
+            >
+              <option value="razorpay">Razorpay</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setShowCheckoutModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="success" onClick={handleProceedPayment}>
+              Proceed To Payment
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
