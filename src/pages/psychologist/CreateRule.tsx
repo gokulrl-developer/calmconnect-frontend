@@ -19,13 +19,13 @@ import { toast } from "sonner";
 //import { WeekdayModel } from "../../components/Week"; // Use your weekday model
 
 const weekdays = [
-  { key: "0", label: "Monday" },
-  { key: "1", label: "Tuesday" },
-  { key: "2", label: "Wednesday" },
-  { key: "3", label: "Thursday" },
-  { key: "4", label: "Friday" },
-  { key: "5", label: "Saturday" },
-  { key: "6", label: "Sunday" },
+  { key: "0", label: "Sunday" },
+  { key: "1", label: "Monday" },
+  { key: "2", label: "Tuesday" },
+  { key: "3", label: "Wednesday" },
+  { key: "4", label: "Thursday" },
+  { key: "5", label: "Friday" },
+  { key: "6", label: "Saturday" },
 ];
 export default function CreateRule() {
   const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
@@ -45,7 +45,7 @@ export default function CreateRule() {
     quickSlots: [],
     slotsOpenTime: null,
     specialDays: [],
-    quickSlotsReleaseWindowMins: null
+    quickSlotsReleaseWindowMins: null,
   });
   const [slots, setSlots] = useState<Slot[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -332,8 +332,8 @@ export default function CreateRule() {
 
     const finalRule = {
       ...rule,
-      startDate:new Date(availabilityRule.startDate!).toISOString(),
-      endDate:new Date(availabilityRule.endDate!).toISOString(),
+      startDate: new Date(availabilityRule.startDate!).toISOString(),
+      endDate: new Date(availabilityRule.endDate!).toISOString(),
       slotsOpenTime: normalSlotOpenTime!.toISOString(),
       quickSlotsReleaseWindowMins:
         quickSlotReleaseWindow.days * 24 * 60 +
@@ -345,7 +345,6 @@ export default function CreateRule() {
       const res = await createAvailabilityRule(finalRule);
       if (res.data) {
         toast("Availability rule created successfully");
-        
       }
     } catch (error) {
       console.log(error);
@@ -445,26 +444,28 @@ export default function CreateRule() {
               slots.map((slot, idx) => (
                 <div
                   key={idx}
-                  className={
-                    slot.quick === true
-                      ? "flex bg-yellow-300 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                      : "flex bg-green-100 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                  }
+                  className={`flex items-center justify-between rounded-lg px-4 py-2 shadow-sm cursor-pointer border transition 
+        ${
+          slot.quick === true
+            ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200 dark:bg-yellow-300/20 dark:border-yellow-500"
+            : "bg-green-50 border-green-200 hover:bg-green-100 dark:bg-green-800/30 dark:border-green-600"
+        }`}
                   onClick={
                     showNormalDaySlots
                       ? () => toggleAsQuickSlot(slot.startTime)
                       : () => {}
                   }
                 >
-                  <div className="flex flex-col font-mono">
-                    <span className="text-sm font-medium text-center text-gray-700 dark:text-gray-200">
+                  {/* Slot Time */}
+                  <div className="flex flex-col font-mono flex-1">
+                    <span className="text-sm font-semibold text-center text-gray-800 dark:text-gray-200">
                       {slot.startTime} - {slot.endTime}
                     </span>
                   </div>
 
+                  {/* Delete Button (only if showWeekDaySlots) */}
                   {showWeekDaySlots && (
-                    <div className="flex gap-2">
-                      {/* Delete Slot Button */}
+                    <div className="flex items-center ml-3">
                       <button
                         type="button"
                         className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition"

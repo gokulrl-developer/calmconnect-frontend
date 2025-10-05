@@ -21,13 +21,13 @@ import Button from "../../components/UI/Button";
 import { EyeIcon } from "lucide-react";
 
 const weekdays = [
-  { key: "0", label: "Monday" },
-  { key: "1", label: "Tuesday" },
-  { key: "2", label: "Wednesday" },
-  { key: "3", label: "Thursday" },
-  { key: "4", label: "Friday" },
-  { key: "5", label: "Saturday" },
-  { key: "6", label: "Sunday" },
+  { key: "0", label: "Sunday" },
+  { key: "1", label: "Monday" },
+  { key: "2", label: "Tuesday" },
+  { key: "3", label: "Wednesday" },
+  { key: "4", label: "Thursday" },
+  { key: "5", label: "Friday" },
+  { key: "6", label: "Saturday" },
 ];
 
 export default function Availability() {
@@ -90,6 +90,7 @@ export default function Availability() {
       const dateString = renderSlots.selectedDate.toISOString();
       const result = await fetchDailyAvailability(dateString);
       if (result.data) {
+        console.log(result.data)
         setAvailableSlots(result.data.availableSlots);
       }
     } catch (error) {
@@ -268,15 +269,15 @@ export default function Availability() {
     setShowWeekDaySlots(true);
   };
 
-   function handleNormalDayClick() {
+  function handleNormalDayClick() {
     setShowWeekDaySlots(false);
     setShowNormalDaySlots(true);
   }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
-      <div className="max-w-6xl mx-auto flex flex-col align-middle gap-5">
+      <div className="max-w-6xl mx-auto flex flex-col items-center gap-5">
         {/* Availability Exceptions */}
-        <div>
+        <div className="items-center">
           <section className="glass-card p-6 animate-in w-max">
             <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-200 mb-4">
               Set Availability Exceptions
@@ -285,7 +286,7 @@ export default function Availability() {
           </section>
         </div>
         {/* Rules List */}
-        <section className="glass-card p-6 animate-in">
+        <section className="glass-card p-6 animate-in w-full">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-primary-700 dark:text-primary-200">
               Availability Rules
@@ -345,10 +346,23 @@ export default function Availability() {
               draft.showSlotsModal = false;
             })
           );
+          setAvailableSlots([]);
+          setAvailabilityRule({
+            startTime: null,
+            endTime: null,
+            startDate: null,
+            endDate: null,
+            durationInMins: null,
+            bufferTimeInMins: null,
+            quickSlots: [],
+            slotsOpenTime: null,
+            specialDays: [],
+            quickSlotsReleaseWindowMins: null,
+          });
         }}
         title="Available Slots In The Day"
       >
-        <section>
+        <section className="m-4">
           <h3 className="text-md font-semibold mb-2 text-gray-700 dark:text-gray-200">
             Slots
           </h3>
@@ -383,23 +397,26 @@ export default function Availability() {
             )}
           </section>
           <div className="flex flex-wrap justify-between">
-            {availableSlots.length > 0 &&
+            {availableSlots.length > 0 ? (
               availableSlots.map((slot, idx) => (
                 <div
                   key={idx}
-                  className={
-                    slot.quick === true
-                      ? "flex bg-yellow-300 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                      : "flex bg-green-100 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                  }
+                  className={`flex items-center justify-between rounded-lg px-4 py-2 shadow-sm border transition cursor-pointer
+        ${
+          slot.quick
+            ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200 dark:bg-yellow-300/20 dark:border-yellow-500 dark:hover:bg-yellow-300/30"
+            : "bg-green-50 border-green-200 hover:bg-green-100 dark:bg-green-800/30 dark:border-green-600 dark:hover:bg-green-800/50"
+        }`}
                 >
-                  <div className="flex flex-col font-mono">
-                    <span className="text-sm font-medium text-center text-gray-700 dark:text-gray-200">
+                  {/* Slot Time */}
+                  <div className="flex flex-col font-mono flex-1">
+                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-100 text-center">
                       {slot.startTime} - {slot.endTime}
                     </span>
                   </div>
-                  <div className="flex gap-2">
-                    {/* Delete Slot Button */}
+
+                  {/* Delete Button */}
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition"
@@ -421,7 +438,12 @@ export default function Availability() {
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div className="text-gray-500 dark:text-gray-400 italic text-sm">
+                No slots created
+              </div>
+            )}
           </div>
         </section>
       </Modal>
@@ -442,42 +464,42 @@ export default function Availability() {
             specialDays: [],
             quickSlotsReleaseWindowMins: null,
           });
-          setShowRuleModal(false)
+          setShowRuleModal(false);
         }}
         title="Availability Rule Shown as Slots"
       >
         <section>
           <section className="flex flex-row items-center">
-              {/* Button for showing  Normal day slots */}
+            {/* Button for showing  Normal day slots */}
             <button
               className="bg-violet-900 hover:bg-secondary-1000 text-white rounded-lg px-4 py-2 font-medium shadow hover:shadow-xl"
               onClick={() => handleNormalDayClick()}
             >
               NORMAL DAY SLOTS
             </button>
-           </section>
+          </section>
 
-            <div className="flex flex-wrap gap-2">
-              {weekdays.map((day, idx) => (
-                <button
-                  key={day.key}
-                  type="button"
-                  className={`flex-1 min-w-[60px] h-12 flex flex-col items-center justify-center rounded-lg font-medium border
+          <div className="flex flex-wrap gap-2">
+            {weekdays.map((day, idx) => (
+              <button
+                key={day.key}
+                type="button"
+                className={`flex-1 min-w-[60px] h-12 flex flex-col items-center justify-center rounded-lg font-medium border
           ${
             selectedWeekdays.includes(day.key)
               ? "bg-primary-500 text-white border-primary-600 shadow pulse-glow"
               : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700"
           }
           hover:scale-[1.02] transition-all duration-300`}
-                  onClick={() => handleWeekdayClick(day.key)}
-                >
-                  <span className="text-xs">{day.label}</span>
-                </button>
-              ))}
-            </div>
+                onClick={() => handleWeekdayClick(day.key)}
+              >
+                <span className="text-xs">{day.label}</span>
+              </button>
+            ))}
+          </div>
         </section>
         {/* Slots Section */}
-        <section>
+        <section className="m-5">
           <h3 className="text-md font-semibold mb-2 text-gray-700 dark:text-gray-200">
             Slots
           </h3>
@@ -490,14 +512,15 @@ export default function Availability() {
               slots.map((slot, idx) => (
                 <div
                   key={idx}
-                  className={
-                    slot.quick === true
-                      ? "flex bg-yellow-300 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                      : "flex bg-green-100 border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer"
-                  }
+                  className={`flex items-center justify-center rounded-lg px-4 py-2 shadow-sm border transition 
+        ${
+          slot.quick
+            ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200 dark:bg-yellow-300/20 dark:border-yellow-500 dark:hover:bg-yellow-300/30"
+            : "bg-green-50 border-green-200 hover:bg-green-100 dark:bg-green-800/30 dark:border-green-600 dark:hover:bg-green-800/50"
+        }`}
                 >
                   <div className="flex flex-col font-mono">
-                    <span className="text-sm font-medium text-center text-gray-700 dark:text-gray-200">
+                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                       {slot.startTime} - {slot.endTime}
                     </span>
                   </div>
