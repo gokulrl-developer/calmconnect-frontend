@@ -78,6 +78,7 @@ const PsychologistDetails: React.FC = () => {
   }, [psychId, selectedDate]);
 
   const handleSlotClick = async (slot: string) => {
+    try{
     setSelectedSlot(slot);
     const result = await fetchCheckoutData({
       startTime: slot,
@@ -85,10 +86,13 @@ const PsychologistDetails: React.FC = () => {
       psychId: psychologist!.psychId,
     });
     if (result.data) {
-      console.log(result.data);
       setCheckoutData({ ...result.data.data });
       setShowCheckoutModal(true);
     }
+  }catch(error){
+    console.log(error)
+
+  }
   };
 
   async function handleProceedPayment() {

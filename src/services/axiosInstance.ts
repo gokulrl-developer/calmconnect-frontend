@@ -40,7 +40,7 @@ export function setupAxiosInterceptors(logoutCallback: () => Promise<any>) {
             handleApiError(logoutError);
           }
       }
-
+     handleApiError(error)
       return Promise.reject(error);
     }
   );

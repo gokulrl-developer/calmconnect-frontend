@@ -13,6 +13,7 @@ import {
 import type { PsychItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
+import { DataTable, type Column } from "../../components/UI/Table";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
@@ -22,20 +23,22 @@ const Psychologists: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
-    currentStatus: 'active' | 'inactive' | null;
+    currentStatus: "active" | "inactive" | null;
     psychId: string | null;
   }>({
     isOpen: false,
     currentStatus: null,
-    psychId: null
+    psychId: null,
   });
 
-  const openConfirmationModal = (psychId:string,currentStatus:"active"|"inactive") => {
-
+  const openConfirmationModal = (
+    psychId: string,
+    currentStatus: "active" | "inactive"
+  ) => {
     setConfirmationModal({
       isOpen: true,
       currentStatus,
-      psychId
+      psychId,
     });
   };
 
@@ -43,10 +46,9 @@ const Psychologists: React.FC = () => {
     setConfirmationModal({
       isOpen: false,
       currentStatus: null,
-      psychId: null
+      psychId: null,
     });
   };
-
 
   const loadPsychs = async () => {
     try {
@@ -65,15 +67,12 @@ const Psychologists: React.FC = () => {
   }, [page]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = async () => {
-    await loadPsychs(); 
+  const handleView = async (psychId: string) => {
+    await loadPsychs();
   };
 
   /* ------------ ACTIVATE/DEACTIVATE BUTTON ------------ */
-  const handleStatusToggle = async (
-    psychId: string,
-    currentStatus: string
-  ) => {
+  const handleStatusToggle = async (psychId: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     try {
       await updatePsychologistStatus(
@@ -109,6 +108,64 @@ const Psychologists: React.FC = () => {
       filterStatus === "all" || psych.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  
+  const columns: Column<PsychItem>[] = [
+    {
+      key: "name",
+      header: "Psychologist",
+      render: (psych) => (
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <AcademicCapIcon className="w-5 h-5 text-white" />
+          </div>
+          <p className="font-medium text-gray-800 dark:text-white">
+            {psych.firstName} {psych.lastName}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "email",
+      header: "Email",
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (psych) => (
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+            psych.status
+          )}`}
+        >
+          {psych.status.charAt(0).toUpperCase() + psych.status.slice(1)}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (psych) => (
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleView(psych.id)}
+          >
+            <EyeIcon className="w-4 h-4 mr-1" />
+            View
+          </Button>
+          <Button
+            variant={psych.status === "active" ? "warning" : "success"}
+            size="sm"
+            onClick={() => openConfirmationModal(psych.id, psych.status)}
+          >
+            {psych.status === "active" ? "Deactivate" : "Activate"}
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -153,79 +210,11 @@ const Psychologists: React.FC = () => {
               Loading...
             </p>
           ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Psychologist
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Email
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Status
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPsychs.map((psych) => (
-                  <tr
-                    key={psych.id}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <AcademicCapIcon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-800 dark:text-white">
-                            {psych.firstName} {psych.lastName}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-gray-800 dark:text-white">
-                      {psych.email}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          psych.status
-                        )}`}
-                      >
-                        {psych.status.charAt(0).toUpperCase() +
-                          psych.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center space-x-2">
-                        <Button variant="secondary" size="sm" onClick={handleView}>
-                          <EyeIcon className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          variant={
-                            psych.status === "active" ? "warning" : "success"
-                          }
-                          size="sm"
-                          onClick={() =>
-                            openConfirmationModal(psych.id,psych.status)
-                          }
-                        >
-                          {psych.status === "active"
-                            ? "Deactivate"
-                            : "Activate"}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <DataTable
+              data={filteredPsychs}
+              columns={columns}
+              rowKey={(psych) => psych.id}
+            />
           )}
         </div>
 
@@ -252,39 +241,52 @@ const Psychologists: React.FC = () => {
         </div>
       </Card>
 
-           {/* Confirmation Modal */}
-        <Modal
-          isOpen={confirmationModal.isOpen}
-          onClose={closeConfirmationModal}
-          title={`${confirmationModal.currentStatus === 'active' ? 'Deactivate' : 'Activate'} Psychologist`}
-        >
-          <div className="space-y-4 p-3">
-            <div className="flex items-center space-x-3">
-              <div>
-                <h4 className="text-lg font-semibold text-gray-800">
-                    Are you sure you want to {confirmationModal.currentStatus==='active'?'Deactivate':'Activate'} this Psychologist? <br/>
-               </h4>
-              
-              </div>
-            </div>
-            <div className="flex justify-end space-x-3 pt-4">
-              <Button
-                variant="secondary"
-                onClick={closeConfirmationModal}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant={confirmationModal.currentStatus === 'inactive' ? 'success' : 'danger'}
-                onClick={()=>{
-                  handleStatusToggle(confirmationModal.psychId!,confirmationModal.currentStatus!);
-                }}
-              >
-                {confirmationModal.currentStatus === 'active' ? 'Deactivate Psychologist' : 'Activate Psychologist'}
-              </Button>
+      {/* Confirmation Modal */}
+      <Modal
+        isOpen={confirmationModal.isOpen}
+        onClose={closeConfirmationModal}
+        title={`${
+          confirmationModal.currentStatus === "active"
+            ? "Deactivate"
+            : "Activate"
+        } Psychologist`}
+      >
+        <div className="space-y-4 p-3">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                Are you sure you want to{" "}
+                {confirmationModal.currentStatus === "active"
+                  ? "Deactivate"
+                  : "Activate"}{" "}
+                this Psychologist? <br />
+              </h4>
             </div>
           </div>
-        </Modal>
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button variant="secondary" onClick={closeConfirmationModal}>
+              Cancel
+            </Button>
+            <Button
+              variant={
+                confirmationModal.currentStatus === "inactive"
+                  ? "success"
+                  : "danger"
+              }
+              onClick={() => {
+                handleStatusToggle(
+                  confirmationModal.psychId!,
+                  confirmationModal.currentStatus!
+                );
+              }}
+            >
+              {confirmationModal.currentStatus === "active"
+                ? "Deactivate Psychologist"
+                : "Activate Psychologist"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

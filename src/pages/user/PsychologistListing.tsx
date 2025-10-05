@@ -60,17 +60,7 @@ const BookSession: React.FC = () => {
 
   const handlePsychologistClick = async (psychologistId: string) => {
     navigate(`/user/psychologist-details?psychId=${psychologistId}`)
-   /*  try{
-    const params=new URLSearchParams();
-    params.append("date",new Date().toISOString());
-    params.append("psychId",psychologistId);
-    const result=await fetchPsychologistDetails(params.toString());
-    if(result.data){
-     
-    }
-  }catch(error){
-    console.log("error fetching psych details",error)
-  } */
+   
   };
 
   // Specializations, genders, languages can stay the same
