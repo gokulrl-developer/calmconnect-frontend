@@ -19,7 +19,6 @@ import PsychologistLayout from "./components/PsychologistLayout";
 import PsychologistDashboard from "./pages/psychologist/Dashboard";
 import PsychologistApplication from "./pages/psychologist/Application";
 import Availability from "./pages/psychologist/Availability";
-import CreateRule from "./pages/psychologist/CreateRule";
 import PsychologistProfile from "./pages/psychologist/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -31,6 +30,7 @@ import GoogleCallback from "./pages/GoogleCallBack";
 import Unauthorised from "./pages/Unauthorised";
 import ForgotPassword from "./pages/ForgotPassword";
 import UserProfile from "./pages/user/Profile";
+import DailyAvailability from "./pages/psychologist/DailyAvailability";
 
 function AppRoutes() {
   return (
@@ -95,7 +95,7 @@ function AppRoutes() {
           <Route element={<PsychologistLayout />}>
             <Route path="/psychologist/dashboard" element={<PsychologistDashboard />} />
             <Route path="/psychologist/availability" element={<Availability />} />
-            <Route path="/psychologist/create-rule" element={<CreateRule />} />
+            <Route path="/psychologist/daily-availability" element={<DailyAvailability />} />
             <Route path="/psychologist/profile" element={<PsychologistProfile />} />
           </Route>
         </Route>
