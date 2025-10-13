@@ -1,5 +1,4 @@
-import type { PsychProfile } from "../types/api/psychologist.types";
-import type { AvailabilityRule, AvailabilityRuleSummary, Slot } from "../types/domain/AvailabiliityRule.types";
+import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile } from "../types/api/psychologist.types";
 import axiosInstance from "./axiosInstance";
 
 interface IApplicationResponse {
@@ -24,22 +23,7 @@ interface DashboardData{
   }
 }
 
-interface DailyAvailability{
-  availableSlots:Slot[]
-}
 
-interface AvailabilityRuleCreateResponse{
-  message:string
-}
-
-interface MarkHolidayRequest{
-  availableSlots:string[],
-  date:string
-}
-
-interface RulesListResponse{
-  summaries:AvailabilityRuleSummary[]
-}
 
 export const fetchApplication = () =>
   axiosInstance
@@ -53,37 +37,7 @@ export const psychologistApply = (formData: FormData) =>
   axiosInstance
     .post<IApplicationResponse>("/psychologist/apply", formData)
     .then((res) => res);
-export const createAvailabilityRule=(rule:AvailabilityRule)=>
-  axiosInstance
-  .post<AvailabilityRuleCreateResponse>("/psychologist/availabilityRule",rule)
-  .then((res)=>res);
-export const fetchDailyAvailability=(date:string)=>
-  axiosInstance
-  .get<DailyAvailability>(`/psychologist/daily-availability?date=${date}`)
-  .then((res)=>res);
-  export const deleteHoliday=(date:string)=>
-    axiosInstance
-  .delete<{message:string}>(`/psychologist/holiday?date=${date}`)
-  .then((res)=>res)
-  export const deleteRule=(ruleId:string)=>
-    axiosInstance
-  .delete<{message:string}>(`/psychologist/availabilityRule/${ruleId}`)
-  .then((res)=>res)
-  export const markHoliday=(holiday:MarkHolidayRequest)=>
-    axiosInstance
-  .post<{message:string}>(`/psychologist/holiday`,{...holiday})
-  .then((res)=>res)
 
-  export const fetchAvailabilityRuleSummaries=()=>
-    axiosInstance
-  .get<RulesListResponse>("/psychologist/availabilityRules")
-  .then((res)=>res)
-
-  export const fetchAvailabilityRuleDetails=(ruleId:string)=>
-    axiosInstance
-  .get<{availabilityRule:AvailabilityRule}>(`/psychologist/availabilityRule/${ruleId}`)
-  .then((res)=>res)
-  
   export const fetchPsychProfile=()=>
     axiosInstance
   .get<PsychProfile>(`/psychologist/profile`)
@@ -96,3 +50,54 @@ export const fetchDailyAvailability=(date:string)=>
         "Content-Type": "multipart/form-data",
       }})
   .then((res)=>res)
+
+export const createAvailabilityRuleAPI = (data: CreateAvailabilityRulePayload) =>
+  axiosInstance.post<MessageResponse>("/psychologist/availability-rule", data)
+    .then(res => res);
+
+export const editAvailabilityRuleAPI = (availabilityRuleId: string, data: EditAvailabilityRulePayload) =>
+  axiosInstance.patch<MessageResponse>(`/psychologist/availability-rule/${availabilityRuleId}`, data)
+    .then(res => res);
+
+export const deleteAvailabilityRuleAPI = (availabilityRuleId: string) =>
+  axiosInstance.delete<MessageResponse>(`/psychologist/availability-rule/${availabilityRuleId}`)
+    .then(res => res);
+
+export const fetchAvailabilityRuleAPI = (availabilityRuleId: string) =>
+  axiosInstance.get<{ availabilityRule: AvailabilityRuleDetails }>(`/psychologist/availability-rule?availabilityRuleId=${availabilityRuleId}`)
+    .then(res => res);
+
+export const listAvailabilityRules = () =>
+  axiosInstance.get<{ summaries: AvailabilityRuleSummary[] }>("/psychologist/availability-rules")
+    .then(res => res);
+
+// ---------- Special Days ----------
+export const createSpecialDay = (data: CreateSpecialDayPayload) =>
+  axiosInstance.post<MessageResponse>("/psychologist/special-day", data)
+    .then(res => res);
+
+export const editSpecialDay = (specialDayId: string, data: EditSpecialDayPayload) =>
+  axiosInstance.patch<MessageResponse>(`/psychologist/special-day/${specialDayId}`, data)
+    .then(res => res);
+
+export const deleteSpecialDay = (specialDayId: string) =>
+  axiosInstance.delete<MessageResponse>(`/psychologist/special-day/${specialDayId}`)
+    .then(res => res);
+
+// ---------- Quick Slots ----------
+export const createQuickSlotAPI = (data: CreateQuickSlotPayload) =>
+  axiosInstance.post<MessageResponse>("/psychologist/quick-slot", data)
+    .then(res => res);
+
+export const editQuickSlotAPI = (quickSlotId: string, data: EditQuickSlotPayload) =>
+  axiosInstance.patch<MessageResponse>(`/psychologist/quick-slot/${quickSlotId}`, data)
+    .then(res => res);
+
+export const deleteQuickSlotAPI = (quickSlotId: string) =>
+  axiosInstance.delete<MessageResponse>(`/psychologist/quick-slot/${quickSlotId}`)
+    .then(res => res);
+
+// ---------- Daily Availability ----------
+export const fetchDailyAvailabilityAPI = (data: FetchDailyAvailabilityPayload) =>
+  axiosInstance.get<DailyAvailability>("/psychologist/daily-availability", { params: data })
+    .then(res => res);
