@@ -12,7 +12,6 @@ profile: {
     bio?: string;
     qualifications?: string;
     hourlyFees?: number;
-    quickSlotHourlyFees?: number;
   }
 }
 

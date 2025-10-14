@@ -7,13 +7,21 @@ import {
   updatePsychProfile,
 } from "../../services/psychologistService";
 import { toast } from "sonner";
-import type { PsychProfile } from "../../types/components/psychologist.types";
+import type {
+  ProfileErrors,
+  PsychProfile,
+} from "../../types/components/psychologist.types"; 
 
 const PsychologistProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<PsychProfile["profile"]>(
     {} as PsychProfile["profile"]
   );
+  const [originalProfile, setOriginalProfile] = useState<
+    PsychProfile["profile"] | null
+  >(null); 
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [errors, setErrors] = useState<ProfileErrors>({}); 
 
   useEffect(() => {
     fetchProfile();
@@ -23,13 +31,30 @@ const PsychologistProfile: React.FC = () => {
     try {
       const result = await fetchPsychProfile();
       if (result.data) {
-        console.log(result.data);
         setProfile(result.data.profile);
+        setOriginalProfile(result.data.profile); 
+        if (result.data.profile.profilePicture)
+          setPreviewUrl(result.data.profile.profilePicture);
       }
     } catch (error) {
       console.log(error);
     }
   }
+
+  useEffect(() => {
+    if (profile?.profilePicture && profile.profilePicture instanceof File) {
+      const url = URL.createObjectURL(profile.profilePicture);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else if (
+      profile?.profilePicture &&
+      typeof profile.profilePicture === "string"
+    ) {
+      setPreviewUrl(profile.profilePicture);
+    } else {
+      setPreviewUrl("");
+    }
+  }, [profile?.profilePicture]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,34 +75,91 @@ const PsychologistProfile: React.FC = () => {
     }
   };
 
+  const validateProfile = (data: PsychProfile["profile"]) => {
+    const newErrors: ProfileErrors = {};
+
+    
+    if (data.gender && !["male", "female", "others"].includes(data.gender))
+      newErrors.gender = "Invalid gender selected.";
+
+    if (data.dob) {
+      const date = new Date(data.dob);
+      if (isNaN(date.getTime())) newErrors.dob = "Invalid date format.";
+      else if (date > new Date())
+        newErrors.dob = "Date of birth cannot be in the future.";
+    }
+
+    if (!data.address?.trim())
+      newErrors.address = "Address is required.";
+
+    if (!data.languages?.trim())
+      newErrors.languages = "Languages field is required.";
+
+    if (
+      !data.specializations ||
+      !Array.isArray(data.specializations) ||
+      data.specializations.length === 0
+    )
+      newErrors.specializations = "At least one specialization is required.";
+
+    if (!data.qualifications?.trim())
+      newErrors.qualifications = "Qualifications are required.";
+
+    if (!data.hourlyFees || data.hourlyFees <= 0)
+      newErrors.hourlyFees = "Hourly fees must be greater than zero.";
+    if (!data.bio?.trim())
+      newErrors.bio = "Bio cannot be empty.";
+
+    return newErrors;
+  };
+
   const handleSave = async () => {
+    if (!profile || !originalProfile) return;
+
+    const validationErrors = validateProfile(profile);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     try {
       const formData = new FormData();
 
-      if (profile.profilePicture) {
-        formData.append("profilePicture", profile.profilePicture);
+      const changedFields = Object.keys(profile).filter((key) => {
+        const field = key as keyof PsychProfile["profile"];
+        const current = profile[field];
+        const original = originalProfile[field];
+
+        if (current instanceof File || original instanceof File)
+          return current !== original;
+
+        return JSON.stringify(current) !== JSON.stringify(original);
+      });
+
+      if (changedFields.length === 0) {
+        toast("No changes detected.");
+        setIsEditing(false);
+        return;
       }
-      if (profile.address) formData.append("address", profile.address);
-      if (profile.languages) formData.append("languages", profile.languages);
-      if (profile.specializations)
-        formData.append(
-          "specializations",
-          JSON.stringify(profile.specializations)
-        );
-      if (profile.bio) formData.append("bio", profile.bio);
-      if (profile.hourlyFees !== undefined)
-        formData.append("hourlyFees", profile.hourlyFees.toString());
-      if (profile.quickSlotHourlyFees !== undefined)
-        formData.append(
-          "quickSlotHourlyFees",
-          profile.quickSlotHourlyFees.toString()
-        );
-      if (profile.qualifications)
-        formData.append("qualifications", profile.qualifications);
+
+      changedFields.forEach((field) => {
+        const key = field as keyof PsychProfile["profile"];
+        const value = profile[key];
+        if (key === "dob" && value)
+          formData.append("dob", new Date(value as string).toISOString());
+        else if (value !== undefined && value !== null)
+          formData.append(
+            key,
+            key === "specializations" && Array.isArray(value)
+              ? JSON.stringify(value)
+              : (value as any)
+          );
+      });
+
       const result = await updatePsychProfile(formData);
       if (result.data) {
-        setIsEditing(false);
         toast(result.data.message);
+        setIsEditing(false);
         fetchProfile();
       }
     } catch (error) {
@@ -85,24 +167,21 @@ const PsychologistProfile: React.FC = () => {
     }
   };
 
+  if (!profile) return <p>Loading...</p>;
+
   return (
     <div className="space-y-6">
       <Card className="p-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center relative">
-          {profile?.profilePicture ? (
+          {previewUrl ? (
             <img
-              src={
-                typeof profile.profilePicture === "string"
-                  ? profile.profilePicture
-                  : URL.createObjectURL(profile.profilePicture)
-              }
+              src={previewUrl}
               alt="Profile"
               className="w-full h-full object-cover"
             />
           ) : (
             <UserIcon className="w-16 h-16 text-gray-400" />
           )}
-
           {isEditing && (
             <input
               type="file"
@@ -115,10 +194,11 @@ const PsychologistProfile: React.FC = () => {
         </div>
 
         <div className="flex-1 space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-              {profile?.firstName} {profile?.lastName}
-            </h2>
+          <div className="flex items-center justify-between">           
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                {profile.firstName} {profile.lastName}
+              </h2>
+
             <Button
               variant="primary"
               size="sm"
@@ -127,24 +207,27 @@ const PsychologistProfile: React.FC = () => {
               {isEditing ? "Save" : "Edit"}
             </Button>
           </div>
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {profile?.email}
+            {profile.email}
           </p>
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {profile?.gender
-              ? profile?.gender.charAt(0).toUpperCase() +
-                profile?.gender.slice(1)
+            {profile.gender
+              ? profile.gender.charAt(0).toUpperCase() +
+                profile.gender.slice(1)
               : "Gender not specified"}
           </p>
+
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {profile?.dob
-              ? new Date(profile?.dob).toLocaleDateString()
+            {profile.dob
+              ? new Date(profile.dob).toLocaleDateString()
               : "Date of Birth not specified"}
           </p>
         </div>
       </Card>
 
-      {/* Profile details (same as before) */}
+      {/* Profile Details Section */}
       <Card className="p-6 space-y-4">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           Profile Details
@@ -156,16 +239,21 @@ const PsychologistProfile: React.FC = () => {
               Address
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                name="address"
-                value={profile?.address || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="text"
+                  name="address"
+                  value={profile.address || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm"
+                />
+                {errors.address && (
+                  <p className="text-red-500 text-sm">{errors.address}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.address || "-"}
+                {profile.address || "-"}
               </p>
             )}
           </div>
@@ -176,16 +264,21 @@ const PsychologistProfile: React.FC = () => {
               Languages
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                name="languages"
-                value={profile?.languages || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="text"
+                  name="languages"
+                  value={profile.languages || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm"
+                />
+                {errors.languages && (
+                  <p className="text-red-500 text-sm">{errors.languages}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.languages || "-"}
+                {profile.languages || "-"}
               </p>
             )}
           </div>
@@ -196,23 +289,30 @@ const PsychologistProfile: React.FC = () => {
               Specializations
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                name="specializations"
-                value={profile?.specializations?.join(", ") || ""}
-                onChange={(e) =>
-                  setProfile((prev) => ({
-                    ...prev,
-                    specializations: e.target.value
-                      .split(",")
-                      .map((s) => s.trim()),
-                  }))
-                }
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="text"
+                  name="specializations"
+                  value={profile.specializations?.join(", ") || ""}
+                  onChange={(e) =>
+                    setProfile((prev) => ({
+                      ...prev,
+                      specializations: e.target.value
+                        .split(",")
+                        .map((s) => s.trim()),
+                    }))
+                  }
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm"
+                />
+                {errors.specializations && (
+                  <p className="text-red-500 text-sm">
+                    {errors.specializations}
+                  </p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.specializations?.join(", ") || "-"}
+                {profile.specializations?.join(", ") || "-"}
               </p>
             )}
           </div>
@@ -223,16 +323,23 @@ const PsychologistProfile: React.FC = () => {
               Qualifications
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                name="qualifications"
-                value={profile?.qualifications || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="text"
+                  name="qualifications"
+                  value={profile.qualifications || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm"
+                />
+                {errors.qualifications && (
+                  <p className="text-red-500 text-sm">
+                    {errors.qualifications}
+                  </p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.qualifications || "-"}
+                {profile.qualifications || "-"}
               </p>
             )}
           </div>
@@ -243,38 +350,21 @@ const PsychologistProfile: React.FC = () => {
               Hourly Fees
             </label>
             {isEditing ? (
-              <input
-                type="number"
-                name="hourlyFees"
-                value={profile?.hourlyFees || 0}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="number"
+                  name="hourlyFees"
+                  value={profile.hourlyFees || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm"
+                />
+                {errors.hourlyFees && (
+                  <p className="text-red-500 text-sm">{errors.hourlyFees}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.hourlyFees ? `$${profile?.hourlyFees}` : "-"}
-              </p>
-            )}
-          </div>
-
-          {/* Quick Slot Fees */}
-          <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Quick Slot Fees
-            </label>
-            {isEditing ? (
-              <input
-                type="number"
-                name="quickSlotHourlyFees"
-                value={profile?.quickSlotHourlyFees || 0}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
-            ) : (
-              <p className="text-gray-800 dark:text-white">
-                {profile?.quickSlotHourlyFees
-                  ? `$${profile?.quickSlotHourlyFees}`
-                  : "-"}
+                {profile.hourlyFees ? `$${profile.hourlyFees}` : "-"}
               </p>
             )}
           </div>
@@ -285,16 +375,21 @@ const PsychologistProfile: React.FC = () => {
               Bio
             </label>
             {isEditing ? (
-              <textarea
-                name="bio"
-                value={profile?.bio || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm resize-none"
-                rows={4}
-              />
+              <>
+                <textarea
+                  name="bio"
+                  value={profile.bio || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border text-gray-800 dark:text-white text-sm resize-none"
+                  rows={4}
+                />
+                {errors.bio && (
+                  <p className="text-red-500 text-sm">{errors.bio}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile?.bio || "-"}
+                {profile.bio || "-"}
               </p>
             )}
           </div>

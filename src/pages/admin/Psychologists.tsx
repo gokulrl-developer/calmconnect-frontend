@@ -13,6 +13,7 @@ import {
 import type { PsychItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
+import { useNavigate } from "react-router-dom";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
@@ -30,6 +31,7 @@ const Psychologists: React.FC = () => {
     psychId: null
   });
 
+  const navigate=useNavigate();
   const openConfirmationModal = (psychId:string,currentStatus:"active"|"inactive") => {
 
     setConfirmationModal({
@@ -65,8 +67,8 @@ const Psychologists: React.FC = () => {
   }, [page]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = async () => {
-    await loadPsychs(); 
+  const handleView = (id:string) => {
+    navigate(`/admin/psychologist-details/${id}`);
   };
 
   /* ------------ ACTIVATE/DEACTIVATE BUTTON ------------ */
@@ -203,7 +205,7 @@ const Psychologists: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center space-x-2">
-                        <Button variant="secondary" size="sm" onClick={handleView}>
+                        <Button variant="secondary" size="sm" onClick={()=>handleView(psych.id)}>
                           <EyeIcon className="w-4 h-4 mr-1" />
                           View
                         </Button>

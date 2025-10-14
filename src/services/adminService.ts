@@ -1,3 +1,4 @@
+import type { AdminPsychDetailsResponse, AdminUserDetailsResponse } from "../types/api/admin.types";
 import axiosInstance from "./axiosInstance";
 
 export interface ApplicationItem {
@@ -121,3 +122,13 @@ export const updatePsychologistStatus = (
   axiosInstance
     .patch<IPsychResponse>(`/admin/psychologist/${psychId}`, { status })
     .then(res => res.data);
+
+export const fetchPsychDetailsByAdminAPI = (psychId: string) =>
+  axiosInstance
+    .get<{data:AdminPsychDetailsResponse}>(`/admin/psychologist-details/${psychId}`)
+    .then(res => res);
+
+export const fetchUserDetailsByAdminAPI = (userId: string) =>
+  axiosInstance
+    .get<{data:AdminUserDetailsResponse}>(`/admin/user-details/${userId}`)
+    .then(res => res);

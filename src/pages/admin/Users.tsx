@@ -5,6 +5,7 @@ import Button from "../../components/UI/Button";
 import { fetchUsers, updateUserStatus } from "../../services/adminService";
 import type { UserItem } from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
+import { useNavigate } from "react-router-dom";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
@@ -12,6 +13,7 @@ const Users: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const navigate=useNavigate();
 const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
     currentStatus: 'active' | 'inactive' | null;
@@ -57,8 +59,8 @@ const [confirmationModal, setConfirmationModal] = useState<{
   }, [page]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = async () => {
-    await loadUsers();
+  const handleView = (userId:string) => {
+    navigate(`/admin/user-details/${userId}`);
   };
 
   /* ------------ ACTIVATE/DEACTIVATE BUTTON ------------ */
@@ -175,7 +177,7 @@ const [confirmationModal, setConfirmationModal] = useState<{
                         <Button
                           variant="secondary"
                           size="sm"
-                          onClick={handleView}
+                          onClick={()=>handleView(user.id)}
                         >
                           <EyeIcon className="w-4 h-4 mr-1" />
                           View
