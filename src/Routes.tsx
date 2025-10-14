@@ -75,9 +75,9 @@ function AppRoutes() {
             <Route path="/admin/applications" element={<AdminApplications />} />
             <Route path="/admin/application-details/:applicationId" element={<AdminApplicationDetails />} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/user-details" element={<AdminUserDetails />} />
+            <Route path="/admin/user-details/:userId" element={<AdminUserDetails />} />
             <Route path="/admin/psychologists" element={<AdminPsychologists />} />
-            <Route path="/admin/psychologist-details" element={<AdminPsychologistDetails />} />
+            <Route path="/admin/psychologist-details/:psychId" element={<AdminPsychologistDetails />} />
           </Route>
         </Route>
 

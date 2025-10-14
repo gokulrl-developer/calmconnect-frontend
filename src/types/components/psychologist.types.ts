@@ -14,7 +14,6 @@ profile: {
     bio?: string;
     qualifications?: string;
     hourlyFees?: number;
-    quickSlotHourlyFees?: number;
   }
 }
 
@@ -65,3 +64,17 @@ export interface RenderedQuickSlot{
   quickSlotId:string,
   slots:Slot[]
 }
+
+export interface ProfileErrors{
+    firstName?: string;
+    lastName?: string;
+    gender?: string;
+    dob?: string;
+    profilePicture?: string;
+    address?: string;
+    languages?: string;
+    specializations?: string;
+    bio?: string;
+    qualifications?: string;
+    hourlyFees?: string;
+  }
