@@ -21,7 +21,6 @@ export interface PsychDetails {
   qualifications: string;
   profilePicture: string;
   hourlyFees: number;
-  quickSlotFees: number;
 }
 
 export interface UserProfile {
@@ -53,7 +52,8 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
- data:{ providerOrderId: string;
+ data:{ 
+  providerOrderId: string;
   amount: number;
   sessionId: string;
  }
