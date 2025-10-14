@@ -13,14 +13,10 @@ import {
 import Modal from "../../components/UI/Modal";
 import type { CheckoutData } from "../../types/components/user.types";
 import { toast } from "sonner";
+import type { Slot } from "../../types/domain/AvailabiliityRule.types";
 declare var Razorpay: any;
 
-// Backend DTO
-export interface Slot {
-  startTime: string;
-  endTime: string;
-  quick: boolean;
-}
+
 
 export interface PsychDetails {
   availableSlots: Slot[];
@@ -32,7 +28,6 @@ export interface PsychDetails {
   qualifications: string;
   profilePicture: string;
   hourlyFees: number;
-  quickSlotFees: number;
 }
 
 const PsychologistDetails: React.FC = () => {
@@ -69,6 +64,7 @@ const PsychologistDetails: React.FC = () => {
         setPsychologist(psychInfo);
       }
     } catch (error) {
+      setAvailableSlots([])
       console.error("Error fetching psychologist details:", error);
     }
   };
@@ -85,7 +81,6 @@ const PsychologistDetails: React.FC = () => {
       psychId: psychologist!.psychId,
     });
     if (result.data) {
-      console.log(result.data);
       setCheckoutData({ ...result.data.data });
       setShowCheckoutModal(true);
     }
@@ -126,7 +121,6 @@ const PsychologistDetails: React.FC = () => {
         description: "Therapy Session Payment",
         order_id: orderId,
         handler: async function (response: any) {
-          console.log("Payment successful:", response);
           try {
             const result = await verifyPayment({
               providerPaymentId: response.razorpay_payment_id,
@@ -136,7 +130,8 @@ const PsychologistDetails: React.FC = () => {
             });
             if (result.data) {
               toast(result.data.message);
-              setShowCheckoutModal(false)
+              setShowCheckoutModal(false);
+              fetchPsychologistDetails(selectedDate);
             }
           } catch (error) {
             console.log(error);
@@ -246,10 +241,6 @@ const PsychologistDetails: React.FC = () => {
                     <span className="font-medium">Hourly Fees: </span>₹
                     {psychologist.hourlyFees}
                   </p>
-                  <p className="text-foreground">
-                    <span className="font-medium">Quick Slot Fees: </span>₹
-                    {psychologist.quickSlotFees}
-                  </p>
                 </div>
               </div>
             </div>
@@ -288,8 +279,7 @@ const PsychologistDetails: React.FC = () => {
                     <button
                       key={i}
                       onClick={() => handleSlotClick(`${slot.startTime}`)}
-                      className={slot.quick===false?"p-2 text-sm border border-border rounded-lg hover:border-primary hover:bg-primary/10 transition-colors":
-                        "p-2 text-sm border border-border bg-yellow-300 hover:bg-yellow-400 rounded-lg hover:border-primary hover:bg-primary/10 transition-colors"}
+                      className="p-2 text-sm border border-border rounded-lg hover:border-primary hover:bg-primary/10 transition-colors"
                     >
                       {`${slot.startTime} - ${slot.endTime}`}
                     </button>
@@ -370,10 +360,6 @@ const PsychologistDetails: React.FC = () => {
             <div className="flex justify-between text-md text-foreground">
               <span>Duration:</span>
               <span>{checkoutData.durationInMins} mins</span>
-            </div>
-            <div className="flex justify-between text-md text-foreground">
-              <span>Quick Slot:</span>
-              <span>{checkoutData.quickSlot ? "Yes" : "No"}</span>
             </div>
             <div className="flex justify-between text-md text-foreground">
               <span>Fees:</span>

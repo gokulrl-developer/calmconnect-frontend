@@ -16,6 +16,5 @@ export interface CheckoutData {
   startTime: string;
   endTime: string;
   durationInMins: number;
-  quickSlot: boolean;
   fees: number;
 }
