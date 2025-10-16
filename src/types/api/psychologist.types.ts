@@ -1,3 +1,5 @@
+import type paginationData from "../pagination.types";
+
 export interface PsychProfile{
 profile: {
     firstName: string;
@@ -118,4 +120,36 @@ export interface EditQuickSlotPayload {
 
 export interface FetchDailyAvailabilityPayload {
   date: string; // ISO date
+}
+
+export interface SessionListingPsychItem {
+  userFullName: string;
+  userEmail:string;
+  startTime: Date;
+  endTime:Date;
+  durationInMins: number;
+  status: "scheduled"|"completed"|"cancelled"|"available"|"pending";
+  fees: number;
+  sessionId: string;
+}
+
+export interface SessionListingResponse{
+  sessions:SessionListingPsychItem[],
+  paginationData:paginationData
+}
+
+export interface RejectedApplication{
+  submittedAt: Date;
+  phone: string;
+  gender: "male" | "female" | "others";
+  dob: Date;
+  profilePicture: string;
+  address: string;
+  languages: string;
+  specializations: string[];
+  bio: string;
+  license: string;
+  resume: string;
+  qualifications: string;
+  reason:string;
 }

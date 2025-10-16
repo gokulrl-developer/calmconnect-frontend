@@ -1,3 +1,5 @@
+import type paginationData from "../pagination.types";
+
 export interface AdminPsychDetailsResponse {
   firstName: string;
   lastName: string;
@@ -27,4 +29,22 @@ export interface AdminUserDetailsResponse {
   dob?: Date;
   profilePicture?: string;
   address?: string;
+}
+
+export interface SessionListingAdminItem {
+  userFullName: string;
+  psychFullName: string;
+  userEmail:string,
+  psychEmail:string,
+  startTime: Date;
+  endTime:Date;
+  durationInMins: number;
+  status: "scheduled"|"completed"|"cancelled"|"available"|"pending";
+  fees: number;
+  sessionId: string;
+}
+
+export interface SessionListingAdminResponse {
+  sessions:SessionListingAdminItem[],
+  paginationData:paginationData
 }

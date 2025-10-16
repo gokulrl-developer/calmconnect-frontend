@@ -55,7 +55,7 @@ const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/psychologist/dashboard' },
-    { icon: Calendar, label: 'Sessions', path: '/psychologist/dashboard' },
+    { icon: Calendar, label: 'Sessions', path: '/psychologist/sessions' },
     { icon: Users, label: 'Patients', path: '/psychologist/dashboard' },
     { icon: Clock, label: 'Availability', path: '/psychologist/availability' },
     { icon: AlertCircle, label: 'Raise Complaint', path: '/psychologist/dashboard' },

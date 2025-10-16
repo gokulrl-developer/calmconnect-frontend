@@ -1,4 +1,4 @@
-import type { AdminPsychDetailsResponse, AdminUserDetailsResponse } from "../types/api/admin.types";
+import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, SessionListingAdminResponse } from "../types/api/admin.types";
 import axiosInstance from "./axiosInstance";
 
 export interface ApplicationItem {
@@ -131,4 +131,9 @@ export const fetchPsychDetailsByAdminAPI = (psychId: string) =>
 export const fetchUserDetailsByAdminAPI = (userId: string) =>
   axiosInstance
     .get<{data:AdminUserDetailsResponse}>(`/admin/user-details/${userId}`)
+    .then(res => res);
+
+export const fetchSessionListingByAdminAPI = (params:string) =>
+  axiosInstance
+    .get<SessionListingAdminResponse>(`/admin/sessions/${params}`)
     .then(res => res);
