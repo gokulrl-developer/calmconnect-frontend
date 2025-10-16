@@ -1,3 +1,4 @@
+import type { MessageResponse } from "../types/api/psychologist.types";
 import type {
   CheckoutDataResponse,
   CreateOrderRequest,
@@ -5,6 +6,7 @@ import type {
   FetchCheckoutRequest,
   ListPsychSummary,
   PsychDetails,
+  SessionListingUserResponse,
   UserProfile,
   VerifyPaymentPayload,
   VerifyPaymentResponse,
@@ -66,3 +68,13 @@ export const verifyPayment = (data: VerifyPaymentPayload) => {
     .post<VerifyPaymentResponse>(`/user/verify-payment`,data)
     .then((res) => res);
 };
+
+export const fetchSessionsByUserAPI = (params:string) =>
+  axiosInstance
+    .get<SessionListingUserResponse>(`/user/sessions/${params}`)
+    .then(res => res);
+
+export const cancelSessionAPI = (sessionId:string) =>
+  axiosInstance
+    .patch<MessageResponse>(`/user/sessions/${sessionId}`)
+    .then(res => res);

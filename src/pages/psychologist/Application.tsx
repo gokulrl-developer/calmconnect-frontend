@@ -5,6 +5,7 @@ import Button from "../../components/UI/Button";
 import { Upload, Camera, Globe, LogOut } from "lucide-react";
 import {
   fetchApplication,
+  fetchRejectedApplicationAPI,
   psychologistApply,
 } from "../../services/psychologistService";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
@@ -21,7 +22,7 @@ const PsychologistApplication = () => {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState<null | string>(null);
   const [submittedFlag, setSubmittedFlag] = useState(false);
-  
+  const [rejectionReason,setRejectionReason]=useState("")
 
   useEffect(() => {
     async function fetchApplicationStatus() {
@@ -49,15 +50,29 @@ const PsychologistApplication = () => {
       handleApiError(error);
     }
   };
-
+function handlePrefill(){
+  setSubmittedFlag(false);
+  fetchRejectedApplication();
+}
+  async function fetchRejectedApplication(){
+    try{
+      const result=await fetchRejectedApplicationAPI();
+      if(result.data){
+        const application:any=result.data.application.dob.toISOString()
+        setFormData({...application})
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
   const [formData, setFormData] = useState({
     bio: "",
     specializations: [] as string[],
     languages: "",
-    profilePicture: null as File | null,
+    profilePicture: null as File | string |null,
     phone: "",
-    license: null as File | null,
-    resume: null as File | null,
+    license: null as File | string |null,
+    resume: null as File | string |null,
     submittedAt: new Date(),
     address: "",
     qualifications: "",
@@ -195,7 +210,7 @@ const PsychologistApplication = () => {
               <div className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
                 {formData.profilePicture ? (
                   <img
-                    src={URL.createObjectURL(formData.profilePicture)}
+                    src={URL.createObjectURL(formData.profilePicture as File)}
                     alt="Profile"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -438,7 +453,7 @@ const PsychologistApplication = () => {
                   onClick={() => document.getElementById("license")?.click()}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {formData.license ? formData.license.name : "Upload Document"}
+                  {formData.license ? (formData.license as File).name : "Upload Document"}
                 </Button>
                 <input
                   id="license"
@@ -468,7 +483,7 @@ const PsychologistApplication = () => {
                   onClick={() => document.getElementById("resume")?.click()}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {formData.resume ? formData.resume.name : "Upload Document"}
+                  {formData.resume ? (formData.resume as File).name : "Upload Document"}
                 </Button>
                 <input
                   id="resume"
@@ -521,7 +536,13 @@ const PsychologistApplication = () => {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
               {`Your Application is ${status}`}
             </h1>
+            {status==="rejected"?<p>
+              {rejectionReason}
+            </p>:null}
           </div>
+          <button onClick={handlePrefill}>
+            RE-APPLY
+          </button>
         </Card>
       </div>
     </div>

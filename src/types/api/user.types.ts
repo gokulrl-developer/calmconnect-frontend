@@ -1,5 +1,6 @@
 import type { CheckoutData } from "../components/user.types";
 import type { Slot } from "../domain/AvailabiliityRule.types";
+import type paginationData from "../pagination.types";
 
 export interface ListPsychSummary {
   psychId: string;
@@ -68,4 +69,20 @@ export interface VerifyPaymentPayload{
 
 export interface VerifyPaymentResponse{
   message:string
+}
+
+export interface SessionListingUserItem {
+  psychFullName: string;
+  psychEmail:string;
+  startTime: Date;
+  endTime: Date;
+  durationInMins: number;
+  status: "scheduled"|"completed"|"cancelled"|"available"|"pending";
+  fees: number;
+  sessionId: string;
+}
+
+export interface SessionListingUserResponse{
+  sessions:SessionListingUserItem[],
+  paginationData:paginationData
 }
