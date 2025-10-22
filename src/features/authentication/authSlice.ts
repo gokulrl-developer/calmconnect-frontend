@@ -14,6 +14,7 @@ const initialState: IAuthState = {
   lastName: null,
   isAuthenticated: false,
   isVerified: false,
+  accountId:null
 };
 const authSlice = createSlice({
   name: "auth",
@@ -33,6 +34,7 @@ const authSlice = createSlice({
       state.firstName = null;
       state.lastName = null;
       state.isAuthenticated = false;
+      state.accountId=null;
     },
   },
   extraReducers: (builder) => {
@@ -42,6 +44,7 @@ const authSlice = createSlice({
         state.lastName = action.payload.user.lastName;
         state.role = "user";
         state.isAuthenticated = true;
+        state.accountId=action.payload.user.id;
       })
       .addCase(loginPsychologistAsync.fulfilled, (state, action) => {
         state.firstName = action.payload.psych.firstName;
@@ -49,6 +52,7 @@ const authSlice = createSlice({
         state.role = "psychologist";
         state.isAuthenticated = true;
         state.isVerified = action.payload.psych.isVerified;
+        state.accountId=action.payload.psych.id;
       })
       .addCase(loginAdminAsync.fulfilled, (state) => {
         state.role = "admin";
@@ -59,6 +63,7 @@ const authSlice = createSlice({
         state.lastName = action.payload.user.lastName;
         state.role = "user";
         state.isAuthenticated = true;
+        state.accountId=action.payload.user.id
       })
       .addCase(googleAuthPsyThunk.fulfilled, (state, action) => {
         state.firstName = action.payload.psych.firstName;
@@ -66,6 +71,7 @@ const authSlice = createSlice({
         state.role = "psychologist";
         state.isAuthenticated = true;
         state.isVerified = action.payload.psych.isVerified;
+        state.accountId=action.payload.psych.id
       });
   },
 });
@@ -81,4 +87,5 @@ export interface IAuthState {
   lastName: string | null;
   isAuthenticated: boolean;
   isVerified: boolean;
+  accountId:string |null;
 }

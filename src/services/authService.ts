@@ -8,13 +8,15 @@ export interface ILoginCredentials{
 export interface IUserLoginResponse{
    user:{ firstName:string;
     lastName:string;
+    id:string
    },
     message:string;
 }
 export interface IPsychologistLoginResponse{
    psych:{ firstName:string;
     lastName:string;
-    isVerified:boolean
+    isVerified:boolean;
+    id:string;
    },
    message:string
 }

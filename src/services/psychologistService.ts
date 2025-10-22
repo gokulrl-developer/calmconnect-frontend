@@ -1,4 +1,4 @@
-import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
+import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CheckSessionAccessResponse, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
 import axiosInstance from "./axiosInstance";
 
 interface IApplicationResponse {
@@ -116,3 +116,8 @@ export const cancelSessionAPI = (sessionId:string) =>
   axiosInstance
     .get<{application:RejectedApplication}>(`/psychologist/application`)
     .then(res => res);
+
+    export const checkSessionAccessAPI = (sessionId: string) =>
+  axiosInstance
+    .get<CheckSessionAccessResponse>(`/psychologist/sessions/${sessionId}/access`)
+    .then((res) => res);

@@ -34,6 +34,8 @@ import DailyAvailability from "./pages/psychologist/DailyAvailability";
 import AdminSessions from "./pages/admin/AdminSessions";
 import UserSessions from "./pages/user/UserSessions";
 import PsychSessions from "./pages/psychologist/PsychSessions";
+import { UserVideoRoom } from "./pages/user/UserVideoRoom";
+import { PsychVideoRoom } from "./pages/psychologist/PsychVideoRoom";
 
 function AppRoutes() {
   return (
@@ -82,6 +84,10 @@ function AppRoutes() {
               element={<PsychologistDetails />}
             />
             <Route path="/user/sessions" element={<UserSessions />} />
+            <Route
+              path="/user/sessions/:sessionId/video"
+              element={<UserVideoRoom />}
+            />
           </Route>
         </Route>
 
@@ -148,10 +154,7 @@ function AppRoutes() {
               path="/psychologist/availability"
               element={<Availability />}
             />
-            <Route
-              path="/psychologist/sessions"
-              element={<PsychSessions/>}
-            />
+            <Route path="/psychologist/sessions" element={<PsychSessions />} />
             <Route
               path="/psychologist/daily-availability"
               element={<DailyAvailability />}
@@ -159,6 +162,10 @@ function AppRoutes() {
             <Route
               path="/psychologist/profile"
               element={<PsychologistProfile />}
+            />
+            <Route
+              path="/psychologist/sessions/:sessionId/video"
+              element={<PsychVideoRoom />}
             />
           </Route>
         </Route>
