@@ -6,8 +6,10 @@ import { handleApiError } from '../../services/axiosInstance';
 import type paginationData from '../../types/pagination.types';
 import type { SessionListingPsychItem } from '../../types/api/psychologist.types';
 import Modal from '../../components/UI/Modal';
+import { useNavigate } from 'react-router-dom';
 
 const PsychSessions: React.FC = () => {
+  const navigate=useNavigate()
   const [sessions, setSessions] = useState<SessionListingPsychItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -43,6 +45,9 @@ const PsychSessions: React.FC = () => {
     loadSessions(pagination.currentPage, statusFilter);
   }, [statusFilter]);
 
+   const joinSession = (sessionId: string) => {
+    navigate(`/psychologist/sessions/${sessionId}/video`);
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -157,7 +162,7 @@ const PsychSessions: React.FC = () => {
                           {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                         </span>
                       </td>
-                      <td className="p-6">
+                      <td className="p-6 flex gap-2">
                         <Button
                           size="sm"
                           onClick={() => {setCancelSessionId(session.sessionId);
@@ -167,6 +172,19 @@ const PsychSessions: React.FC = () => {
                           disabled={session.status !== 'scheduled'}
                         >
                           Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          disabled={
+                            session.status !== "scheduled" ||
+                            new Date(session.startTime).getTime() - Date.now() >
+                              5 * 60 * 1000 || // 5 minutes
+                            new Date(session.endTime).getTime() < Date.now()
+                          }
+                          onClick={() => joinSession(session.sessionId)}
+                        >
+                          Join
                         </Button>
                       </td>
                     </tr>

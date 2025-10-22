@@ -1,6 +1,7 @@
 import type { MessageResponse } from "../types/api/psychologist.types";
 import type {
   CheckoutDataResponse,
+  CheckSessionAccessResponse,
   CreateOrderRequest,
   CreateOrderResponse,
   FetchCheckoutRequest,
@@ -60,21 +61,26 @@ export const fetchCheckoutData = (data: FetchCheckoutRequest) => {
 
 export const createOrder = (data: CreateOrderRequest) => {
   return axiosInstance
-    .post<CreateOrderResponse>(`/user/create-order`,data)
+    .post<CreateOrderResponse>(`/user/create-order`, data)
     .then((res) => res);
 };
 export const verifyPayment = (data: VerifyPaymentPayload) => {
   return axiosInstance
-    .post<VerifyPaymentResponse>(`/user/verify-payment`,data)
+    .post<VerifyPaymentResponse>(`/user/verify-payment`, data)
     .then((res) => res);
 };
 
-export const fetchSessionsByUserAPI = (params:string) =>
+export const fetchSessionsByUserAPI = (params: string) =>
   axiosInstance
     .get<SessionListingUserResponse>(`/user/sessions/${params}`)
-    .then(res => res);
+    .then((res) => res);
 
-export const cancelSessionAPI = (sessionId:string) =>
+export const cancelSessionAPI = (sessionId: string) =>
   axiosInstance
     .patch<MessageResponse>(`/user/sessions/${sessionId}`)
-    .then(res => res);
+    .then((res) => res);
+
+export const checkSessionAccessAPI = (sessionId: string) =>
+  axiosInstance
+    .get<CheckSessionAccessResponse>(`/user/sessions/${sessionId}/access`)
+    .then((res) => res);

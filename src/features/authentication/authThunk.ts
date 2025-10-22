@@ -205,7 +205,6 @@ export const googleAuthUserThunk = createAsyncThunk<
   "auth/googleAuthUser",
   async (credentials, thunkAPI) => {
     try {
-      console.log("reached thunk")
       const data = await googleAuthUser(credentials);
       console.log(data)
       thunkAPI.dispatch(setSuccess("Verification successful"));

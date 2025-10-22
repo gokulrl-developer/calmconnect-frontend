@@ -153,3 +153,18 @@ export interface RejectedApplication{
   qualifications: string;
   reason:string;
 }
+
+export interface CheckSessionAccessResponse{
+    allowed:boolean,
+    reason?:string,
+    session?:SessionDetailsInVideoCall
+}
+
+export interface SessionDetailsInVideoCall{
+ psychologist:string,
+ user:string,
+ startTime:Date,
+ endTime:Date,
+ durationInMins:number,
+ sessionId:string
+}
