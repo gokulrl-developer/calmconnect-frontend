@@ -38,3 +38,12 @@ export interface SocketData {
   role: "user" | "psychologist";
   sessionId?: string;
 }
+
+export interface SocketErrorPayload {
+  message:string
+}
+
+export interface SocketConnectionErrorPayload {
+  message:string,
+  code:string
+}

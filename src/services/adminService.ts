@@ -1,4 +1,5 @@
 import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, SessionListingAdminResponse } from "../types/api/admin.types";
+import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
 
 export interface ApplicationItem {
@@ -137,3 +138,23 @@ export const fetchSessionListingByAdminAPI = (params:string) =>
   axiosInstance
     .get<SessionListingAdminResponse>(`/admin/sessions/${params}`)
     .then(res => res);
+
+export const fetchNotificationsAPI = (data: GetNotificationsPayload) => {
+  const { page, limit } = data;
+
+  return axiosInstance
+    .get<GetNotificationResponse>(`/admin/notifications?page=${page}&limit=${limit}`)
+    .then((res) => res);
+};
+
+export const markAllNotificationsReadAPI = () => {
+  return axiosInstance
+    .patch<MarkNotificationsReadResponse>(`/admin/notifications`,{},{isSilentError:true} as any)
+    .then((res) => res);
+};
+
+export const getAdminUnreadNotificationsCountAPI = () => {
+  return axiosInstance
+    .get<GetUnreadNotificationCountResponse>(`/admin/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};

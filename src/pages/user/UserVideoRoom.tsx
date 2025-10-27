@@ -10,7 +10,10 @@ import type {
   ChatMessage,
   JoinDeniedPayload,
   SignalPayload,
+  SocketConnectionErrorPayload,
+  SocketErrorPayload,
 } from "../../types/domain/socket.types";
+import { logOut, refreshTokenAPI } from "../../services/authService";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 
@@ -32,18 +35,37 @@ export const UserVideoRoom = () => {
   const [text, setText] = useState("");
   const [joined, setJoined] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
   const { sessionId } = useParams<{ sessionId: string }>();
   const userId = useAppSelector((state: IRootState) => state.auth.accountId);
+  const isAuthenticated = useAppSelector(
+    (state: IRootState) => state.auth.isAuthenticated
+  );
 
   // --- SOCKET SETUP ---
   useEffect(() => {
-    const s = io(SIGNALING_URL, { transports: ["websocket"] });
+    const s = io(`${SIGNALING_URL}/meeting`, { transports: ["websocket"] });
     setSocket(s);
 
-    s.on("connect_error", (err: unknown) => {
+    s.on("connect_error", async (err: SocketConnectionErrorPayload) => {
       const msg = err instanceof Error ? err.message : "Connection error";
-      console.error(msg);
-      toast.error(msg);
+      if (
+        err.code === "INVALID_CREDENTIALS" ||
+        err.code === "SESSION_EXPIRED"
+      ) {
+        await refreshTokenAPI();
+      } else if (err.code === "BLOCKED") {
+        if (isAuthenticated === true) {
+          await logOut();
+        }
+      } else {
+        console.error(msg);
+        toast.error(msg);
+      }
+    });
+
+    s.on("error", (payload: SocketErrorPayload) => {
+      toast.error(payload.message);
     });
 
     s.on("join-accepted", () => {
@@ -57,7 +79,9 @@ export const UserVideoRoom = () => {
     });
 
     s.on("chat-history", (history: ChatMessage[]) => setMessages(history));
-    s.on("chat-message", (m: ChatMessage) => setMessages((prev) => [...prev, m]));
+    s.on("chat-message", (m: ChatMessage) =>
+      setMessages((prev) => [...prev, m])
+    );
     s.on("peer-joined", () => toast.info("Psychologist joined the meeting"));
 
     s.on("signal", async (payload: SignalPayload) => {
@@ -67,7 +91,11 @@ export const UserVideoRoom = () => {
         await pc.setRemoteDescription(new RTCSessionDescription(payload.data));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        s.emit("signal", { sessionId, type: "answer", data: pc.localDescription });
+        s.emit("signal", {
+          sessionId,
+          type: "answer",
+          data: pc.localDescription,
+        });
       } else if (payload.type === "answer") {
         await pc.setRemoteDescription(new RTCSessionDescription(payload.data));
       } else if (payload.type === "ice") {
@@ -173,6 +201,14 @@ export const UserVideoRoom = () => {
     setText("");
   }
 
+  function toggleMute() {
+    if (localStreamRef.current) {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+      setIsMuted((prev) => !prev);
+    }
+  }
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">
       {/* Left side: Video area */}
@@ -189,32 +225,44 @@ export const UserVideoRoom = () => {
           >
             Join Call
           </button>
+          {joined && (
+            <button
+              onClick={async () => {
+                socket?.emit("leave-room", { sessionId });
+                setJoined(false);
 
-          <button
-             onClick={async () => {
-                          socket?.emit("leave-room", { sessionId });
-                          setJoined(false);
-            
-                          if (localStreamRef.current) {
-                            localStreamRef.current
-                              .getTracks()
-                              .forEach((track) => track.stop());
-                            localStreamRef.current = null;
-                          }
-            
-                          pcRef.current?.close();
-                          pcRef.current = null;
-            
-                          if (localRef.current) localRef.current.srcObject = null;
-                          if (remoteRef.current) remoteRef.current.srcObject = null;
-            
-                          toast.info("You left the meeting");
-                        }}
-            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
-          >
-            Leave
-          </button>
+                if (localStreamRef.current) {
+                  localStreamRef.current
+                    .getTracks()
+                    .forEach((track) => track.stop());
+                  localStreamRef.current = null;
+                }
 
+                pcRef.current?.close();
+                pcRef.current = null;
+
+                if (localRef.current) localRef.current.srcObject = null;
+                if (remoteRef.current) remoteRef.current.srcObject = null;
+
+                toast.info("You left the meeting");
+              }}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
+            >
+              Leave
+            </button>
+          )}
+          {joined && (
+            <button
+              onClick={toggleMute}
+              className={`px-4 py-2 rounded-lg font-medium text-white transition ${
+                isMuted
+                  ? "bg-gray-500 hover:bg-gray-600"
+                  : "bg-yellow-500 hover:bg-yellow-600"
+              }`}
+            >
+              {isMuted ? "Unmute" : "Mute"}
+            </button>
+          )}
           <div className="ml-4 text-sm text-gray-600">{info}</div>
         </div>
 
