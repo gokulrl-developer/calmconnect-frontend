@@ -11,7 +11,10 @@ import type {
   JoinDeniedPayload,
   PeerJoinedPayload,
   SignalPayload,
+  SocketConnectionErrorPayload,
+  SocketErrorPayload,
 } from "../../types/domain/socket.types";
+import { logOut, refreshTokenAPI } from "../../services/authService";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 const stunUrls = import.meta.env.VITE_STUN_SERVERS?.split(",") || [
@@ -32,22 +35,37 @@ export const PsychVideoRoom = () => {
   const [text, setText] = useState("");
   const [joined, setJoined] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
   const { sessionId } = useParams<{ sessionId: string }>();
 
   const psychId = useAppSelector((state: IRootState) => state.auth.accountId);
+  const isAuthenticated = useAppSelector(
+    (state: IRootState) => state.auth.isAuthenticated
+  );
 
   useEffect(() => {
-    const s = io(SIGNALING_URL, { transports: ["websocket"] });
+    const s = io(`${SIGNALING_URL}/meeting`, { transports: ["websocket"] });
     setSocket(s);
 
-    s.on("connect_error", (err: unknown) => {
-      if (err instanceof Error) {
-        console.error(err.message);
-        toast.error(err.message);
+    s.on("connect_error", async (err: SocketConnectionErrorPayload) => {
+      const msg = err instanceof Error ? err.message : "Connection error";
+      if (
+        err.code === "INVALID_CREDENTIALS" ||
+        err.code === "SESSION_EXPIRED"
+      ) {
+        await refreshTokenAPI();
+      } else if (err.code === "BLOCKED") {
+        if (isAuthenticated === true) {
+          await logOut();
+        }
       } else {
-        console.error("Unknown connect error", err);
-        toast.error("Connection error");
+        console.error(msg);
+        toast.error(msg);
       }
+    });
+
+    s.on("error", (payload: SocketErrorPayload) => {
+      toast.error(payload.message);
     });
 
     s.on("join-accepted", () => {
@@ -215,6 +233,14 @@ export const PsychVideoRoom = () => {
     setText("");
   }
 
+  function toggleMute() {
+    if (localStreamRef.current) {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+      });
+      setIsMuted((prev) => !prev);
+    }
+  }
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">
       {/* Left: Video Area */}
@@ -231,32 +257,44 @@ export const PsychVideoRoom = () => {
           >
             Join Call
           </button>
+          {joined && (
+            <button
+              onClick={async () => {
+                socket?.emit("leave-room", { sessionId });
+                setJoined(false);
 
-          <button
-            onClick={async () => {
-              socket?.emit("leave-room", { sessionId });
-              setJoined(false);
+                if (localStreamRef.current) {
+                  localStreamRef.current
+                    .getTracks()
+                    .forEach((track) => track.stop());
+                  localStreamRef.current = null;
+                }
 
-              if (localStreamRef.current) {
-                localStreamRef.current
-                  .getTracks()
-                  .forEach((track) => track.stop());
-                localStreamRef.current = null;
-              }
+                pcRef.current?.close();
+                pcRef.current = null;
 
-              pcRef.current?.close();
-              pcRef.current = null;
+                if (localRef.current) localRef.current.srcObject = null;
+                if (remoteRef.current) remoteRef.current.srcObject = null;
 
-              if (localRef.current) localRef.current.srcObject = null;
-              if (remoteRef.current) remoteRef.current.srcObject = null;
-
-              toast.info("You left the meeting");
-            }}
-            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
-          >
-            Leave
-          </button>
-
+                toast.info("You left the meeting");
+              }}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
+            >
+              Leave
+            </button>
+          )}
+          {joined && (
+            <button
+              onClick={toggleMute}
+              className={`px-4 py-2 rounded-lg font-medium text-white transition ${
+                isMuted
+                  ? "bg-gray-500 hover:bg-gray-600"
+                  : "bg-yellow-500 hover:bg-yellow-600"
+              }`}
+            >
+              {isMuted ? "Unmute" : "Mute"}
+            </button>
+          )}
           <div className="ml-4 text-sm text-gray-600">{info}</div>
         </div>
 

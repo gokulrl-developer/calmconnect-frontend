@@ -36,140 +36,162 @@ import UserSessions from "./pages/user/UserSessions";
 import PsychSessions from "./pages/psychologist/PsychSessions";
 import { UserVideoRoom } from "./pages/user/UserVideoRoom";
 import { PsychVideoRoom } from "./pages/psychologist/PsychVideoRoom";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import PsychNotifications from "./pages/psychologist/Notifications"
+import UserNotifications from "./pages/user/Notifications"
+import AdminNotifications from "./pages/admin/Notifications"
 
 function AppRoutes() {
   return (
     <>
-      <Toaster position="top-right" richColors closeButton />
-      <ErrorWatcher />
+        <Toaster position="top-right" richColors closeButton />
+        <ErrorWatcher />
 
-      <Routes>
-        {/* Common Routes */}
-        <Route path="/unauthorised" element={<Unauthorised />} />
-        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+            <NotificationProvider>
+        <Routes>
+          {/* Common Routes */}
+          <Route path="/unauthorised" element={<Unauthorised />} />
+          <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
-        {/* Guest Only Routes */}
-        <Route element={<GuestRoute />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/user/login" element={<Login role="user" />} />
-          <Route
-            path="/psychologist/login"
-            element={<Login role="psychologist" />}
-          />
-          <Route path="/admin/login" element={<Login role="admin" />} />
-          <Route path="/user/sign-up" element={<SignUp />} />
-          <Route path="/psychologist/sign-up" element={<SignUp />} />
-          <Route
-            path="/psychologist/forgot-password"
-            element={<ForgotPassword role="psychologist" />}
-          />
-          <Route
-            path="/user/forgot-password"
-            element={<ForgotPassword role="user" />}
-          />
-        </Route>
-
-        {/* User Routes */}
-        <Route
-          element={
-            <ProtectedRoute allowedRole="user" isVerifiedPsychRoute={false} />
-          }
-        >
-          <Route element={<UserLayout />}>
-            <Route path="/user/dashboard" element={<UserDashboard />} />
-            <Route path="/user/profile" element={<UserProfile />} />
-            <Route path="/user/psychologists" element={<BookSession />} />
+          {/* Guest Only Routes */}
+          <Route element={<GuestRoute />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/user/login" element={<Login role="user" />} />
             <Route
-              path="/user/psychologist-details"
-              element={<PsychologistDetails />}
-            />
-            <Route path="/user/sessions" element={<UserSessions />} />
+              path="/psychologist/login"
+              element={<Login role="psychologist" />}
+              />
+            <Route path="/admin/login" element={<Login role="admin" />} />
+            <Route path="/user/sign-up" element={<SignUp />} />
+            <Route path="/psychologist/sign-up" element={<SignUp />} />
             <Route
-              path="/user/sessions/:sessionId/video"
-              element={<UserVideoRoom />}
+              path="/psychologist/forgot-password"
+              element={<ForgotPassword role="psychologist" />}
+              />
+            <Route
+              path="/user/forgot-password"
+              element={<ForgotPassword role="user" />}
+              />
+          </Route>
+
+
+          {/* User Routes */}
+          <Route
+            element={
+              <ProtectedRoute allowedRole="user" isVerifiedPsychRoute={false} />
+            }
+          >
+            <Route element={<UserLayout />}>
+              <Route path="/user/dashboard" element={<UserDashboard />} />
+              <Route path="/user/profile" element={<UserProfile />} />
+              <Route path="/user/psychologists" element={<BookSession />} />
+              <Route
+                path="/user/psychologist-details"
+                element={<PsychologistDetails />}
+              />
+              <Route path="/user/sessions" element={<UserSessions />} />
+              <Route path="/user/notifications" element={<UserNotifications />} />
+              <Route
+                path="/user/sessions/:sessionId/video"
+                element={<UserVideoRoom />}
+              />
+            </Route>
+          </Route>
+
+          {/* Admin Routes */}
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRole="admin"
+                isVerifiedPsychRoute={false}
+              />
+            }
+          >
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route
+                path="/admin/applications"
+                element={<AdminApplications />}
+              />
+              <Route
+                path="/admin/application-details/:applicationId"
+                element={<AdminApplicationDetails />}
+              />
+              <Route path="/admin/users" element={<AdminUsers />} />
+              <Route
+                path="/admin/user-details/:userId"
+                element={<AdminUserDetails />}
+              />
+              <Route
+                path="/admin/psychologists"
+                element={<AdminPsychologists />}
+              />
+              <Route
+                path="/admin/psychologist-details/:psychId"
+                element={<AdminPsychologistDetails />}
+              />
+              <Route path="/admin/sessions" element={<AdminSessions />} />
+              <Route path="/admin/notifications" element={<AdminNotifications />} />
+            </Route>
+          </Route>
+
+          {/* Unverified Psychologist Routes */}
+          <Route
+            element={
+              <ProtectedRoute
+                allowedRole="psychologist"
+                isVerifiedPsychRoute={false}
+              />
+            }
+          >
+            <Route
+              path="/psychologist/application"
+              element={<PsychologistApplication />}
             />
           </Route>
-        </Route>
 
-        {/* Admin Routes */}
-        <Route
-          element={
-            <ProtectedRoute allowedRole="admin" isVerifiedPsychRoute={false} />
-          }
-        >
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/applications" element={<AdminApplications />} />
-            <Route
-              path="/admin/application-details/:applicationId"
-              element={<AdminApplicationDetails />}
-            />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route
-              path="/admin/user-details/:userId"
-              element={<AdminUserDetails />}
-            />
-            <Route
-              path="/admin/psychologists"
-              element={<AdminPsychologists />}
-            />
-            <Route
-              path="/admin/psychologist-details/:psychId"
-              element={<AdminPsychologistDetails />}
-            />
-            <Route path="/admin/sessions" element={<AdminSessions />} />
-          </Route>
-        </Route>
-
-        {/* Unverified Psychologist Routes */}
-        <Route
-          element={
-            <ProtectedRoute
-              allowedRole="psychologist"
-              isVerifiedPsychRoute={false}
-            />
-          }
-        >
+          {/* Verified Psychologist Routes */}
           <Route
-            path="/psychologist/application"
-            element={<PsychologistApplication />}
-          />
-        </Route>
-
-        {/* Verified Psychologist Routes */}
-        <Route
-          element={
-            <ProtectedRoute
-              allowedRole="psychologist"
-              isVerifiedPsychRoute={true}
-            />
-          }
-        >
-          <Route element={<PsychologistLayout />}>
-            <Route
-              path="/psychologist/dashboard"
-              element={<PsychologistDashboard />}
-            />
-            <Route
-              path="/psychologist/availability"
-              element={<Availability />}
-            />
-            <Route path="/psychologist/sessions" element={<PsychSessions />} />
-            <Route
-              path="/psychologist/daily-availability"
-              element={<DailyAvailability />}
-            />
-            <Route
-              path="/psychologist/profile"
-              element={<PsychologistProfile />}
-            />
-            <Route
-              path="/psychologist/sessions/:sessionId/video"
-              element={<PsychVideoRoom />}
-            />
+            element={
+              <ProtectedRoute
+                allowedRole="psychologist"
+                isVerifiedPsychRoute={true}
+              />
+            }
+          >
+            <Route element={<PsychologistLayout />}>
+              <Route
+                path="/psychologist/dashboard"
+                element={<PsychologistDashboard />}
+              />
+              <Route
+                path="/psychologist/availability"
+                element={<Availability />}
+              />
+              <Route
+                path="/psychologist/sessions"
+                element={<PsychSessions />}
+              />
+              <Route
+                path="/psychologist/daily-availability"
+                element={<DailyAvailability />}
+              />
+              <Route
+                path="/psychologist/profile"
+                element={<PsychologistProfile />}
+              />
+              <Route
+                path="/psychologist/notifications"
+                element={<PsychNotifications />}
+              />
+              <Route
+                path="/psychologist/sessions/:sessionId/video"
+                element={<PsychVideoRoom />}
+              />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </NotificationProvider>
     </>
   );
 }

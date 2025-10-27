@@ -12,6 +12,7 @@ import type {
   VerifyPaymentPayload,
   VerifyPaymentResponse,
 } from "../types/api/user.types";
+import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import type paginationData from "../types/pagination.types";
 import axiosInstance from "./axiosInstance";
 
@@ -84,3 +85,23 @@ export const checkSessionAccessAPI = (sessionId: string) =>
   axiosInstance
     .get<CheckSessionAccessResponse>(`/user/sessions/${sessionId}/access`)
     .then((res) => res);
+
+export const fetchNotificationsAPI = (data: GetNotificationsPayload) => {
+  const { page, limit } = data;
+
+  return axiosInstance
+    .get<GetNotificationResponse>(`/user/notifications?page=${page}&limit=${limit}`)
+    .then((res) => res);
+};
+
+export const markAllNotificationsReadAPI = () => {
+  return axiosInstance
+    .patch<MarkNotificationsReadResponse>(`/user/notifications`,{},{isSilentError:true} as any)
+    .then((res) => res);
+};
+
+export const getUserUnreadNotificationsCountAPI = () => {
+  return axiosInstance
+    .get<GetUnreadNotificationCountResponse>(`/user/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -9,23 +9,24 @@ import {
   LogOut,
   Menu,
   X,
-  Users,
   Wallet,
   Info,
   Bell,
-  MessageSquare
 } from 'lucide-react';
 import { useAppDispatch } from '../hooks/customReduxHooks';
 import { logout} from '../features/authentication/authSlice';
 import { handleApiError } from '../services/axiosInstance';
 import { logOut } from '../services/authService';
+import { NotificationContext } from '../contexts/NotificationContext';
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const dispatch=useAppDispatch()
   const navigate = useNavigate();
+  const { unreadNotificationCount} = useContext(NotificationContext);
 
+  
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 1024;
@@ -56,14 +57,12 @@ const Sidebar: React.FC = () => {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/psychologist/dashboard' },
     { icon: Calendar, label: 'Sessions', path: '/psychologist/sessions' },
-    { icon: Users, label: 'Patients', path: '/psychologist/dashboard' },
     { icon: Clock, label: 'Availability', path: '/psychologist/availability' },
     { icon: AlertCircle, label: 'Raise Complaint', path: '/psychologist/dashboard' },
     { icon: Wallet, label: 'Wallet', path: '/psychologist/dashboard' },
     { icon: User, label: 'Profile', path: '/psychologist/profile' },
     { icon: Info, label: 'Wrong Actions', path: '/psychologist/dashboard' },
-    { icon: Bell, label: 'Notifications', path: '/psychologist/dashboard' },
-    { icon: MessageSquare, label: 'Follow Up Chats', path: '/psychologist/dashboard' },
+    { icon: Bell, label: 'Notifications', path: '/psychologist/notifications' },
   ];
 
   return (
@@ -111,6 +110,11 @@ const Sidebar: React.FC = () => {
                 {!isCollapsed && (
                   <span className="flex-1 text-left">{item.label}</span>
                 )}
+                 {item.path === '/psychologist/notifications' && unreadNotificationCount>0  && (
+              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadNotificationCount}
+              </span>
+            )}
               </button>
             ))}
           </nav>

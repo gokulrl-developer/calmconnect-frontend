@@ -1,4 +1,5 @@
 import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CheckSessionAccessResponse, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
+import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
 
 interface IApplicationResponse {
@@ -121,3 +122,23 @@ export const cancelSessionAPI = (sessionId:string) =>
   axiosInstance
     .get<CheckSessionAccessResponse>(`/psychologist/sessions/${sessionId}/access`)
     .then((res) => res);
+
+export const fetchNotificationsAPI = (data: GetNotificationsPayload) => {
+  const { page, limit } = data;
+
+  return axiosInstance
+    .get<GetNotificationResponse>(`/psychologist/notifications?page=${page}&limit=${limit}`)
+    .then((res) => res);
+};
+
+export const markAllNotificationsReadAPI = () => {
+  return axiosInstance
+    .patch<MarkNotificationsReadResponse>(`/psychologist/notifications`,{},{isSilentError:true} as any)
+    .then((res) => res);
+};
+
+export const getPsychUnreadNotificationsCountAPI = () => {
+  return axiosInstance
+    .get<GetUnreadNotificationCountResponse>(`/psychologist/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};

@@ -91,3 +91,5 @@ export const resendOtpResetUser=(data:{email:string})=>
   axiosInstance.post<{message:string}>("/user/resend-otp-reset",data).then(res=>res.data)
 export const resendOtpResetPsych=(data:{email:string})=>
   axiosInstance.post<{message:string}>("/psych/resend-otp-reset",data).then(res=>res.data)
+export const refreshTokenAPI=()=>
+  axiosInstance.post("/refresh").then(res=>res.data);
