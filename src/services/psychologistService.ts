@@ -7,13 +7,32 @@ interface IApplicationResponse {
   message: string;
 }
 
-interface ApplicationStatus {
+export interface LatestApplicationData{
+    firstName:string,
+    lastName:string,
+    email:string,
+    submittedAt:Date, 
+    phone:string, 
+    gender:"male"|"female"|"others",
+    dob:Date,
+    profilePicture:string,
+    address:string,
+    languages:string,
+    specializations:string[],
+    bio:string,
+    licenseUrl:string,
+    resume:string,
+    qualifications:string,
+    status:"pending"|"accepted"|"rejected",
+    rejectionReason?:string
+}
+interface LatestApplicationDataResponse {
   psych: {
     id: string;
     role: string;
     isVerified: boolean;
   };
-  status: string;
+  application:LatestApplicationData | null
 }
 
 interface DashboardData{
@@ -26,9 +45,9 @@ interface DashboardData{
 
 
 
-export const fetchApplication = () =>
+export const fetchLatestApplicationAPI = () =>
   axiosInstance
-    .get<ApplicationStatus>("/psychologist/application")
+    .get<LatestApplicationDataResponse>("/psychologist/application")
     .then((res) => res);
 export const fetchDashboard = () =>
   axiosInstance

@@ -44,7 +44,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   },[accountId,isAuthenticated,role])
 
     async function fetchUnreadCount(){
-          if (!isAuthenticated || !accountId || !role) return;
+          if (!isAuthenticated || !role) return;
           if(role==="user"){
             const result=await getUserUnreadNotificationsCountAPI()
             setUnreadCount(result.data.count)
@@ -54,18 +54,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
             setUnreadCount(result.data.count)
           }
           if(role==="admin"){
-            const result=await getAdminUnreadNotificationsCountAPI()
+            const result=await getAdminUnreadNotificationsCountAPI();
             setUnreadCount(result.data.count)
           }
     }
   useEffect(() => {
-    if (!isAuthenticated || !accountId) return;
+    if (!isAuthenticated || !role) return;
     const s = io(`${SIGNALING_URL}/notifications`, {
       transports: ["websocket"],
     });
-    if (accountId) {
-      s.emit("register", accountId);
-    }
+    
+      s.emit("register");
+    
     s.on("notification", (notif: Notification) => {
         setUnreadCount((prev)=>prev+1)
       console.log(notif);
