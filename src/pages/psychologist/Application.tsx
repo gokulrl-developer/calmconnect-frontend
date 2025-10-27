@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
-import { Upload, Camera, Globe, LogOut } from "lucide-react";
+import { Upload, Camera, Globe, LogOut, Download } from "lucide-react";
 import {
-  fetchApplication,
-  fetchRejectedApplicationAPI,
+  fetchLatestApplicationAPI,
   psychologistApply,
+  type LatestApplicationData,
 } from "../../services/psychologistService";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
 import {
@@ -17,209 +17,240 @@ import { handleApiError } from "../../services/axiosInstance";
 import { toast } from "sonner";
 import { logOut } from "../../services/authService";
 
-const PsychologistApplication = () => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const [status, setStatus] = useState<null | string>(null);
-  const [submittedFlag, setSubmittedFlag] = useState(false);
-  const [rejectionReason,setRejectionReason]=useState("")
 
-  useEffect(() => {
-    async function fetchApplicationStatus() {
+const PsychologistApplication = () => {
+   const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const [showForm,setShowForm]=useState<boolean>(false);
+    const [existingApplication,setExistingApplication]=useState<LatestApplicationData|null>(null)
+  
+  
+    useEffect(() => {
+      fetchLatestApplication();
+    }, []);
+    
+    async function fetchLatestApplication() {
       try {
-        const result = await fetchApplication();
-        console.log(result?.data)
-          await dispatch(setVerification(result.data.psych.isVerified));
-          setStatus(result.data.status);
-          result.data.status === "pending"
-            ? setSubmittedFlag(true)
-            : setSubmittedFlag(false);
+        const result = await fetchLatestApplicationAPI();
+        await dispatch(setVerification(result.data.psych.isVerified));
+        if(result.data.application){
+          console.log("fetching application",result.data.application)
+          setExistingApplication(result.data.application)
+        }
       } catch (error) {}
     }
-      fetchApplicationStatus();
-  }, [submittedFlag]);
-
-  const handleLogout = async () => {
-    try {
-      const result = await logOut();
-      if (result) {
-        dispatch(logout());
-        navigate("/");
+  
+    const handleLogout = async () => {
+      try {
+        const result = await logOut();
+        if (result) {
+          dispatch(logout());
+          navigate("/");
+        }
+      } catch (error) {
+        handleApiError(error);
       }
-    } catch (error) {
-      handleApiError(error);
-    }
-  };
-function handlePrefill(){
-  setSubmittedFlag(false);
-  fetchRejectedApplication();
+    };
+ 
+   /*  async function fetchRejectedApplication(){
+      try{
+        const result=await fetchRejectedApplicationAPI();
+        if(result.data){
+          const application:any=result.data.application.dob.toISOString()
+          setFormData({...application})
+        }
+      }catch(error){
+        console.log(error)
+      }
+    } */
+    const [formData, setFormData] = useState({
+      bio: "",
+      specializations: [] as string[],
+      languages: "",
+      profilePicture: null as File | string |null,
+      phone: "",
+      license: null as File | string |null,
+      resume: null as File | string |null,
+      submittedAt: new Date(),
+      address: "",
+      qualifications: "",
+      dob: null as string | null,
+      gender: null as "male" | "female" | "others" | null,
+    });
+  
+  
+    const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  
+    const specializations = [
+      "Anxiety Disorders",
+      "Depression",
+      "PTSD",
+      "Relationship Counseling",
+      "Child Psychology",
+      "Addiction Therapy",
+      "Cognitive Behavioral Therapy",
+      "Family Therapy",
+      "Grief Counseling",
+      "Stress Management",
+    ];
+  
+  
+    const handleInputChange = (field: string, value: any) => {
+      setFormData({ ...formData, [field]: value });
+      if (errors[field]) {
+        setErrors({ ...errors, [field]: "" });
+      }
+    };
+  
+  
+    const handleSpecializationToggle = (specialization: string) => {
+      const updatedSpecializations = formData.specializations.includes(
+        specialization
+      )
+        ? formData.specializations.filter((s: any) => s !== specialization)
+        : [...formData.specializations, specialization];
+      setFormData({ ...formData, specializations: updatedSpecializations });
+    };
+  
+  
+    const handleFileUpload = (field: string, file: File | null) => {
+      setFormData({ ...formData, [field]: file });
+    };
+  
+  
+    const validateForm = () => {
+      const newErrors: Record<string, string> = {};
+      if (!formData.bio.trim()) newErrors.bio = "Bio is required";
+      if (formData.specializations.length === 0)
+        newErrors.specializations = "At least one specialization is required";
+      if (!formData.languages.trim())
+        newErrors.languages = "Languages are required";
+      if (!formData.license) newErrors.license = "License document is required";
+      if (!formData.resume) newErrors.resume = "Resume is required";
+      if (!formData.profilePicture) newErrors.profilePicture = "Profile picture is required";
+      if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+      if (!formData.address.trim()) newErrors.address = "Address is required";
+      if (!formData.qualifications.trim())
+        newErrors.qualifications = "Qualifications are required";
+      if (!formData.dob) newErrors.dob = "Date of birth is required";
+      if (!formData.gender) newErrors.gender = "Gender is required";
+  
+  
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+  
+  
+    const handleSubmit = async (e: React.FormEvent) => {
+      try {
+        e.preventDefault();
+        if (validateForm()) {
+          const formDataInstance = new FormData();
+          formDataInstance.append("bio", formData.bio);
+          formDataInstance.append("languages", formData.languages);
+          formDataInstance.append("phone", formData.phone);
+          formDataInstance.append("address", formData.address);
+          formDataInstance.append(
+            "submittedAt",
+            formData.submittedAt.toISOString()
+          );
+          formDataInstance.append("qualifications", formData.qualifications);
+          if (formData.dob) formDataInstance.append("dob", formData.dob);
+          if (formData.gender) formDataInstance.append("gender", formData.gender);
+  
+  
+          formData.specializations.forEach((spec, i) => {
+            formDataInstance.append(`specializations[${i}]`, spec);
+          });
+  
+  
+          if (formData.profilePicture) {
+            formDataInstance.append("profilePicture", formData.profilePicture);
+          }
+          if (formData.license) {
+            formDataInstance.append("license", formData.license);
+          }
+          if (formData.resume) {
+            formDataInstance.append("resume", formData.resume);
+          }
+  
+  
+          const res = await psychologistApply(formDataInstance);
+          if (res.data) {
+            toast("Application submitted successfully");
+              fetchLatestApplication();
+            setShowForm(false);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
+  
+function handleShowForm(prefill: boolean) {
+  console.log("exisign application",existingApplication)
+  if (prefill && existingApplication && existingApplication.status === "rejected") {
+    setFormData({
+      bio: existingApplication.bio || "",
+      specializations: existingApplication.specializations || [],
+      languages: existingApplication.languages || "",
+      profilePicture: existingApplication.profilePicture || null,
+      phone: existingApplication.phone || "",
+      license: existingApplication.licenseUrl || null,
+      resume: existingApplication.resume || null,
+      submittedAt: new Date(),
+      address: existingApplication.address || "",
+      qualifications: existingApplication.qualifications || "",
+      dob: existingApplication.dob
+        ? new Date(existingApplication.dob).toISOString().split("T")[0]
+        : null,
+      gender: existingApplication.gender || null,
+    });
+  } 
+  setShowForm(true);
 }
-  async function fetchRejectedApplication(){
-    try{
-      const result=await fetchRejectedApplicationAPI();
-      if(result.data){
-        const application:any=result.data.application.dob.toISOString()
-        setFormData({...application})
-      }
-    }catch(error){
-      console.log(error)
-    }
-  }
-  const [formData, setFormData] = useState({
-    bio: "",
-    specializations: [] as string[],
-    languages: "",
-    profilePicture: null as File | string |null,
-    phone: "",
-    license: null as File | string |null,
-    resume: null as File | string |null,
-    submittedAt: new Date(),
-    address: "",
-    qualifications: "",
-    dob: null as string | null,
-    gender: null as "male" | "female" | "others" | null,
-  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const specializations = [
-    "Anxiety Disorders",
-    "Depression",
-    "PTSD",
-    "Relationship Counseling",
-    "Child Psychology",
-    "Addiction Therapy",
-    "Cognitive Behavioral Therapy",
-    "Family Therapy",
-    "Grief Counseling",
-    "Stress Management",
-  ];
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData({ ...formData, [field]: value });
-    if (errors[field]) {
-      setErrors({ ...errors, [field]: "" });
-    }
-  };
-
-  const handleSpecializationToggle = (specialization: string) => {
-    const updatedSpecializations = formData.specializations.includes(
-      specialization
-    )
-      ? formData.specializations.filter((s: any) => s !== specialization)
-      : [...formData.specializations, specialization];
-    setFormData({ ...formData, specializations: updatedSpecializations });
-  };
-
-  const handleFileUpload = (field: string, file: File | null) => {
-    setFormData({ ...formData, [field]: file });
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.bio.trim()) newErrors.bio = "Bio is required";
-    if (formData.specializations.length === 0)
-      newErrors.specializations = "At least one specialization is required";
-    if (!formData.languages.trim())
-      newErrors.languages = "Languages are required";
-    if (!formData.license) newErrors.license = "License document is required";
-    if (!formData.resume) newErrors.resume = "Resume is required";
-    if (!formData.profilePicture) newErrors.profilePicture = "Profile picture is required";
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.qualifications.trim())
-      newErrors.qualifications = "Qualifications are required";
-    if (!formData.dob) newErrors.dob = "Date of birth is required";
-    if (!formData.gender) newErrors.gender = "Gender is required";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault();
-      if (validateForm()) {
-        const formDataInstance = new FormData();
-        formDataInstance.append("bio", formData.bio);
-        formDataInstance.append("languages", formData.languages);
-        formDataInstance.append("phone", formData.phone);
-        formDataInstance.append("address", formData.address);
-        formDataInstance.append(
-          "submittedAt",
-          formData.submittedAt.toISOString()
-        );
-        formDataInstance.append("qualifications", formData.qualifications);
-        if (formData.dob) formDataInstance.append("dob", formData.dob);
-        if (formData.gender) formDataInstance.append("gender", formData.gender);
-
-        formData.specializations.forEach((spec, i) => {
-          formDataInstance.append(`specializations[${i}]`, spec);
-        });
-
-        if (formData.profilePicture) {
-          formDataInstance.append("profilePicture", formData.profilePicture);
-        }
-        if (formData.license) {
-          formDataInstance.append("license", formData.license);
-        }
-        if (formData.resume) {
-          formDataInstance.append("resume", formData.resume);
-        }
-
-        const res = await psychologistApply(formDataInstance);
-        if (res.data) {
-          toast("Application submitted successfully");
-         setSubmittedFlag(true);
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  };
-
-  return submittedFlag === false ? (
+  // ---------------------- FORM UI ----------------------
+  return (showForm ===true ?
+    (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="p-4 border-t border-gray-300">
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-3 w-1/6 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 group"
-          >
-            <LogOut
-              size={20}
-              className="transition-transform group-hover:scale-110"
-            />
-            <p>LOGOUT</p>
-          </button>
-        </div>
         <Card className="p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Complete Your Application
-            </h1>
-            <p className="text-gray-600">
-              Provide your professional details to join our platform
-            </p>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+            {existingApplication?.status === "rejected"
+              ? "Update and Reapply"
+              : "Complete Your Application"}
+          </h1>
+
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Profile Picture */}
             <div className="flex flex-col items-center md:items-start">
-              <div className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-300">
+              <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-dashed border-gray-300">
                 {formData.profilePicture ? (
-                  <img
-                    src={URL.createObjectURL(formData.profilePicture as File)}
-                    alt="Profile"
-                    className="w-full h-full rounded-full object-cover"
-                  />
+                  typeof formData.profilePicture === "string" ? (
+                    <img
+                      src={formData.profilePicture}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={URL.createObjectURL(formData.profilePicture)}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
-                  <Camera className="w-8 h-8 text-gray-400" />
+                  <Camera className="w-10 h-10 text-gray-400 m-auto mt-8" />
                 )}
               </div>
 
-              {/* Upload Button */}
+
               <Button
                 type="button"
                 variant="secondary"
@@ -243,14 +274,12 @@ function handlePrefill(){
                     e.target.files?.[0] || null
                   )
                 }
-                />
-                {errors.profilePicture && (
-                   <p className="text-red-500 text-sm">{errors.profilePicture}</p>
-                 )}
+              />
+              {errors.profilePicture && (
+                <p className="text-red-500 text-sm">{errors.profilePicture}</p>
+              )}
             </div>
-
-            <div className="mt-6 flex flex-col md:flex-row md:space-x-4 w-full">
-              {/* DOB */}
+ {/* DOB */}
               <div className="flex-1">
                 <div className="space-y-2">
                   <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
@@ -270,6 +299,7 @@ function handlePrefill(){
                   )}
                 </div>
               </div>
+
 
               {/* Gender */}
               <div className="flex-1">
@@ -298,6 +328,7 @@ function handlePrefill(){
                 </div>
               </div>
 
+
               {/* Phone */}
               <div className="flex-1">
                 <div className="space-y-2">
@@ -319,7 +350,7 @@ function handlePrefill(){
                   )}
                 </div>
               </div>
-            </div>
+
 
             {/* Bio */}
             <div className="space-y-2">
@@ -339,6 +370,7 @@ function handlePrefill(){
                 <p className="text-red-500 text-sm">{errors.bio}</p>
               )}
             </div>
+
 
             {/* Qualifications */}
             <div className="space-y-2">
@@ -362,6 +394,7 @@ function handlePrefill(){
               )}
             </div>
 
+
             {/* Address */}
             <div className="space-y-2">
               <label htmlFor="address" className="block text-sm font-medium text-gray-700">
@@ -380,6 +413,7 @@ function handlePrefill(){
                 <p className="text-red-500 text-sm">{errors.address}</p>
               )}
             </div>
+
 
             {/* Languages */}
             <div className="space-y-2">
@@ -405,6 +439,7 @@ function handlePrefill(){
                 <p className="text-red-500 text-sm">{errors.languages}</p>
               )}
             </div>
+
 
             {/* Specializations */}
             <div className="space-y-2">
@@ -440,113 +475,166 @@ function handlePrefill(){
               )}
             </div>
 
-            {/* License */}
-            <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Upload License Document
-                </label>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full"
-                  onClick={() => document.getElementById("license")?.click()}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {formData.license ? (formData.license as File).name : "Upload Document"}
-                </Button>
-                <input
-                  id="license"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={(e) =>
-                    handleFileUpload("license", e.target.files?.[0] || null)
-                  }
-                />
-                {errors.license && (
-                  <p className="text-red-500 text-sm">{errors.license}</p>
-                )}
-              </div>
-            </div>
 
-            {/* Resume */}
-            <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Upload Resume
-                </label>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full"
-                  onClick={() => document.getElementById("resume")?.click()}
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {formData.resume ? (formData.resume as File).name : "Upload Document"}
-                </Button>
-                <input
-                  id="resume"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={(e) =>
-                    handleFileUpload("resume", e.target.files?.[0] || null)
-                  }
-                />
-                {errors.resume && (
-                  <p className="text-red-500 text-sm">{errors.resume}</p>
-                )}
-              </div>
-            </div>
+            {/* License + Resume */}
+            {(["license", "resume"] as const).map((field) => {
+              const value = formData[field];
+              const label =
+                field === "license"
+                  ? "Upload License Document"
+                  : "Upload Resume";
 
-            <div className="flex space-x-4">
-              <Button
-                type="button"
-                variant="secondary"
-                className="flex-1"
-                onClick={() => navigate(-1)}
-              >
-                Back
-              </Button>
-              <Button type="submit" className="flex-1" size="lg">
-                Submit Application
-              </Button>
-            </div>
+
+              return (
+                <div key={field}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
+                    {label}
+                  </label>
+
+
+                  {typeof value === "string" ? (
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => window.open(value, "_blank")}
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        Download
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => document.getElementById(field)?.click()}
+                      >
+                        <Upload className="w-4 h-4 mr-1" />
+                        Re-upload
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => document.getElementById(field)?.click()}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Document
+                    </Button>
+                  )}
+
+
+                  <input
+                    id={field}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                    onChange={(e) =>
+                      handleFileUpload(field, e.target.files?.[0] || null)
+                    }
+                  />
+
+
+                  {errors[field] && (
+                    <p className="text-red-500 text-sm">{errors[field]}</p>
+                  )}
+                </div>
+              );
+            })}
+
+
+            <Button type="submit" className="w-full py-3 text-lg font-semibold">
+              Submit Application
+            </Button>
           </form>
         </Card>
       </div>
     </div>
-  ) : (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="p-4 border-t border-gray-300">
+  ):(
+
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+        <Card className="p-10 max-w-2xl text-center shadow-xl">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            {existingApplication === null
+              ? "Become a Verified Psychologist"
+              :existingApplication && existingApplication.status === "pending"
+              ? "Your Application is Pending"
+              : existingApplication && existingApplication.status === "rejected"
+              ? "Your Application was Rejected"
+              : ""}
+          </h1>
+
+
+          {existingApplication === null && (
+            <>
+              <p className="text-gray-600 mb-2">
+                You need to fill the form and apply to become a verified
+                psychologist.
+              </p>
+              <p className="text-gray-500 italic mb-8">
+                You can only apply 3 times from one account.
+              </p>
+              <Button
+                onClick={() => handleShowForm(false)}
+                size="lg"
+                className="px-6 py-3 text-lg font-semibold"
+              >
+                Fill Form
+              </Button>
+            </>
+          )}
+
+
+          {existingApplication && existingApplication.status === "pending" && (
+            <>
+              <p className="text-gray-600 mb-3">
+                Your application is under review.
+              </p>
+              <p className="text-gray-500">
+                Submitted on{" "}
+                <span className="font-semibold">
+                  {new Date(
+                    existingApplication!.submittedAt
+                  ).toLocaleDateString()}
+                </span>
+              </p>
+            </>
+          )}
+
+
+          {existingApplication && existingApplication.status === "rejected" && (
+            <>
+              <p className="text-gray-600 mb-4">
+                Your application was rejected for the following reason:
+              </p>
+              <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg p-3 mb-6">
+                {existingApplication?.rejectionReason || "No reason provided"}
+              </div>
+              <Button
+                onClick={() => handleShowForm(true)}
+                variant="secondary"
+                size="lg"
+              >
+                Re-Apply
+              </Button>
+            </>
+          )}
+
+
           <button
-            onClick={() => handleLogout()}
-            className="flex items-center space-x-3 w-full px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 group"
+            onClick={handleLogout}
+            className="mt-8 text-red-600 hover:underline flex items-center justify-center gap-2"
           >
-            <LogOut
-              size={20}
-              className="transition-transform group-hover:scale-110"
-            />
-          </button>
-        </div>
-        <Card className="p-8 shadow-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {`Your Application is ${status}`}
-            </h1>
-            {status==="rejected"?<p>
-              {rejectionReason}
-            </p>:null}
-          </div>
-          <button onClick={handlePrefill}>
-            RE-APPLY
+            <LogOut size={18} /> Logout
           </button>
         </Card>
       </div>
-    </div>
-  );
+    )
+  )
+
 };
+
 
 export default PsychologistApplication;
