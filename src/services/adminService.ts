@@ -1,4 +1,5 @@
 import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, SessionListingAdminResponse } from "../types/api/admin.types";
+import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
 
@@ -156,5 +157,31 @@ export const markAllNotificationsReadAPI = () => {
 export const getAdminUnreadNotificationsCountAPI = () => {
   return axiosInstance
     .get<GetUnreadNotificationCountResponse>(`/admin/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};
+export const getAdminTransactionsAPI = (payload:TransactionListingPayload) => {
+  const{page,limit,type,date,referenceType}=payload;
+  const params = new URLSearchParams();
+
+  params.append("page", page!.toString());
+  params.append("limit", limit!.toString());
+
+  if (type) params.append("type", type);
+  if (referenceType) params.append("referenceType", referenceType);
+  if (date) params.append("date", date);
+  return axiosInstance
+    .get<TransactionListingResponse>(`/admin/transactions?${params}`)
+    .then((res) => res);
+};
+export const getAdminWalletAPI = () => {
+  return axiosInstance
+    .get<WalletResponse>(`/admin/wallet`)
+    .then((res) => res);
+};
+export const downloadTransactionReceiptAPI = (transactionId:string) => {
+  return axiosInstance
+    .get(`/admin/transactions/${transactionId}/receipt`, {
+  responseType: "blob"
+})
     .then((res) => res);
 };

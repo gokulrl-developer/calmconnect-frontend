@@ -1,4 +1,5 @@
 import type { MessageResponse } from "../types/api/psychologist.types";
+import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type {
   CheckoutDataResponse,
   CheckSessionAccessResponse,
@@ -103,5 +104,31 @@ export const markAllNotificationsReadAPI = () => {
 export const getUserUnreadNotificationsCountAPI = () => {
   return axiosInstance
     .get<GetUnreadNotificationCountResponse>(`/user/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};
+export const getUserTransactionsAPI = (payload:TransactionListingPayload) => {
+  const{page,limit,type,date,referenceType}=payload;
+  const params = new URLSearchParams();
+
+  params.append("page", page!.toString());
+  params.append("limit", limit!.toString());
+
+  if (type) params.append("type", type);
+  if (referenceType) params.append("referenceType", referenceType);
+  if (date) params.append("date", date);
+  return axiosInstance
+    .get<TransactionListingResponse>(`/user/transactions?${params}`)
+    .then((res) => res);
+};
+export const getUserWalletAPI = () => {
+  return axiosInstance
+    .get<WalletResponse>(`/user/wallet`)
+    .then((res) => res);
+};
+export const downloadTransactionReceiptAPI = (transactionId:string) => {
+  return axiosInstance
+    .get(`/user/transactions/${transactionId}/receipt`, {
+  responseType: "blob"
+})
     .then((res) => res);
 };

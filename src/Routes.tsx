@@ -40,6 +40,9 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import PsychNotifications from "./pages/psychologist/Notifications"
 import UserNotifications from "./pages/user/Notifications"
 import AdminNotifications from "./pages/admin/Notifications"
+import AdminTransactions from "./pages/admin/Transactions"
+import PsychTransactions from "./pages/psychologist/Transactions"
+import UserTransactions from "./pages/user/Transactions"
 
 function AppRoutes() {
   return (
@@ -91,6 +94,7 @@ function AppRoutes() {
               />
               <Route path="/user/sessions" element={<UserSessions />} />
               <Route path="/user/notifications" element={<UserNotifications />} />
+              <Route path="/user/transactions" element={<UserTransactions />} />
               <Route
                 path="/user/sessions/:sessionId/video"
                 element={<UserVideoRoom />}
@@ -132,6 +136,7 @@ function AppRoutes() {
               />
               <Route path="/admin/sessions" element={<AdminSessions />} />
               <Route path="/admin/notifications" element={<AdminNotifications />} />
+              <Route path="/admin/transactions" element={<AdminTransactions />} />
             </Route>
           </Route>
 
@@ -183,6 +188,10 @@ function AppRoutes() {
               <Route
                 path="/psychologist/notifications"
                 element={<PsychNotifications />}
+              />
+              <Route
+                path="/psychologist/transactions"
+                element={<PsychTransactions />}
               />
               <Route
                 path="/psychologist/sessions/:sessionId/video"

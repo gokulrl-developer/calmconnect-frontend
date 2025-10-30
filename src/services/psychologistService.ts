@@ -1,4 +1,5 @@
 import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CheckSessionAccessResponse, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
+import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
 
@@ -159,5 +160,32 @@ export const markAllNotificationsReadAPI = () => {
 export const getPsychUnreadNotificationsCountAPI = () => {
   return axiosInstance
     .get<GetUnreadNotificationCountResponse>(`/psychologist/notifications/count`,{isSilentError:true} as any)
+    .then((res) => res);
+};
+
+export const getPsychTransactionsAPI = (payload:TransactionListingPayload) => {
+  const{page,limit,type,date,referenceType}=payload;
+  const params = new URLSearchParams();
+
+  params.append("page", page!.toString());
+  params.append("limit", limit!.toString());
+
+  if (type) params.append("type", type);
+  if (referenceType) params.append("referenceType", referenceType);
+  if (date) params.append("date", date);
+  return axiosInstance
+    .get<TransactionListingResponse>(`/psychologist/transactions?${params}`)
+    .then((res) => res);
+};
+export const getPsychWalletAPI = () => {
+  return axiosInstance
+    .get<WalletResponse>(`/psychologist/wallet`)
+    .then((res) => res);
+};
+export const downloadTransactionReceiptAPI = (transactionId:string) => {
+  return axiosInstance
+    .get(`/psychologist/transactions/${transactionId}/receipt`, {
+  responseType: "blob"
+})
     .then((res) => res);
 };
