@@ -101,7 +101,6 @@ const Applications: React.FC = () => {
     }
   };
 
-  // Search and pagination logic
   const filteredApplications = applications.filter(app =>
     `${app.firstName} ${app.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     app.email.toLowerCase().includes(search.toLowerCase())

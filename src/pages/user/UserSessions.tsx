@@ -53,7 +53,7 @@ const UserSessions: React.FC = () => {
   };
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
+      case "ended":
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
       case "cancelled":
         return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
@@ -61,8 +61,6 @@ const UserSessions: React.FC = () => {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
       case "pending":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
-      case "available":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
@@ -116,11 +114,10 @@ const UserSessions: React.FC = () => {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
-          <option value="all">All</option>
+           <option value="all">All</option>
           <option value="scheduled">Scheduled</option>
-          <option value="completed">Completed</option>
+          <option value="ended">Ended</option>
           <option value="cancelled">Cancelled</option>
-          <option value="available">Available</option>
           <option value="pending">Pending</option>
         </select>
       </div>
