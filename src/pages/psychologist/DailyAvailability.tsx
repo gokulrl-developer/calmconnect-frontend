@@ -33,8 +33,8 @@ import Modal from "../../components/UI/Modal";
 import { toast } from "sonner";
 
 export default function DailyAvailability() {
-  const [availabilityRule, setAvailabilityRule] =
-    useState<AvailabilityRuleDetails>({} as AvailabilityRuleDetails);
+  const [availabilityRules, setAvailabilityRule] =
+    useState<AvailabilityRuleDetails[]>([] as AvailabilityRuleDetails[]);
   const [originalSpecialDay, setOriginalSpecialDay] = useState<SpecialDay>(
     {} as SpecialDay
   );
@@ -88,8 +88,8 @@ export default function DailyAvailability() {
       });
 
       if (result.data) {
-        const { availabilityRule, specialDay, quickSlots } = result.data;
-        setAvailabilityRule(availabilityRule);
+        const { availabilityRules, specialDay, quickSlots } = result.data;
+        setAvailabilityRule(availabilityRules);
         if (specialDay) {
           setOriginalSpecialDay(specialDay);
           setCurrentSpecialDay(specialDay);
@@ -106,13 +106,17 @@ export default function DailyAvailability() {
             bufferTimeInMins: specialDay.bufferTimeInMins,
           });
           setSpecialDaySlots(slots);
-        } else if (availabilityRule) {
-          const slots = useGenerateSlots({
-            startTime: availabilityRule.startTime,
-            endTime: availabilityRule.endTime,
-            durationInMins: availabilityRule.durationInMins,
-            bufferTimeInMins: availabilityRule.bufferTimeInMins,
-          });
+        } else if (availabilityRules.length>0) {
+          let slots:Slot[]=[];
+          for(let availabilityRule of availabilityRules){
+            const availabilityRuleSlots = useGenerateSlots({
+              startTime: availabilityRule.startTime,
+              endTime: availabilityRule.endTime,
+              durationInMins: availabilityRule.durationInMins,
+              bufferTimeInMins: availabilityRule.bufferTimeInMins,
+            });
+            slots=[...availabilityRuleSlots]
+          }
           setAvailabilityRuleSlots(slots);
         }
 

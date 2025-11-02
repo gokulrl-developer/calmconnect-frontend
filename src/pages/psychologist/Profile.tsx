@@ -145,20 +145,21 @@ const PsychologistProfile: React.FC = () => {
       changedFields.forEach((field) => {
         const key = field as keyof PsychProfile["profile"];
         const value = profile[key];
-        if (key === "dob" && value)
+        if (key === "dob" && value){
           formData.append("dob", new Date(value as string).toISOString());
-        else if (value !== undefined && value !== null)
+        }else if(value !== undefined && value !== null){
           formData.append(
             key,
             key === "specializations" && Array.isArray(value)
               ? JSON.stringify(value)
               : (value as any)
           );
+        }
       });
 
       const result = await updatePsychProfile(formData);
       if (result.data) {
-        toast(result.data.message);
+        toast.success(result.data.message);
         setIsEditing(false);
         fetchProfile();
       }
@@ -364,7 +365,7 @@ const PsychologistProfile: React.FC = () => {
               </>
             ) : (
               <p className="text-gray-800 dark:text-white">
-                {profile.hourlyFees ? `$${profile.hourlyFees}` : "-"}
+                {profile.hourlyFees ? `INR ${profile.hourlyFees}` : "-"}
               </p>
             )}
           </div>

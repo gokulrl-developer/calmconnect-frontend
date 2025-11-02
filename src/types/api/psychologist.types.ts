@@ -62,7 +62,7 @@ export interface QuickSlot {
 
 // ---------- Daily Availability ----------
 export interface DailyAvailability {
-  availabilityRule: AvailabilityRuleDetails;
+  availabilityRules: AvailabilityRuleDetails[];
   specialDay?: SpecialDay;
   quickSlots: QuickSlot[];
 }
