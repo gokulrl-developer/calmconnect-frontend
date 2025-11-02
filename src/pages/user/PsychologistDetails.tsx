@@ -59,6 +59,7 @@ const PsychologistDetails: React.FC = () => {
       const res = await fetchPsychDetailsByUser(params.toString());
       if (res.data) {
         let data = res.data;
+        console.log(res.data.availableSlots)
         setAvailableSlots(data.availableSlots);
         const { availableSlots: _, ...psychInfo } = data;
         setPsychologist(psychInfo);
@@ -129,7 +130,7 @@ const PsychologistDetails: React.FC = () => {
               sessionId,
             });
             if (result.data) {
-              toast(result.data.message);
+              toast.success("Session booked successfully");
               setShowCheckoutModal(false);
               fetchPsychologistDetails(selectedDate);
             }
