@@ -1,4 +1,5 @@
-import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, SessionListingAdminResponse } from "../types/api/admin.types";
+import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, ComplaintDetailsResponse, ComplaintHistoryResponse, ComplaintListingResponse, SessionListingAdminResponse } from "../types/api/admin.types";
+import type { MessageResponse } from "../types/api/psychologist.types";
 import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
@@ -183,5 +184,45 @@ export const downloadTransactionReceiptAPI = (transactionId:string) => {
     .get(`/admin/transactions/${transactionId}/receipt`, {
   responseType: "blob"
 })
+    .then((res) => res);
+};
+
+// Complaints  --------------------------------
+export const resolveComplaintAPI = (complaintId:string,adminNotes:string) => {
+  return axiosInstance
+    .patch<MessageResponse>(`/admin/complaints/${complaintId}`, {
+  adminNotes
+})
+    .then((res) => res);
+};
+export const listComplaintsAPI = (page:number,limit:number,status?:"pending"|"resolved",search?:string) => {
+  let params=new URLSearchParams();
+params.append("page",page.toString());
+params.append("limit",limit.toString());
+if(status){
+  params.append("status",status)
+}
+if(search){
+  params.append("search",search)
+}
+  return axiosInstance
+    .get<ComplaintListingResponse>(`/admin/complaints?${params}`
+)
+    .then((res) => res);
+};
+export const fetchComplaintHistoryAPI = (psychId:string,page:number,limit:number) => {
+  let params=new URLSearchParams();
+params.append("page",page.toString());
+params.append("limit",limit.toString());
+params.append("psychId",psychId);
+  return axiosInstance
+    .get<ComplaintHistoryResponse>(`/admin/complaints/?${params}`
+)
+    .then((res) => res);
+};
+export const fetchComplaintDetailsAPI = (complaintId:string) => {
+  return axiosInstance
+    .get<ComplaintDetailsResponse>(`/admin/complaints/${complaintId}`
+)
     .then((res) => res);
 };

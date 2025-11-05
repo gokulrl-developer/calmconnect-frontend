@@ -45,8 +45,7 @@ export default function UserSidebar() {
     { path: '/user/psychologists', label: 'Book Session', icon: Calendar },
     { path: '/user/sessions', label: 'My Sessions', icon: Target },
     { path: '/user/transactions', label: 'Transactions', icon: CreditCard },
-    { path: '/user/warnings-actions', label: 'Warnings & Actions', icon: AlertTriangle },
-    { path: '/user/complaints', label: 'Support', icon: HelpCircle },
+    { path: '/user/complaints', label: 'Complaints', icon: AlertTriangle },
     { path: '/user/notifications', label: 'Notifications', icon: Bell },
   ] : [];
 

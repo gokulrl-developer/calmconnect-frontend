@@ -3,6 +3,7 @@ import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import {
   cancelSessionAPI,
+  createComplaintAPI,
   fetchSessionsByUserAPI,
 } from "../../services/userService";
 import { handleApiError } from "../../services/axiosInstance";
@@ -10,9 +11,10 @@ import type { SessionListingUserItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const UserSessions: React.FC = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<SessionListingUserItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -24,6 +26,12 @@ const UserSessions: React.FC = () => {
   });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [cancelSessionId, setCancelSessionId] = useState<string | null>(null);
+  const [showReportPsychologistModal, setShowReportPsychologistModal] =
+    useState(false);
+  const [complaintDescription, setComplaintDescription] = useState("");
+  const [complaintDescriptionError, setComplaintDescriptionError] =
+    useState("");
+  const [reportSessionId, setReportSessionId] = useState<string | null>(null);
   const loadSessions = async (page: number = 1, status: string = "all") => {
     setLoading(true);
     try {
@@ -48,6 +56,34 @@ const UserSessions: React.FC = () => {
     loadSessions(pagination.currentPage, statusFilter);
   }, [statusFilter]);
 
+  const reportPsychologist = (sessionId: string) => {
+    setReportSessionId(sessionId);
+    setShowReportPsychologistModal(true);
+  };
+  const closeReportPsychologistModal = () => {
+    setShowReportPsychologistModal(false);
+    setReportSessionId(null);
+    setComplaintDescription("");
+    setComplaintDescriptionError("");
+  };
+  const handleReportPsychologist = async () => {
+  if (!complaintDescription.trim()) {
+    setComplaintDescriptionError("Please describe your concern.");
+    return;
+  }
+  try {
+    const result = await createComplaintAPI(
+      reportSessionId!,
+      complaintDescription,
+    );
+    if (result.data) {
+      closeReportPsychologistModal();
+      toast.success(result.data.message)
+    }
+  } catch (error) {
+   console.log(error);
+  }
+};
   const joinSession = (sessionId: string) => {
     navigate(`/user/sessions/${sessionId}/video`);
   };
@@ -114,7 +150,7 @@ const UserSessions: React.FC = () => {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
-           <option value="all">All</option>
+          <option value="all">All</option>
           <option value="scheduled">Scheduled</option>
           <option value="ended">Ended</option>
           <option value="cancelled">Cancelled</option>
@@ -213,6 +249,13 @@ const UserSessions: React.FC = () => {
                         >
                           Join
                         </Button>
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          onClick={() => reportPsychologist(session.sessionId)}
+                        >
+                          Report
+                        </Button>
                       </td>
                     </tr>
                   ))
@@ -274,6 +317,63 @@ const UserSessions: React.FC = () => {
             </Button>
             <Button variant="danger" onClick={handleCancelSession}>
               Proceed to Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* complaintRaise Modal */}
+      <Modal
+        isOpen={showReportPsychologistModal}
+        onClose={closeReportPsychologistModal}
+        title="Report Psychologist"
+      >
+        <div className="space-y-4 p-3">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                Describe your issue below.
+              </h4>
+            </div>
+          </div>
+          <div className="rounded-lg p-4">
+            {/* Complaint Description */}
+            <div className="space-y-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={complaintDescription}
+                onChange={(e) => {setComplaintDescription(e.target.value)
+                  if(typeof e.target.value.trim()==="string" && e.target.value.trim()!==""){
+                    setComplaintDescriptionError("")
+                  }
+                }}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${
+                  complaintDescriptionError
+                    ? "border-red-300"
+                    : "border-gray-300"
+                }`}
+                placeholder="Describe the complaint"
+              />
+              {complaintDescriptionError && (
+                <p className="text-red-500 text-sm">
+                  {complaintDescriptionError}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button variant="secondary" onClick={closeReportPsychologistModal}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleReportPsychologist}>
+              Proceed
             </Button>
           </div>
         </div>

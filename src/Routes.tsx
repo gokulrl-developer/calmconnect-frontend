@@ -43,6 +43,9 @@ import AdminNotifications from "./pages/admin/Notifications"
 import AdminTransactions from "./pages/admin/Transactions"
 import PsychTransactions from "./pages/psychologist/Transactions"
 import UserTransactions from "./pages/user/Transactions"
+import UserComplaints from "./pages/user/UserComplaints";
+import AdminComplaints from "./pages/admin/AdminComplaints";
+import AdminComplaintDetails from "./pages/admin/AdminComplaintDetails";
 
 function AppRoutes() {
   return (
@@ -95,6 +98,7 @@ function AppRoutes() {
               <Route path="/user/sessions" element={<UserSessions />} />
               <Route path="/user/notifications" element={<UserNotifications />} />
               <Route path="/user/transactions" element={<UserTransactions />} />
+              <Route path="/user/complaints" element={<UserComplaints />} />
               <Route
                 path="/user/sessions/:sessionId/video"
                 element={<UserVideoRoom />}
@@ -137,6 +141,8 @@ function AppRoutes() {
               <Route path="/admin/sessions" element={<AdminSessions />} />
               <Route path="/admin/notifications" element={<AdminNotifications />} />
               <Route path="/admin/transactions" element={<AdminTransactions />} />
+              <Route path="/admin/complaints" element={<AdminComplaints />} />
+              <Route path="/admin/complaints/:complaintId" element={<AdminComplaintDetails />} />
             </Route>
           </Route>
 

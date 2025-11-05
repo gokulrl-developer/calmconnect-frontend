@@ -55,13 +55,7 @@ const Sidebar: React.FC = () => {
         </button>
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
-          onClick={()=>{navigate("/admin/sessions")}}>
-          <ClipboardDocumentListIcon className="w-5 h-5 mr-3" />
-          Sessions
-        </button>
-        <button
-          className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
-          >
+          onClick={()=>{navigate("/admin/complaints")}}>
           <FlagIcon className="w-5 h-5 mr-3 text-yellow-500" /> 
           Complaints
         </button>

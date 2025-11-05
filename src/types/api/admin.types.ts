@@ -48,3 +48,58 @@ export interface SessionListingAdminResponse {
   sessions:SessionListingAdminItem[],
   paginationData:paginationData
 }
+
+export interface ComplaintDetailsResponse {
+  userId: string;
+  userFullName: string;
+  userEmail: string;
+  psychologistId: string;
+  psychologistFullName: string;
+  psychologistEmail: string;
+  sessionId?: string;
+  sessionStartTime: string;
+  sessionEndTime: string;
+  sessionStatus: "scheduled" | "cancelled" | "ended" | "pending";
+  sessionFees: number;
+  description: string;
+  status: "pending" | "resolved";
+  createdAt: string;
+  adminNotes?: string;
+  resolvedAt?: string;
+}
+
+export interface ComplaintListingResponse{
+  complaints:ComplaintListItem[],
+  paginationData:paginationData
+}
+
+export interface ComplaintListItem{
+    complaintId:string,
+    userFullName:string,
+    userEmail:string,
+    psychologistFullName:string,
+    psychologistEmail:string,
+    sessionId?:string,
+    status:"pending"|"resolved",
+    createdAt:string
+}
+
+export interface ComplaintResolutionRequest{
+  adminNotes:string
+}
+
+export interface ComplaintHistoryItem{
+    complaintId:string,
+    userFullName:string,
+    userEmail:string,
+    psychologistFullName:string,
+    psychologistEmail:string,
+    sessionId?:string,
+    status:"pending"|"resolved",
+    createdAt:string
+}
+
+export interface ComplaintHistoryResponse{
+  complaints:ComplaintHistoryItem[],
+  paginationData:paginationData
+}
