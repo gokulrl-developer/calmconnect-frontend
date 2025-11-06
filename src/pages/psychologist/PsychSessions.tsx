@@ -16,6 +16,9 @@ const PsychSessions: React.FC = () => {
   const [sessions, setSessions] = useState<SessionListingPsychItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sessionDetails, setSessionDetails] =
+    useState<SessionListingPsychItem | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [pagination, setPagination] = useState<paginationData>({
     totalItems: 0,
     totalPages: 1,
@@ -101,6 +104,13 @@ const PsychSessions: React.FC = () => {
       console.log(error);
     }
   };
+  function viewDetails(sessionId: string) {
+    const sessionDetails = sessions.find(
+      (session: SessionListingPsychItem) => session.sessionId === sessionId
+    );
+    setSessionDetails(sessionDetails!);
+    setShowDetailsModal(true);
+  }
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -193,16 +203,18 @@ const PsychSessions: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-6 flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setCancelSessionId(session.sessionId);
-                            setShowConfirmationModal(true);
-                          }}
-                          disabled={session.status !== "scheduled"}
-                        >
-                          Cancel
-                        </Button>
+                        {session.status === "scheduled" && (
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => {
+                              setCancelSessionId(session.sessionId);
+                              setShowConfirmationModal(true);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        )}
                         <Button
                           variant="primary"
                           size="sm"
@@ -215,6 +227,13 @@ const PsychSessions: React.FC = () => {
                           onClick={() => joinSession(session.sessionId)}
                         >
                           Join
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => viewDetails(session.sessionId)}
+                        >
+                          Details
                         </Button>
                       </td>
                     </tr>
@@ -278,6 +297,94 @@ const PsychSessions: React.FC = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Session Details Modal */}
+      <Modal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        title="Session Details"
+      >
+        {sessionDetails ? (
+          <div className="space-y-4 p-3 text-gray-800 dark:text-gray-200">
+            {/* User Info */}
+            <div>
+              <h4 className="text-lg font-semibold dark:text-white mb-1">
+                User
+              </h4>
+              <p>{sessionDetails.userFullName || "N/A"}</p>
+              <p className="text-sm text-gray-500">
+                {sessionDetails.userEmail || "N/A"}
+              </p>
+            </div>
+
+            {/* Session Info */}
+            <div>
+              <h4 className="text-lg font-semibold dark:text-white mb-1">
+                Session Information
+              </h4>
+              <div className="text-sm space-y-1">
+                <p>
+                  <span className="font-medium">Session Id:</span> #
+                  {sessionDetails.sessionId.slice(-5)}
+                </p>
+                <p>
+                  <span className="font-medium">Start Time:</span>{" "}
+                  {formatDateTime(sessionDetails.startTime)}
+                </p>
+                <p>
+                  <span className="font-medium">End Time:</span>{" "}
+                  {formatDateTime(sessionDetails.endTime)}
+                </p>
+                <p>
+                  <span className="font-medium">Duration:</span>{" "}
+                  {sessionDetails.durationInMins} mins
+                </p>
+              </div>
+            </div>
+
+            {/* Payment Info */}
+            <div>
+              <h4 className="text-lg font-semibold dark:text-white mb-1">
+                Payment
+              </h4>
+              <p className="text-sm">
+                <span className="font-medium">Amount:</span> ₹
+                {sessionDetails.fees}
+              </p>
+            </div>
+
+            {/* Status */}
+            <div>
+              <h4 className="text-lg font-semibold dark:text-white mb-1">
+                Status
+              </h4>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                  sessionDetails.status
+                )}`}
+              >
+                {sessionDetails.status.charAt(0).toUpperCase() +
+                  sessionDetails.status.slice(1)}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500 text-center p-4">
+            Loading details...
+          </div>
+        )}
       </Modal>
     </div>
   );

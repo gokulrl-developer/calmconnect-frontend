@@ -16,8 +16,11 @@ import { toast } from "sonner";
 const UserSessions: React.FC = () => {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<SessionListingUserItem[]>([]);
+  const [sessionDetails, setSessionDetails] =
+    useState<SessionListingUserItem | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [pagination, setPagination] = useState<paginationData>({
     totalItems: 0,
     totalPages: 1,
@@ -67,23 +70,23 @@ const UserSessions: React.FC = () => {
     setComplaintDescriptionError("");
   };
   const handleReportPsychologist = async () => {
-  if (!complaintDescription.trim()) {
-    setComplaintDescriptionError("Please describe your concern.");
-    return;
-  }
-  try {
-    const result = await createComplaintAPI(
-      reportSessionId!,
-      complaintDescription,
-    );
-    if (result.data) {
-      closeReportPsychologistModal();
-      toast.success(result.data.message)
+    if (!complaintDescription.trim()) {
+      setComplaintDescriptionError("Please describe your concern.");
+      return;
     }
-  } catch (error) {
-   console.log(error);
-  }
-};
+    try {
+      const result = await createComplaintAPI(
+        reportSessionId!,
+        complaintDescription
+      );
+      if (result.data) {
+        closeReportPsychologistModal();
+        toast.success(result.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const joinSession = (sessionId: string) => {
     navigate(`/user/sessions/${sessionId}/video`);
   };
@@ -134,6 +137,13 @@ const UserSessions: React.FC = () => {
     }
   };
 
+  function viewDetails(sessionId: string) {
+    const sessionDetails = sessions.find(
+      (session: SessionListingUserItem) => session.sessionId === sessionId
+    );
+    setSessionDetails(sessionDetails!);
+    setShowDetailsModal(true);
+  }
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -226,16 +236,19 @@ const UserSessions: React.FC = () => {
                         </span>
                       </td>
                       <td className="p-6 flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setCancelSessionId(session.sessionId);
-                            setShowConfirmationModal(true);
-                          }}
-                          disabled={session.status !== "scheduled"}
-                        >
-                          Cancel
-                        </Button>
+                        {session.status === "scheduled" && (
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            onClick={() => {
+                              setCancelSessionId(session.sessionId);
+                              setShowConfirmationModal(true);
+                            }}
+                            disabled={session.status !== "scheduled"}
+                          >
+                            Cancel
+                          </Button>
+                        )}
                         <Button
                           variant="primary"
                           size="sm"
@@ -255,6 +268,13 @@ const UserSessions: React.FC = () => {
                           onClick={() => reportPsychologist(session.sessionId)}
                         >
                           Report
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => viewDetails(session.sessionId)}
+                        >
+                          Details
                         </Button>
                       </td>
                     </tr>
@@ -348,9 +368,13 @@ const UserSessions: React.FC = () => {
               <textarea
                 id="description"
                 value={complaintDescription}
-                onChange={(e) => {setComplaintDescription(e.target.value)
-                  if(typeof e.target.value.trim()==="string" && e.target.value.trim()!==""){
-                    setComplaintDescriptionError("")
+                onChange={(e) => {
+                  setComplaintDescription(e.target.value);
+                  if (
+                    typeof e.target.value.trim() === "string" &&
+                    e.target.value.trim() !== ""
+                  ) {
+                    setComplaintDescriptionError("");
                   }
                 }}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${
@@ -377,6 +401,107 @@ const UserSessions: React.FC = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Session Details Modal */}
+      <Modal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        title="Session Details"
+      >
+        {sessionDetails ? (
+          <div className="space-y-4 p-3 text-gray-800 dark:text-gray-200">
+            {/* Psychologist Info */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                Psychologist
+              </h4>
+              <p>{sessionDetails.psychFullName || "N/A"}</p>
+              <p className="text-sm text-gray-500">
+                {sessionDetails.psychEmail || "N/A"}
+              </p>
+            </div>
+
+            {/* Session Info */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                Session Information
+              </h4>
+              <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <p>
+                  <span className="font-medium">Session Id:</span> #
+                  {sessionDetails.sessionId.split("").slice(-5).join("")}
+                </p>
+                <p>
+                  <span className="font-medium">Start Time:</span>{" "}
+                  {formatDateTime(sessionDetails.startTime)}
+                </p>
+                <p>
+                  <span className="font-medium">End Time:</span>{" "}
+                  {formatDateTime(sessionDetails.endTime)}
+                </p>
+                <p>
+                  <span className="font-medium">Duration:</span>{" "}
+                  {sessionDetails.durationInMins} minutes
+                </p>
+              </div>
+            </div>
+
+            {/* Payment Info */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                Payment
+              </h4>
+              <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <p>
+                  <span className="font-medium">Amount:</span> ₹
+                  {sessionDetails.fees}
+                </p>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-1">
+                Status
+              </h4>
+              <p>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    sessionDetails.status
+                  )}`}
+                >
+                  {sessionDetails.status.charAt(0).toUpperCase() +
+                    sessionDetails.status.slice(1)}
+                </span>
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end space-x-3 pt-4">
+              {sessionDetails.status === "ended" && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => toast.info("Prompt for rating/review")}
+                >
+                  Rate & Review
+                </Button>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500 text-center p-4">
+            Loading details...
+          </div>
+        )}
       </Modal>
     </div>
   );
