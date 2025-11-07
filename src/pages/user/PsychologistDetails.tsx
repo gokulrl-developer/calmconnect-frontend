@@ -8,15 +8,18 @@ import {
   createOrder,
   fetchCheckoutData,
   fetchPsychDetailsByUser,
+  listPsychReviewsAPI,
   verifyPayment,
 } from "../../services/userService";
 import Modal from "../../components/UI/Modal";
 import type { CheckoutData } from "../../types/components/user.types";
 import { toast } from "sonner";
 import type { Slot } from "../../types/domain/AvailabiliityRule.types";
+import type { ListPsychReviewsItem } from "../../types/api/user.types";
+import type paginationData from "../../types/pagination.types";
+import { produce } from "immer";
+import Pagination from "../../components/Pagination";
 declare var Razorpay: any;
-
-
 
 export interface PsychDetails {
   availableSlots: Slot[];
@@ -48,6 +51,16 @@ const PsychologistDetails: React.FC = () => {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
+  const [reviews, setReviews] = useState<ListPsychReviewsItem[]>([]);
+  const [sortReviews, setSortReviews] = useState<"recent" | "top-rated">(
+    "recent"
+  );
+  const [pagination, setPagination] = useState<paginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 5,
+  });
 
   // --- Fetch Psychologist Details ---
   const fetchPsychologistDetails = async (date: Date) => {
@@ -59,21 +72,45 @@ const PsychologistDetails: React.FC = () => {
       const res = await fetchPsychDetailsByUser(params.toString());
       if (res.data) {
         let data = res.data;
-        console.log(res.data.availableSlots)
+        console.log(res.data.availableSlots);
         setAvailableSlots(data.availableSlots);
         const { availableSlots: _, ...psychInfo } = data;
         setPsychologist(psychInfo);
       }
     } catch (error) {
-      setAvailableSlots([])
+      setAvailableSlots([]);
       console.error("Error fetching psychologist details:", error);
     }
   };
 
   useEffect(() => {
     fetchPsychologistDetails(selectedDate);
-  }, [psychId, selectedDate]);
+  }, [psychId, selectedDate]); 
+  useEffect(() => {
+    loadReviews();
+  }, [psychId, pagination.currentPage,sortReviews]);
 
+   const loadReviews = async () => {
+      try {
+        if(!psychId){
+          return;
+        }
+        const queryParams = new URLSearchParams();
+        queryParams.set("page",pagination.currentPage.toString());
+        queryParams.set("limit",pagination.pageSize.toString());
+        queryParams.set("psychId",psychId);
+        queryParams.set("sort",sortReviews)
+        const result = await listPsychReviewsAPI(queryParams.toString());
+  
+        if (result.data) {
+          setReviews(result.data.reviews)
+          setPagination(result.data.paginationData);
+        }
+      } catch (error) {
+        console.log("error fetching reviews",error)
+      }
+    };
+  
   const handleSlotClick = async (slot: string) => {
     setSelectedSlot(slot);
     const result = await fetchCheckoutData({
@@ -153,33 +190,6 @@ const PsychologistDetails: React.FC = () => {
       console.error("Payment error:", err);
     }
   }
-
-  const reviews = [
-    {
-      id: 1,
-      user: "Anonymous",
-      rating: 5,
-      text: "Dr. Johnson helped me overcome my anxiety.",
-      date: "2024-07-15",
-      consultations: 8,
-    },
-    {
-      id: 2,
-      user: "Anonymous",
-      rating: 5,
-      text: "Excellent therapist. I feel much better after our sessions.",
-      date: "2024-07-10",
-      consultations: 12,
-    },
-    {
-      id: 3,
-      user: "Anonymous",
-      rating: 4,
-      text: "Very helpful and understanding. Recommended!",
-      date: "2024-07-05",
-      consultations: 3,
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-background py-6">
@@ -303,7 +313,7 @@ const PsychologistDetails: React.FC = () => {
           <div className="space-y-3">
             {reviews.map((review) => (
               <div
-                key={review.id}
+                key={review.reviewId}
                 className="border-b border-border pb-3 last:border-b-0"
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -315,15 +325,22 @@ const PsychologistDetails: React.FC = () => {
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {review.user} • {new Date(review.date).toLocaleDateString()}{" "}
-                    • {review.consultations} consultations
+                    {"Anonymous"} • {new Date(review.createdAt).toLocaleDateString()}{" "}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">{review.text}</p>
+                <p className="text-sm text-muted-foreground">{review.comment}</p>
               </div>
             ))}
           </div>
         </Card>
+        <Pagination
+         paginationData={pagination}
+         setCurrentPage={(page:number)=>setPagination(
+          produce(draft=>{
+            draft.currentPage=page
+          })
+         )}
+        />
       </div>
 
       {/* Checkout modal */}

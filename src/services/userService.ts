@@ -11,7 +11,9 @@ import type {
   ComplaintListingResponse,
   CreateOrderRequest,
   CreateOrderResponse,
+  CreateReviewRequest,
   FetchCheckoutRequest,
+  ListPsychReviewsResponse,
   ListPsychSummary,
   PsychDetails,
   SessionListingUserResponse,
@@ -166,5 +168,15 @@ export const listComplaintsAPI = (page: number, limit: number) => {
 export const fetchComplaintDetailsAPI = (complaintId: string) => {
   return axiosInstance
     .get<ComplaintDetailsResponse>(`/user/complaints/${complaintId}`)
+    .then((res) => res);
+};
+export const createReviewAPI = (payload:CreateReviewRequest) => {
+  return axiosInstance
+    .post<MessageResponse>(`/user/reviews/`,payload)
+    .then((res) => res);
+};
+export const listPsychReviewsAPI = (query:string) => {
+  return axiosInstance
+    .get<ListPsychReviewsResponse>(`/user/reviews?${query}`)
     .then((res) => res);
 };

@@ -4,6 +4,7 @@ import Button from "../../components/UI/Button";
 import {
   cancelSessionAPI,
   createComplaintAPI,
+  createReviewAPI,
   fetchSessionsByUserAPI,
 } from "../../services/userService";
 import { handleApiError } from "../../services/axiosInstance";
@@ -35,6 +36,12 @@ const UserSessions: React.FC = () => {
   const [complaintDescriptionError, setComplaintDescriptionError] =
     useState("");
   const [reportSessionId, setReportSessionId] = useState<string | null>(null);
+  const [showRateModal, setShowRateModal] = useState(false);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewCommentError, setReviewCommentError] = useState("");
+  const [ratingError, setRatingError] = useState("");
+  const [rating, setRating] = useState<number | null>(null);
+  const [reviewSessionId, setReviewSessionId] = useState<string | null>(null);
   const loadSessions = async (page: number = 1, status: string = "all") => {
     setLoading(true);
     try {
@@ -54,7 +61,7 @@ const UserSessions: React.FC = () => {
       setLoading(false);
     }
   };
-
+ 
   useEffect(() => {
     loadSessions(pagination.currentPage, statusFilter);
   }, [statusFilter]);
@@ -143,6 +150,47 @@ const UserSessions: React.FC = () => {
     );
     setSessionDetails(sessionDetails!);
     setShowDetailsModal(true);
+  }
+
+  const closeReviewModal = () => {
+    setShowRateModal(false);
+    setReviewComment("");
+    setReviewCommentError("");
+    setRating(null);
+    setReviewSessionId(null);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!rating) {
+      toast.error("Please select a rating before submitting.");
+      return;
+    }
+    if (reviewComment.trim().length > 300) {
+      setReviewCommentError("Comment should not exceed 300 characters.");
+      return;
+    }
+    if (!rating) {
+      setRatingError("Rating is needed for submitting review.");
+      return;
+    }
+
+    try {
+       const result = await createReviewAPI({
+        sessionId: reviewSessionId!,
+        rating,
+        comment: reviewComment.trim(),
+      });
+
+      if (result.data) {
+        toast.success(result.data.message || "Review submitted successfully!");
+        closeReviewModal();
+      } 
+    } catch (error) {
+      console.log("error on submitting review", error);
+    }
+  };
+  function markRating(star:number){
+    setRating(star);
   }
   return (
     <div className="space-y-6">
@@ -244,7 +292,6 @@ const UserSessions: React.FC = () => {
                               setCancelSessionId(session.sessionId);
                               setShowConfirmationModal(true);
                             }}
-                            disabled={session.status !== "scheduled"}
                           >
                             Cancel
                           </Button>
@@ -276,6 +323,18 @@ const UserSessions: React.FC = () => {
                         >
                           Details
                         </Button>
+                        {session.status === "ended" && (
+                          <Button
+                            size="sm"
+                            variant="success"
+                            onClick={() => {
+                              setShowRateModal(true);
+                              setReviewSessionId(session.sessionId);
+                            }}
+                          >
+                            Rate
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -402,6 +461,90 @@ const UserSessions: React.FC = () => {
           </div>
         </div>
       </Modal>
+      {/* Rate and Review Modal */}
+      <Modal
+        isOpen={showRateModal}
+        onClose={closeReviewModal}
+        title="Rate and Review Psychologist"
+      >
+        <div className="space-y-4 p-3">
+          {/* Rating Section */}
+          <div className="flex flex-col items-center space-y-3">
+            <h4 className="text-lg font-semibold text-gray-800">
+              Rate your experience
+            </h4>
+            <div className="flex space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <svg
+                  key={star}
+                  onClick={() => markRating(star)}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill={star <= (rating || 0) ? "#facc15" : "none"}
+                  stroke="#facc15"
+                  strokeWidth="2"
+                  className={`w-8 h-8 cursor-pointer transition-transform duration-200 hover:scale-110 ${
+                    star <= (rating || 0)
+                      ? "drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]"
+                      : "hover:drop-shadow-[0_0_3px_rgba(250,204,21,0.4)]"
+                  }`}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                  />
+                </svg>
+              ))}
+            </div>
+            {rating && (
+              <p className="text-sm text-gray-600">
+                You rated <span className="font-medium">{rating}</span> out of 5
+              </p>
+            )}
+            {ratingError && (
+             <p className="text-red-500 text-sm">{ratingError}</p>
+           )}
+          </div>
+
+          {/* Review Textarea */}
+          <div className="rounded-lg p-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="reviewComment"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Comment (optional)
+              </label>
+              <textarea
+                id="reviewComment"
+                value={reviewComment}
+                onChange={(e) => {
+                  setReviewComment(e.target.value);
+                  setReviewCommentError("");
+                }}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${
+                  reviewCommentError ? "border-red-300" : "border-gray-300"
+                }`}
+                placeholder="Share your experience..."
+              />
+              {reviewCommentError && (
+                <p className="text-red-500 text-sm">{reviewCommentError}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button variant="secondary" onClick={closeReviewModal}>
+              Cancel
+            </Button>
+            <Button variant="success" onClick={handleSubmitReview}>
+              Submit Review
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Session Details Modal */}
       <Modal
@@ -479,15 +622,6 @@ const UserSessions: React.FC = () => {
 
             {/* Actions */}
             <div className="flex justify-end space-x-3 pt-4">
-              {sessionDetails.status === "ended" && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => toast.info("Prompt for rating/review")}
-                >
-                  Rate & Review
-                </Button>
-              )}
               <Button
                 variant="secondary"
                 size="sm"
