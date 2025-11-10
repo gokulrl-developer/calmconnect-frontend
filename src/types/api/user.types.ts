@@ -135,3 +135,27 @@ export interface CreateComplaintRequest {
   sessionId: string;
   description: string;
 }
+
+export interface CreateReviewRequest{
+  sessionId:string,
+  rating:number,
+  comment?:string, // max 300 characters
+}
+
+export interface ListPsychReviewsItem {
+  reviewId: string;
+  rating: number; // 1-5
+  createdAt: string;
+  comment?: string; // 300 characters ...
+}
+export interface ListPsychReviewsResponse {
+  paginationData: paginationData;
+  reviews: ListPsychReviewsItem[];
+}
+
+export interface ListPsychReviewsRequest{
+ psychId:string;
+ sort:"recent"|"top-rated";
+ skip:number;
+ limit:number;
+}
