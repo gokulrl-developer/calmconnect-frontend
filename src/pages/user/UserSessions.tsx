@@ -13,6 +13,7 @@ import type paginationData from "../../types/pagination.types";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import Table from "../../components/UI/Table";
 
 const UserSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const UserSessions: React.FC = () => {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
     loadSessions(pagination.currentPage, statusFilter);
   }, [statusFilter]);
@@ -175,7 +176,7 @@ const UserSessions: React.FC = () => {
     }
 
     try {
-       const result = await createReviewAPI({
+      const result = await createReviewAPI({
         sessionId: reviewSessionId!,
         rating,
         comment: reviewComment.trim(),
@@ -184,12 +185,12 @@ const UserSessions: React.FC = () => {
       if (result.data) {
         toast.success(result.data.message || "Review submitted successfully!");
         closeReviewModal();
-      } 
+      }
     } catch (error) {
       console.log("error on submitting review", error);
     }
   };
-  function markRating(star:number){
+  function markRating(star: number) {
     setRating(star);
   }
   return (
@@ -218,130 +219,108 @@ const UserSessions: React.FC = () => {
 
       <Card>
         <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-6 text-center text-gray-500 dark:text-gray-300">
-              Loading...
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Psychologist
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Start Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    End Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Status
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="p-6 text-center text-gray-500 dark:text-gray-300"
+          <Table<SessionListingUserItem, "sessionId">
+            keyField="sessionId"
+            data={sessions}
+            loading={loading}
+            columns={[
+              {
+                header: "Psychologist",
+                render: (_, row) => (
+                  <div>
+                    <div className="text-gray-800 dark:text-white font-medium">
+                      {row!.psychFullName}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {row!.psychEmail}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Start Time",
+                accessor: "startTime",
+                render: (value) => formatDateTime(value as string),
+              },
+              {
+                header: "End Time",
+                accessor: "endTime",
+                render: (value) => formatDateTime(value as string),
+              },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (value) => (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      value as string
+                    )}`}
+                  >
+                    {(value as string).charAt(0).toUpperCase() +
+                      (value as string).slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <div className="flex gap-2">
+                    {row!.status === "scheduled" && (
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => {
+                          setCancelSessionId(row!.sessionId);
+                          setShowConfirmationModal(true);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      disabled={
+                        row!.status !== "scheduled" ||
+                        new Date(row!.startTime).getTime() - Date.now() >
+                          5 * 60 * 1000 || // 5 minutes
+                        new Date(row!.endTime).getTime() < Date.now()
+                      }
+                      onClick={() => joinSession(row!.sessionId)}
                     >
-                      No sessions found
-                    </td>
-                  </tr>
-                ) : (
-                  sessions.map((session) => (
-                    <tr
-                      key={session.sessionId}
-                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
+                      Join
+                    </Button>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => reportPsychologist(row!.sessionId)}
                     >
-                      <td className="p-6">
-                        <div className="text-gray-800 dark:text-white font-medium">
-                          {session.psychFullName}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {session.psychEmail}
-                        </div>
-                      </td>
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.startTime)}
-                      </td>
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.endTime)}
-                      </td>
-                      <td className="p-6">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            session.status
-                          )}`}
-                        >
-                          {session.status.charAt(0).toUpperCase() +
-                            session.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="p-6 flex gap-2">
-                        {session.status === "scheduled" && (
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => {
-                              setCancelSessionId(session.sessionId);
-                              setShowConfirmationModal(true);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          disabled={
-                            session.status !== "scheduled" ||
-                            new Date(session.startTime).getTime() - Date.now() >
-                              5 * 60 * 1000 || // 5 minutes
-                            new Date(session.endTime).getTime() < Date.now()
-                          }
-                          onClick={() => joinSession(session.sessionId)}
-                        >
-                          Join
-                        </Button>
-                        <Button
-                          variant="warning"
-                          size="sm"
-                          onClick={() => reportPsychologist(session.sessionId)}
-                        >
-                          Report
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => viewDetails(session.sessionId)}
-                        >
-                          Details
-                        </Button>
-                        {session.status === "ended" && (
-                          <Button
-                            size="sm"
-                            variant="success"
-                            onClick={() => {
-                              setShowRateModal(true);
-                              setReviewSessionId(session.sessionId);
-                            }}
-                          >
-                            Rate
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
+                      Report
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => viewDetails(row!.sessionId)}
+                    >
+                      Details
+                    </Button>
+                    {row!.status === "ended" && (
+                      <Button
+                        size="sm"
+                        variant="success"
+                        onClick={() => {
+                          setShowRateModal(true);
+                          setReviewSessionId(row!.sessionId);
+                        }}
+                      >
+                        Rate
+                      </Button>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
 
         {/* Pagination */}
@@ -503,8 +482,8 @@ const UserSessions: React.FC = () => {
               </p>
             )}
             {ratingError && (
-             <p className="text-red-500 text-sm">{ratingError}</p>
-           )}
+              <p className="text-red-500 text-sm">{ratingError}</p>
+            )}
           </div>
 
           {/* Review Textarea */}

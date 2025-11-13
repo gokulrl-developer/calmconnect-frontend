@@ -12,6 +12,7 @@ import {
   listComplaintsAPI,
 } from "../../services/userService";
 import Modal from "../../components/UI/Modal";
+import Table from "../../components/UI/Table";
 
 const UserComplaints: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -156,90 +157,66 @@ const UserComplaints: React.FC = () => {
 
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Complaint ID
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Psychologist
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Email
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Status
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Created At
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {complaints.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="p-6 text-center text-gray-500 dark:text-gray-300"
+          <Table<ComplaintListingItem, "complaintId">
+            keyField="complaintId"
+            data={complaints}
+            loading={false}
+            columns={[
+              {
+                header: "Complaint ID",
+                accessor: "complaintId",
+                render: (value) => `#${value!.slice(-4)}`,
+              },
+              {
+                header: "Psychologist",
+                accessor: "psychologistFullName",
+              },
+              {
+                header: "Email",
+                accessor: "psychologistEmail",
+              },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (value) => (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                      value as string
+                    )}`}
                   >
-                    No complaints found
-                  </td>
-                </tr>
-              ) : (
-                complaints.map((complaint) => (
-                  <tr
-                    key={complaint.complaintId}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                  >
-                    <td className="p-6 text-gray-800 dark:text-white font-medium">
-                      #{complaint.complaintId.slice(-4)}
-                    </td>
-                    <td className="p-6 text-gray-800 dark:text-white">
-                      {complaint.psychologistFullName}
-                    </td>
-                    <td className="p-6 text-gray-800 dark:text-white">
-                      {complaint.psychologistEmail}
-                    </td>
-                    <td className="p-6">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          complaint.status
-                        )}`}
-                      >
-                        {complaint.status.charAt(0).toUpperCase() +
-                          complaint.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="p-6 text-gray-800 dark:text-white whitespace-nowrap">
-                      {formatDateTime(complaint.createdAt)}
-                    </td>
-                    <td className="p-6 flex gap-2">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() =>
-                          viewComplaintDetails(complaint.complaintId)
-                        }
-                      >
-                        Details
-                      </Button>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => viewSessionDetails(complaint.sessionId)}
-                      >
-                        Session
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                    {(value as string).charAt(0).toUpperCase() +
+                      (value as string).slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Created At",
+                accessor: "createdAt",
+                render: (value) => formatDateTime(value),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => viewComplaintDetails(row!.complaintId)}
+                    >
+                      Details
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => viewSessionDetails(row!.sessionId)}
+                    >
+                      Session
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
 
         {/* Pagination */}

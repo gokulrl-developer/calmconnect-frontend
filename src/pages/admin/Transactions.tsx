@@ -14,6 +14,7 @@ import {
   getAdminTransactionsAPI,
   getAdminWalletAPI,
 } from "../../services/adminService";
+import Table from "../../components/UI/Table";
 
 const Transactions: React.FC = () => {
   const [type, setType] = useState<"debit" | "credit" | undefined>(undefined);
@@ -176,84 +177,95 @@ const Transactions: React.FC = () => {
         </div>
 
         {/* Transactions Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Transaction ID
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Type
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Amount
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Purpose
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Date & Time
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {transactions.map((txn) => (
-                <tr
-                  key={txn.transactionId}
-                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
+        <Table<TransactionListItem,"transactionId">
+          keyField="transactionId"
+          data={transactions}
+          columns={[
+            {
+              header: "Transaction ID",
+              accessor: "transactionId",
+              render: (value) => (
+                <span className="text-gray-800 dark:text-white">
+                  {typeof value==="string" &&"#" + value.split("").slice(-4).join("")}
+                </span>
+              ),
+            },
+            {
+              header: "Type",
+              accessor: "type",
+              render: (value) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    value === "credit"
+                      ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200"
+                      : "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200"
+                  }`}
                 >
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {"#" + txn.transactionId.split("").slice(-4).join("")}
-                  </td>
-                  <td className="p-6">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(
-                        txn.type
-                      )}`}
-                    >
-                      {txn.type.charAt(0).toUpperCase() + txn.type.slice(1)}
-                    </span>
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    ₹{txn.amount.toLocaleString()}
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {txn.referenceType
-                      ? txn.referenceType
-                          .replace(/([A-Z])/g, " $1")
-                          .replace(/^./, (s) => s.toUpperCase())
-                      : "N/A"}
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {new Intl.DateTimeFormat("en-IN", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    }).format(new Date(txn.createdAt))}
-                  </td>
-                  <td className="p-6 flex space-x-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleReceiptDownload(txn.transactionId)}
-                    >
-                      <ArrowDownTrayIcon className="w-4 h-4 mr-1" />
-                      Receipt
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  {typeof value==="string" &&value.charAt(0).toUpperCase() + value.slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Amount",
+              accessor: "amount",
+              render: (value) => (
+                <span className="text-gray-800 dark:text-white">
+                  ₹{typeof value==="number" &&value.toLocaleString()}
+                </span>
+              ),
+            },
+            {
+              header: "Purpose",
+              accessor: "referenceType",
+              render: (value) => (
+                <span className="text-gray-800 dark:text-white">
+                  {typeof value==="string" 
+                    ? value
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/^./, (s) => s.toUpperCase())
+                    : "N/A"}
+                </span>
+              ),
+            },
+            {
+              header: "Date & Time",
+              accessor: "createdAt",
+              render: (value) => (
+                <span className="text-gray-800 dark:text-white">
+                  {typeof value==="string" &&new Intl.DateTimeFormat("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  }).format(new Date(value))}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              accessor: "transactionId",
+              render: (value) => 
+                  (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    {typeof value==="string" &&
+                    handleReceiptDownload(value)}
+                  }
+                  }
+                >
+                  <ArrowDownTrayIcon className="w-4 h-4 mr-1" />
+                  Receipt
+                </Button>
+                  )
+            
+              
+            },
+          ]}
+        />
 
         {/* Pagination */}
         <Pagination
