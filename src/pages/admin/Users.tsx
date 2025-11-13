@@ -6,6 +6,7 @@ import { fetchUsers, updateUserStatus } from "../../services/adminService";
 import type { UserItem } from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
+import Table from "../../components/UI/Table";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
@@ -133,70 +134,70 @@ const [confirmationModal, setConfirmationModal] = useState<{
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          {loading ? (
-            <p className="text-center text-gray-600 dark:text-gray-400">Loading...</p>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">User</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">Email</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
+       <Table<UserItem>
+          loading={loading}
+          data={filteredUsers}
+          keyField="id"
+          columns={[
+            {
+              header: "User",
+              render: (_, user) => (
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800 dark:text-white">
+                      {user!.firstName} {user!.lastName}
+                    </p>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Email",
+              accessor: "email",
+              className: "text-gray-800 dark:text-white",
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (status, user) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    status!
+                  )}`}
+                >
+                  {status!.charAt(0).toUpperCase() + status!.slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              render: (_, user) => (
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleView(user!.id)}
                   >
-                    <td className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <UserIcon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-800 dark:text-white">
-                            {user.firstName} {user.lastName}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-gray-800 dark:text-white">{user.email}</td>
-                    <td className="p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}
-                      >
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={()=>handleView(user.id)}
-                        >
-                          <EyeIcon className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          variant={user.status === "active" ? "warning" : "success"}
-                          size="sm"
-                          onClick={() => openConfirmationModal(user.id, user.status)}
-                        >
-                          {user.status === "active" ? "Deactivate" : "Activate"}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                    <EyeIcon className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button
+                    variant={user!.status === "active" ? "warning" : "success"}
+                    size="sm"
+                    onClick={() =>
+                      openConfirmationModal(user!.id, user!.status)
+                    }
+                  >
+                    {user!.status === "active" ? "Deactivate" : "Activate"}
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+        />
 
         {/* Pagination */}
         <div className="flex justify-between items-center mt-4">

@@ -10,13 +10,17 @@ import type {
   ComplaintListItem,
   ComplaintListingResponse,
 } from "../../types/api/admin.types";
-import { listComplaintsAPI, resolveComplaintAPI } from "../../services/adminService";
+import {
+  listComplaintsAPI,
+  resolveComplaintAPI,
+} from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import Table from "../../components/UI/Table";
 
 const AdminComplaints: React.FC = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const [complaints, setComplaints] = useState<ComplaintListItem[]>([]);
   const [pagination, setPagination] = useState<paginationData>({
     totalItems: 0,
@@ -28,7 +32,7 @@ const AdminComplaints: React.FC = () => {
     "all" | "pending" | "resolved"
   >("all");
   const [searchQuery, setSearchQuery] = useState("");
-const [showResolveModal, setShowResolveModal] = useState(false);
+  const [showResolveModal, setShowResolveModal] = useState(false);
   const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(
     null
   );
@@ -88,10 +92,10 @@ const [showResolveModal, setShowResolveModal] = useState(false);
     });
 
     const timePart = date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
-    
+
     return (
       <div className="flex flex-col leading-tight">
         <span>{datePart}</span>
@@ -99,7 +103,7 @@ const [showResolveModal, setShowResolveModal] = useState(false);
       </div>
     );
   };
-    const openResolveModal = (complaintId: string) => {
+  const openResolveModal = (complaintId: string) => {
     setSelectedComplaintId(complaintId);
     setShowResolveModal(true);
   };
@@ -119,17 +123,17 @@ const [showResolveModal, setShowResolveModal] = useState(false);
     if (!selectedComplaintId) return;
 
     try {
-     const res= await resolveComplaintAPI(selectedComplaintId,  adminNotes );
-     if(res.data){
-        toast.success(res.data.message)
-      closeResolveModal();
-      fetchComplaints(
-        pagination.currentPage,
-        pagination.pageSize,
-        statusFilter,
-        searchQuery
-      );
-    }
+      const res = await resolveComplaintAPI(selectedComplaintId, adminNotes);
+      if (res.data) {
+        toast.success(res.data.message);
+        closeResolveModal();
+        fetchComplaints(
+          pagination.currentPage,
+          pagination.pageSize,
+          statusFilter,
+          searchQuery
+        );
+      }
     } catch (error) {
       console.error("Error resolving complaint:", error);
     }
@@ -146,7 +150,7 @@ const [showResolveModal, setShowResolveModal] = useState(false);
   };
 
   const viewDetails = (complaintId: string) => {
-    navigate(`/admin/complaints/${complaintId}`)
+    navigate(`/admin/complaints/${complaintId}`);
   };
 
   return (
@@ -196,96 +200,89 @@ const [showResolveModal, setShowResolveModal] = useState(false);
 
         {/* Table */}
         <div className="overflow-x-auto mt-4">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  ID
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  User
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Psychologist
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Status
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                  Created At
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {complaints.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-3 text-center text-gray-500 dark:text-gray-300 text-sm"
+          <Table<ComplaintListItem, "complaintId">
+            keyField="complaintId"
+            data={complaints}
+            columns={[
+              {
+                header: "ID",
+                accessor: "complaintId",
+                render: (value) => (
+                  <span className="text-gray-800 dark:text-white">
+                    #{typeof value === "string" && value.slice(-4)}
+                  </span>
+                ),
+              },
+              {
+                header: "User",
+                render: (_, row) => (
+                  <div>
+                    <div className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                      {row!.userFullName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {row!.userEmail}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Psychologist",
+                render: (_, row) => (
+                  <div>
+                    <div className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                      {row!.psychologistFullName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {row!.psychologistEmail}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (value) => (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      value ? getStatusColor(value) : ""
+                    }`}
                   >
-                    No complaints found
-                  </td>
-                </tr>
-              ) : (
-                complaints.map((complaint) => (
-                  <tr
-                    key={complaint.complaintId}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                  >
-                    <td className="px-4 py-3 text-gray-800 dark:text-white font-medium">
-                      #{complaint.complaintId.slice(-4)}
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white">
-                      <div className="text-sm font-medium truncate">
-                        {complaint.userFullName}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {complaint.userEmail}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white">
-                      <div className="text-sm font-medium truncate">
-                        {complaint.psychologistFullName}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {complaint.psychologistEmail}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          complaint.status
-                        )}`}
-                      >
-                        {complaint.status.charAt(0).toUpperCase() +
-                          complaint.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white whitespace-nowrap text-xs">
-                      {formatDateTime(complaint.createdAt)}
-                    </td>
-                    <td className="px-4 py-3 flex gap-1">
-                      <Button
-                        variant="primary"
-                        onClick={() => viewDetails(complaint.complaintId)}
-                      >
-                        Details
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => openResolveModal(complaint.complaintId)}
-                      >
-                        Resolve
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                    {typeof value === "string" &&
+                      value.charAt(0).toUpperCase() + value.slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Created At",
+                accessor: "createdAt",
+                render: (value) => (
+                  <span className="text-gray-800 dark:text-white text-xs">
+                    {formatDateTime(value)}
+                  </span>
+                ),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="primary"
+                      onClick={() => viewDetails(row!.complaintId)}
+                    >
+                      Details
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => openResolveModal(row!.complaintId)}
+                    >
+                      Resolve
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+          />
         </div>
 
         {/* Pagination */}

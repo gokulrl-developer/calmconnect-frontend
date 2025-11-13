@@ -9,7 +9,12 @@ import type {
   TransactionListItem,
   WalletData,
 } from "../../types/api/shared.types";
-import { downloadTransactionReceiptAPI, getUserTransactionsAPI, getUserWalletAPI } from "../../services/userService";
+import {
+  downloadTransactionReceiptAPI,
+  getUserTransactionsAPI,
+  getUserWalletAPI,
+} from "../../services/userService";
+import Table from "../../components/UI/Table";
 
 const Transactions: React.FC = () => {
   const [type, setType] = useState<"debit" | "credit" | undefined>(undefined);
@@ -147,9 +152,7 @@ const Transactions: React.FC = () => {
               setReferenceType(
                 e.target.value === "all"
                   ? undefined
-                  : (e.target.value as
-                      | "booking"
-                      | "refund")
+                  : (e.target.value as "booking" | "refund")
               )
             }
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
@@ -171,82 +174,73 @@ const Transactions: React.FC = () => {
 
         {/* Transactions Table */}
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Transaction ID
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Type
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Amount
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Purpose
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Date & Time
-                </th>
-                <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {transactions.map((txn) => (
-                <tr
-                  key={txn.transactionId}
-                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                >
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {"#" + txn.transactionId.split("").slice(-4).join("")}
-                  </td>
-                  <td className="p-6">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(
-                        txn.type
-                      )}`}
-                    >
-                      {txn.type.charAt(0).toUpperCase() + txn.type.slice(1)}
-                    </span>
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    ₹{txn.amount.toLocaleString()}
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {txn.referenceType
-                      ? txn.referenceType
-                          .replace(/([A-Z])/g, " $1")
-                          .replace(/^./, (s) => s.toUpperCase())
-                      : "N/A"}
-                  </td>
-                  <td className="p-6 text-gray-800 dark:text-white">
-                    {new Intl.DateTimeFormat("en-IN", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    }).format(new Date(txn.createdAt))}
-                  </td>
-                  <td className="p-6 flex space-x-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleReceiptDownload(txn.transactionId)}
-                    >
-                      <ArrowDownTrayIcon className="w-4 h-4 mr-1" />
-                      Receipt
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table<TransactionListItem, "transactionId">
+            keyField="transactionId"
+            data={transactions}
+            loading={false}
+            columns={[
+              {
+                header: "Transaction ID",
+                accessor: "transactionId",
+                render: (value) => `#${(value as string).slice(-4)}`,
+              },
+              {
+                header: "Type",
+                accessor: "type",
+                render: (value) => (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getTypeColor(
+                      value as "credit" | "debit"
+                    )}`}
+                  >
+                    {(value as string).charAt(0).toUpperCase() +
+                      (value as string).slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Amount",
+                accessor: "amount",
+                render: (value) => `₹${value!.toLocaleString()}`,
+              },
+              {
+                header: "Purpose",
+                accessor: "referenceType",
+                render: (value) =>
+                  value
+                    ? (value as string)
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/^./, (s) => s.toUpperCase())
+                    : "N/A",
+              },
+              {
+                header: "Date & Time",
+                accessor: "createdAt",
+                render: (value) =>
+                  new Intl.DateTimeFormat("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  }).format(new Date(value!)),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleReceiptDownload(row!.transactionId)}
+                  >
+                    <ArrowDownTrayIcon className="w-4 h-4 mr-1" />
+                    Receipt
+                  </Button>
+                ),
+              },
+            ]}
+          />
         </div>
 
         {/* Pagination */}

@@ -6,6 +6,7 @@ import { handleApiError } from "../../services/axiosInstance";
 import type paginationData from "../../types/pagination.types";
 import type { SessionListingAdminItem } from "../../types/api/admin.types";
 import { fetchSessionListingByAdminAPI } from "../../services/adminService";
+import Table from "../../components/UI/Table";
 
 const AdminSessions: React.FC = () => {
   const [sessions, setSessions] = useState<SessionListingAdminItem[]>([]);
@@ -108,106 +109,83 @@ const AdminSessions: React.FC = () => {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-6 text-center text-gray-500 dark:text-gray-300">
-              Loading...
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    User
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Psychologist
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Start Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    End Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Status
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="p-6 text-center text-gray-500 dark:text-gray-300"
-                    >
-                      No sessions found
-                    </td>
-                  </tr>
-                ) : (
-                  sessions.map((session) => (
-                    <tr
-                      key={session.sessionId}
-                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                    >
-                      {/* User */}
-                      <td className="p-6">
-                        <div className="text-gray-800 dark:text-white font-medium">
-                          {session.userFullName}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {session.userEmail}
-                        </div>
-                      </td>
-
-                      {/* Psychologist */}
-                      <td className="p-6">
-                        <div className="text-gray-800 dark:text-white font-medium">
-                          {session.psychFullName}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {session.psychEmail}
-                        </div>
-                      </td>
-
-                      {/* Start / End / Status */}
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.startTime)}
-                      </td>
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.endTime)}
-                      </td>
-                      <td className="p-6">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            session.status
-                          )}`}
-                        >
-                          {session.status.charAt(0).toUpperCase() +
-                            session.status.slice(1)}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="p-6">
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => viewDetails(session.sessionId)}
-                        >
-                          Details
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
+        <Table<SessionListingAdminItem>
+          data={sessions}
+          loading={loading}
+          keyField="sessionId"
+          columns={[
+            {
+              header: "User",
+              render: (_, session) => (
+                <div>
+                  <div className="font-medium text-gray-800 dark:text-white">
+                    {session!.userFullName}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {session!.userEmail}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Psychologist",
+              render: (_, session) => (
+                <div>
+                  <div className="font-medium text-gray-800 dark:text-white">
+                    {session!.psychFullName}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {session!.psychEmail}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Start Time",
+              accessor: "startTime",
+              render: (startTime) => (
+                <span className="text-gray-800 dark:text-white">
+                  {formatDateTime(startTime as string)}
+                </span>
+              ),
+            },
+            {
+              header: "End Time",
+              accessor: "endTime",
+              render: (endTime) => (
+                <span className="text-gray-800 dark:text-white">
+                  {formatDateTime(endTime as string)}
+                </span>
+              ),
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (status) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    status as string
+                  )}`}
+                >
+                  {(status as string).charAt(0).toUpperCase() +
+                    (status as string).slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              render: (_, session) => (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => viewDetails(session!.sessionId)}
+                >
+                  Details
+                </Button>
+              ),
+            },
+          ]}
+        />
 
         {/* Pagination */}
         <div className="flex justify-end space-x-2 mt-4">

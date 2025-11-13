@@ -16,6 +16,7 @@ import type {
 } from "../../types/api/admin.types";
 import { toast } from "sonner";
 import type paginationData from "../../types/pagination.types";
+import Table from "../../components/UI/Table";
 
 const AdminComplaintDetails: React.FC = () => {
   const { complaintId } = useParams();
@@ -286,90 +287,76 @@ const AdminComplaintDetails: React.FC = () => {
         </h1>
         {/* Table */}
         <div className="overflow-x-auto mt-4">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  ID
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  User
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Psychologist
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Status
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                  Created At
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {complaints.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-3 text-center text-gray-500 dark:text-gray-300 text-sm"
+          <Table<ComplaintListItem, "complaintId">
+            keyField="complaintId"
+            data={complaints}
+            columns={[
+              {
+                header: "ID",
+                render: (_, row) => (
+                  <span className="text-gray-800 dark:text-white font-medium">
+                    #{row!.complaintId.slice(-4)}
+                  </span>
+                ),
+              },
+              {
+                header: "User",
+                render: (_, row) => (
+                  <div>
+                    <div className="text-sm font-medium truncate text-gray-800 dark:text-white">
+                      {row!.userFullName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {row!.userEmail}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Psychologist",
+                render: (_, row) => (
+                  <div>
+                    <div className="text-sm font-medium truncate text-gray-800 dark:text-white">
+                      {row!.psychologistFullName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {row!.psychologistEmail}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (value) => (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      value ? getStatusColor(value) : ""
+                    }`}
                   >
-                    No complaints found
-                  </td>
-                </tr>
-              ) : (
-                complaints.map((complaint) => (
-                  <tr
-                    key={complaint.complaintId}
-                    className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
+                    {typeof value === "string" &&
+                      value.charAt(0).toUpperCase() + value.slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Created At",
+                accessor: "createdAt",
+                render: (value) => formatDateTime(value),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <Button
+                    variant="primary"
+                    onClick={() => viewDetails(row!.complaintId)}
                   >
-                    <td className="px-4 py-3 text-gray-800 dark:text-white font-medium">
-                      #{complaint.complaintId.slice(-4)}
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white">
-                      <div className="text-sm font-medium truncate">
-                        {complaint.userFullName}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {complaint.userEmail}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white">
-                      <div className="text-sm font-medium truncate">
-                        {complaint.psychologistFullName}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {complaint.psychologistEmail}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          complaint.status
-                        )}`}
-                      >
-                        {complaint.status.charAt(0).toUpperCase() +
-                          complaint.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-800 dark:text-white whitespace-nowrap text-xs">
-                      {formatDateTime(complaint.createdAt)}
-                    </td>
-                    <td className="px-4 py-3 flex gap-1">
-                      <Button
-                        variant="primary"
-                        onClick={() => viewDetails(complaint.complaintId)}
-                      >
-                        Details
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                    Details
+                  </Button>
+                ),
+              },
+            ]}
+          />
         </div>
 
         {/* Pagination */}

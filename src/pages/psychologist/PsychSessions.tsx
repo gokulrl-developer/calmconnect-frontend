@@ -10,6 +10,7 @@ import type paginationData from "../../types/pagination.types";
 import type { SessionListingPsychItem } from "../../types/api/psychologist.types";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
+import Table from "../../components/UI/Table";
 
 const PsychSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -136,113 +137,89 @@ const PsychSessions: React.FC = () => {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-6 text-center text-gray-500 dark:text-gray-300">
-              Loading...
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    User
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Start Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    End Time
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Status
-                  </th>
-                  <th className="text-left p-6 text-sm font-medium text-gray-600 dark:text-gray-400">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sessions.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="p-6 text-center text-gray-500 dark:text-gray-300"
+        <Table<SessionListingPsychItem, "sessionId">
+          keyField="sessionId"
+          data={sessions}
+          loading={loading}
+          columns={[
+            {
+              header: "User",
+              render: (_, row) => (
+                <div>
+                  <div className="text-gray-800 dark:text-white font-medium">
+                    {row!.userFullName}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {row!.userEmail}
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Start Time",
+              accessor: "startTime",
+              render: (value) => formatDateTime(value as string),
+            },
+            {
+              header: "End Time",
+              accessor: "endTime",
+              render: (value) => formatDateTime(value as string),
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (value) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    value ? getStatusColor(value as string) : ""
+                  }`}
+                >
+                  {typeof value === "string" &&
+                    value.charAt(0).toUpperCase() + value.slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              render: (_, row) => (
+                <div className="flex gap-2">
+                  {row!.status === "scheduled" && (
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => {
+                        setCancelSessionId(row!.sessionId);
+                        setShowConfirmationModal(true);
+                      }}
                     >
-                      No sessions found
-                    </td>
-                  </tr>
-                ) : (
-                  sessions.map((session) => (
-                    <tr
-                      key={session.sessionId}
-                      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-                    >
-                      <td className="p-6">
-                        <div className="text-gray-800 dark:text-white font-medium">
-                          {session.userFullName}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {session.userEmail}
-                        </div>
-                      </td>
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.startTime)}
-                      </td>
-                      <td className="p-6 text-gray-800 dark:text-white">
-                        {formatDateTime(session.endTime)}
-                      </td>
-                      <td className="p-6">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            session.status
-                          )}`}
-                        >
-                          {session.status.charAt(0).toUpperCase() +
-                            session.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="p-6 flex gap-2">
-                        {session.status === "scheduled" && (
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => {
-                              setCancelSessionId(session.sessionId);
-                              setShowConfirmationModal(true);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        )}
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          disabled={
-                            session.status !== "scheduled" ||
-                            new Date(session.startTime).getTime() - Date.now() >
-                              5 * 60 * 1000 || // 5 minutes
-                            new Date(session.endTime).getTime() < Date.now()
-                          }
-                          onClick={() => joinSession(session.sessionId)}
-                        >
-                          Join
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => viewDetails(session.sessionId)}
-                        >
-                          Details
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={
+                      row!.status !== "scheduled" ||
+                      new Date(row!.startTime).getTime() - Date.now() >
+                        5 * 60 * 1000 ||
+                      new Date(row!.endTime).getTime() < Date.now()
+                    }
+                    onClick={() => joinSession(row!.sessionId)}
+                  >
+                    Join
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => viewDetails(row!.sessionId)}
+                  >
+                    Details
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+        />
 
         {/* Pagination */}
         <div className="flex justify-end space-x-2 mt-4">
