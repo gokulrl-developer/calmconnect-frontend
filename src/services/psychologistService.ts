@@ -1,4 +1,4 @@
-import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CheckSessionAccessResponse, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
+import type { AvailabilityRuleDetails, AvailabilityRuleSummary, CheckSessionAccessResponse, CreateAvailabilityRulePayload, CreateQuickSlotPayload, CreateSpecialDayPayload, DailyAvailability, EditAvailabilityRulePayload, EditQuickSlotPayload, EditSpecialDayPayload, FetchDailyAvailabilityPayload, MessageResponse, PsychologistDashboardResponse, PsychProfile, RejectedApplication, SessionListingResponse } from "../types/api/psychologist.types";
 import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
@@ -36,15 +36,6 @@ interface LatestApplicationDataResponse {
   application:LatestApplicationData | null
 }
 
-interface DashboardData{
-  psych:{
-    id:string;
-    role:string;
-    isVerified:boolean
-  }
-}
-
-
 
 export const fetchLatestApplicationAPI = () =>
   axiosInstance
@@ -52,7 +43,7 @@ export const fetchLatestApplicationAPI = () =>
     .then((res) => res);
 export const fetchDashboard = () =>
   axiosInstance
-    .get<DashboardData>("/psychologist/dashboard")
+    .get<{dashboard:PsychologistDashboardResponse}>("/psychologist/dashboard")
     .then((res) => res);
 export const psychologistApply = (formData: FormData) =>
   axiosInstance

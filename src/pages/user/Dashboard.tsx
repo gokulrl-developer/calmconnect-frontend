@@ -1,204 +1,215 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Card from '../../components/UI/Card';
-import Button from '../../components/UI/Button';
-import { 
-  Calendar, 
-  MessageCircle, 
-  User, 
-  Clock, 
-  Star, 
-  Bell,
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Card from "../../components/UI/Card";
+import Button from "../../components/UI/Button";
+import {
+  Calendar,
+  Clock,
   CreditCard,
-  FileText,
-  Shield,
-  Users
-} from 'lucide-react';
-import { fetchDashboard } from '../../services/userService';
+  AlertTriangle,
+  Star,
+} from "lucide-react";
+import { fetchDashboard } from "../../services/userService";
+import type {
+  UserDashboardResponse,
+  UserRecentSessionsEntry,
+  UserRecentTransactionsEntry,
+  UserRecentComplaintsEntry,
+} from "../../types/api/user.types"; 
 
 const Dashboard = () => {
+  const [dashboard, setDashboard] = useState<UserDashboardResponse | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-        async function loadDashboard() {
-          try {
-            const result = await fetchDashboard();
-          } catch (error) {}
-        }
-          loadDashboard();
-      }, []);
-
-  const upcomingSessions = [
-    {
-      id: 1,
-      psychologist: 'Dr. Sarah Johnson',
-      date: '2024-02-15',
-      time: '10:00 AM',
-      type: 'Individual Therapy'
-    },
-    {
-      id: 2,
-      psychologist: 'Dr. Michael Chen',
-      date: '2024-02-18',
-      time: '2:00 PM',
-      type: 'Anxiety Support'
+    async function loadDashboard() {
+      try {
+        const res = await fetchDashboard();
+        setDashboard(res.data.dashboard);
+        console.log(res.data.dashboard)
+      } catch (error) {
+        console.error("Failed to load dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    loadDashboard();
+  }, []);
 
-  const recentActivity = [
-    { id: 1, action: 'Session completed with Dr. Sarah Johnson', time: '2 hours ago' },
-    { id: 2, action: 'New message from Dr. Michael Chen', time: '1 day ago' },
-    { id: 3, action: 'Payment processed successfully', time: '3 days ago' }
-  ];
+  if (loading) {
+    return <div className="text-center py-10 text-gray-600">Loading dashboard...</div>;
+  }
 
-  const quickActions = [
-    { title: 'Book Session', icon: Calendar, href: '/user/book', color: 'bg-blue-500' },
-    { title: 'My Sessions', icon: Clock, href: '/user/sessions', color: 'bg-green-500' },
-    { title: 'Messages', icon: MessageCircle, href: '/user/followup-chats', color: 'bg-purple-500' },
-    { title: 'Profile', icon: User, href: '/user/profile', color: 'bg-orange-500' },
-    { title: 'Notifications', icon: Bell, href: '/user/notifications', color: 'bg-red-500' },
-    { title: 'Payments', icon: CreditCard, href: '/user/transactions', color: 'bg-indigo-500' }
+  if (!dashboard) {
+    return <div className="text-center py-10 text-red-600">Failed to load dashboard data.</div>;
+  }
+
+  const { sessionSummary, recentSessions, recentTransactions, recentComplaints } = dashboard;
+
+  const summaryCards = [
+    { title: "Total Sessions", value: sessionSummary.totalSessions, icon: Clock, color: "bg-blue-500" },
+    { title: "Completed Sessions", value: sessionSummary.completedSessions, icon: Star, color: "bg-green-500" },
+    { title: "Upcoming Sessions", value: sessionSummary.upcomingSessions, icon: Calendar, color: "bg-purple-500" },
+    { title: "Cancelled Sessions", value: sessionSummary.cancelledSessions, icon: AlertTriangle, color: "bg-red-500" },
   ];
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Welcome back!</h1>
-          <p className="text-gray-600 mt-2">Here's what's happening with your mental health journey</p>
+          <p className="text-gray-600 mt-2">Here's a quick overview of your activities</p>
         </div>
         <Link to="/user/book">
           <Button>Book New Session</Button>
         </Link>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {quickActions.map((action, index) => (
-          <Link key={index} to={action.href}>
-            <Card className="p-4 hover:shadow-lg transition-all duration-300 cursor-pointer" hover>
-              <div className="flex flex-col items-center text-center space-y-2">
-                <div className={`p-3 rounded-full ${action.color} bg-opacity-20`}>
-                  <action.icon className="w-6 h-6 text-gray-800" />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {summaryCards.map((card, index) => {
+          const Icon = card.icon;
+          return (
+            <Card key={index} className="p-6 shadow-lg">
+              <div className="flex items-center space-x-4">
+                <div className={`p-3 rounded-full ${card.color} bg-opacity-20`}>
+                  <Icon className="w-6 h-6 text-gray-700" />
                 </div>
-                <span className="text-sm font-medium text-gray-800">{action.title}</span>
+                <div>
+                  <p className="text-2xl font-bold text-gray-800">{card.value}</p>
+                  <p className="text-sm text-gray-600">{card.title}</p>
+                </div>
               </div>
             </Card>
-          </Link>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Upcoming Sessions */}
-        <div className="lg:col-span-2">
-          <Card className="p-6 shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">Upcoming Sessions</h2>
-              <Link to="/user/sessions">
-                <Button variant="secondary" size="sm">View All</Button>
-              </Link>
-            </div>
-            
-            {upcomingSessions.length > 0 ? (
-              <div className="space-y-4">
-                {upcomingSessions.map((session) => (
-                  <div key={session.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-primary-500/20 rounded-full">
-                        <Calendar className="w-5 h-5 text-primary-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-800">{session.psychologist}</h3>
-                        <p className="text-sm text-gray-600">{session.type}</p>
-                        <p className="text-sm text-gray-600">{session.date} at {session.time}</p>
-                      </div>
+      {/* Recent Sessions & Transactions Side by Side */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Recent Sessions */}
+        <Card className="p-6 shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Sessions</h2>
+          <div className="space-y-4">
+            {recentSessions.length > 0 ? (
+              recentSessions.map((session: UserRecentSessionsEntry) => (
+                <div
+                  key={session.sessionId}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    {session.profilePicture ? (
+                      <img
+                        src={session.profilePicture}
+                        alt="profile"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-300" />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {session.firstName} {session.lastName}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {new Date(session.startTime).toLocaleString()}
+                      </p>
                     </div>
-                    <Button size="sm" variant="secondary">Join</Button>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No upcoming sessions</p>
-                <Link to="/user/book">
-                  <Button className="mt-4">Book Your First Session</Button>
-                </Link>
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <div>
-          <Card className="p-6 shadow-lg">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <div className="p-1 bg-primary-500/20 rounded-full mt-1">
-                    <div className="w-2 h-2 bg-primary-600 rounded-full"></div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-800">{activity.action}</p>
-                    <p className="text-xs text-gray-600">{activity.time}</p>
-                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      session.status === "ended"
+                        ? "bg-green-100 text-green-800"
+                        : session.status === "scheduled"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : session.status === "cancelled"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {session.status}
+                  </span>
                 </div>
-              ))}
-            </div>
-          </Card>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">No recent sessions found.</p>
+            )}
+          </div>
+        </Card>
+
+        {/* Recent Transactions */}
+        <Card className="p-6 shadow-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h2>
+          <div className="space-y-4">
+            {recentTransactions.length > 0 ? (
+              recentTransactions.map((txn: UserRecentTransactionsEntry) => (
+                <div
+                  key={txn.transactionId}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  <div>
+                    <p className="text-sm text-gray-800">
+                      {txn.referenceType === "booking"
+                        ? `Session with Dr. ${txn.psychFirstName} ${txn.psychLastName}`
+                        : `Refund from Session with Dr. ${txn.psychFirstName} ${txn.psychLastName}`}
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {new Date(txn.time).toLocaleString()}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      txn.type === "credit"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {txn.type}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">No recent transactions found.</p>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Recent Complaints */}
+      <Card className="p-6 shadow-lg">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Complaints</h2>
+        <div className="space-y-4">
+          {recentComplaints.length > 0 ? (
+            recentComplaints.map((comp: UserRecentComplaintsEntry) => (
+              <div
+                key={comp.complaintId}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <div>
+                  <p className="text-sm text-gray-800">
+                    Complaint against Dr. {comp.psychFirstName} {comp.psychLastName}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {new Date(comp.raisedTime).toLocaleString()}
+                  </p>
+                </div>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    comp.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {comp.status}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 text-sm">No recent complaints found.</p>
+          )}
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <Card className="p-6 shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-blue-500/20 rounded-full">
-              <Clock className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-800">12</p>
-              <p className="text-sm text-gray-600">Total Sessions</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-green-500/20 rounded-full">
-              <Star className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-800">4.8</p>
-              <p className="text-sm text-gray-600">Avg Rating</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-purple-500/20 rounded-full">
-              <MessageCircle className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-800">24</p>
-              <p className="text-sm text-gray-600">Messages</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 shadow-lg">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-orange-500/20 rounded-full">
-              <Users className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-800">3</p>
-              <p className="text-sm text-gray-600">Psychologists</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 };
