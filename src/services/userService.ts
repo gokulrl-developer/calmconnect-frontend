@@ -17,6 +17,7 @@ import type {
   ListPsychSummary,
   PsychDetails,
   SessionListingUserResponse,
+  UserDashboardResponse,
   UserProfile,
   VerifyPaymentPayload,
   VerifyPaymentResponse,
@@ -38,7 +39,7 @@ interface DashboardData {
 }
 
 export const fetchDashboard = () =>
-  axiosInstance.get<DashboardData>("/user/dashboard").then((res) => res);
+  axiosInstance.get<{dashboard:UserDashboardResponse}>("/user/dashboard").then((res) => res);
 
 export const fetchPsychologistsByUser = (params: string) =>
   axiosInstance

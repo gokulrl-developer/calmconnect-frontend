@@ -1,4 +1,4 @@
-import type { AdminPsychDetailsResponse, AdminUserDetailsResponse, ComplaintDetailsResponse, ComplaintHistoryResponse, ComplaintListingResponse, SessionListingAdminResponse } from "../types/api/admin.types";
+import type { AdminRegistrationTrendsResponse, AdminPsychDetailsResponse, AdminRevenueTrendsResponse, AdminSessionTrendsResponse, AdminTopPsychologistResponse, AdminUserDetailsResponse, ComplaintDetailsResponse, ComplaintHistoryResponse, ComplaintListingResponse, FetchRevenueGraphRequest, FetchSessionsGraphRequest, FetchTopPsychologistRequest, SessionListingAdminResponse, FetchRegistrationTrendsRequest, FetchDashboardDataRequest, DashboardSummaryCardResponse } from "../types/api/admin.types";
 import type { MessageResponse } from "../types/api/psychologist.types";
 import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
@@ -224,5 +224,50 @@ export const fetchComplaintDetailsAPI = (complaintId:string) => {
   return axiosInstance
     .get<ComplaintDetailsResponse>(`/admin/complaints/${complaintId}`
 )
+    .then((res) => res);
+};
+
+
+export const fetchRevenueTrendsAPI = (data: FetchRevenueGraphRequest) => {
+  const { fromDate, toDate } = data;
+  return axiosInstance
+    .get<AdminRevenueTrendsResponse >(
+      `/admin/dashboard/revenue?fromDate=${fromDate}&toDate=${toDate}`
+    )
+    .then((res) => res);
+};
+
+export const fetchRegistrationTrendsAPI = (data: FetchRegistrationTrendsRequest) => {
+  const { fromDate, toDate } = data;
+  return axiosInstance
+    .get<AdminRegistrationTrendsResponse >(
+      `/admin/dashboard/clients?fromDate=${fromDate}&toDate=${toDate}`
+    )
+    .then((res) => res);
+};
+
+export const fetchSessionTrendsAPI = (data: FetchSessionsGraphRequest) => {
+  const { fromDate, toDate } = data;
+  return axiosInstance
+    .get<AdminSessionTrendsResponse >(
+      `/admin/dashboard/sessions?fromDate=${fromDate}&toDate=${toDate}`
+    )
+    .then((res) => res);
+};
+
+export const fetchTopPsychologistsAPI = (data: FetchTopPsychologistRequest) => {
+  const { fromDate, toDate, limit } = data;
+  return axiosInstance
+    .get<AdminTopPsychologistResponse >(
+      `/admin/dashboard/top-psychologists?fromDate=${fromDate}&toDate=${toDate}&limit=${limit}`
+    )
+    .then((res) => res);
+};
+export const fetchDashboardSummaryCardsAPI = (data: FetchDashboardDataRequest) => {
+  const { fromDate, toDate} = data;
+  return axiosInstance
+    .get<{summaryCards:DashboardSummaryCardResponse} >(
+      `/admin/dashboard/summary-cards?fromDate=${fromDate}&toDate=${toDate}`
+    )
     .then((res) => res);
 };

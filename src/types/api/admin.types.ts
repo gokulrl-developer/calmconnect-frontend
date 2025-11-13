@@ -103,3 +103,66 @@ export interface ComplaintHistoryResponse{
   complaints:ComplaintHistoryItem[],
   paginationData:paginationData
 }
+
+
+export interface AdminRevenueTrendsEntry {
+  label: string;   
+  revenue: number; 
+}
+
+export interface AdminRegistrationTrendsEntry {
+  label: string;       
+  users: number;       
+  psychologists: number; 
+}
+
+export interface AdminSessionTrendsEntry {
+  label: string;             // day or month
+  sessions: number;          // total booked sessions
+  cancelledSessions: number; // cancelled sessions
+}
+
+export interface AdminTopPsychologistEntry {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  sessionCount: number;
+  profilePicture: string;
+}
+export interface AdminTopPsychologistResponse {
+  topPsychologists:AdminTopPsychologistEntry[]
+}
+
+export interface FetchDashboardDataRequest {
+  fromDate: string;
+  toDate: string;
+}
+
+export interface AdminSessionTrendsResponse{
+  sessionTrends:AdminSessionTrendsEntry[]
+}
+export interface AdminRegistrationTrendsResponse{
+registrationTrends:AdminRegistrationTrendsEntry[]
+}
+export interface AdminRevenueTrendsResponse{
+  revenueTrends:AdminRevenueTrendsEntry[]
+}
+export interface FetchRevenueGraphRequest extends FetchDashboardDataRequest {}
+export interface FetchRegistrationTrendsRequest extends FetchDashboardDataRequest {}
+export interface FetchSessionsGraphRequest extends FetchDashboardDataRequest {}
+export interface FetchTopPsychologistRequest extends FetchDashboardDataRequest {
+  limit: number; 
+}
+
+export interface SummaryCardItem{
+    totalValue:number; // all time total
+    addedValue:number; // added in the time range
+}
+
+export interface DashboardSummaryCardResponse{
+    users:SummaryCardItem;
+    psychologists:SummaryCardItem;
+    sessions:SummaryCardItem;
+    revenue:SummaryCardItem;
+}
