@@ -21,6 +21,7 @@ const Applications: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [rejectionReasonError, setRejectionReasonError] = useState<string>("");
+  const [filterStatus,setFilterStatus]=useState<"accepted"|"pending"|"rejected"|undefined>(undefined)
   const navigate = useNavigate();
 
   const [confirmationModal, setConfirmationModal] = useState<{
@@ -66,7 +67,7 @@ const Applications: React.FC = () => {
     const loadApplications = async () => {
       setLoading(true);
       try {
-        const response = await fetchApplications();
+        const response = await fetchApplications(currentPage,filterStatus);
         setApplications(response.data);
       } catch (error) {
         handleApiError(error);
@@ -76,7 +77,7 @@ const Applications: React.FC = () => {
     };
 
     loadApplications();
-  }, []);
+  }, [currentPage,filterStatus]);
 
   const handleStatusChange = async (
     id: string,
@@ -142,6 +143,22 @@ const Applications: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
             Psychologist Applications
           </h1>
+          <select
+            value={filterStatus ?? ""}
+            onChange={(e) =>
+              setFilterStatus(
+                e.target.value === ""
+                  ? undefined
+                  : (e.target.value as "pending" | "accepted" | "rejected")
+              )
+            }
+            className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
           <div className="flex items-center space-x-2">
             <input
               type="text"
