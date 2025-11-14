@@ -154,6 +154,11 @@ export const markAllNotificationsReadAPI = () => {
     .patch<MarkNotificationsReadResponse>(`/admin/notifications`,{},{isSilentError:true} as any)
     .then((res) => res);
 };
+export const clearNotificationsAPI = () => {
+  return axiosInstance
+    .delete<MessageResponse>(`/admin/notifications`)
+    .then((res) => res);
+};
 
 export const getAdminUnreadNotificationsCountAPI = () => {
   return axiosInstance

@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import {
+  clearNotificationsAPI,
   fetchNotificationsAPI,
   markAllNotificationsReadAPI,
 } from "../../services/adminService";
@@ -10,6 +11,9 @@ import type { NotificationListingItem } from "../../types/domain/Notification.ty
 import Pagination from "../../components/Pagination";
 import type paginationData from "../../types/pagination.types";
 import { NotificationContext } from "../../contexts/NotificationContext";
+import { toast } from "sonner";
+import Button from "../../components/UI/Button";
+import Modal from "../../components/UI/Modal";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(
@@ -21,8 +25,8 @@ export default function Notifications() {
     totalItems: 0,
     pageSize: 10,
   });
+  const [showConfirmationModal,setShowConfirmationModal]=useState(false);
   const { setUnreadNotificationCount } = useContext(NotificationContext);
-
   function setCurrentPage(page: number) {
     setPagingationData(produce((draft) => (draft.currentPage = page)));
   }
@@ -64,6 +68,18 @@ export default function Notifications() {
       console.log(err);
     }
   }
+
+  async function clearNotifications(){
+    try{
+      const result=await clearNotificationsAPI();
+      if(result.data){
+        toast.success(result.data.message);
+        fetchNotifications();
+      }
+    }catch(error){
+      console.log("error clearing messages",error)
+    }
+  }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
@@ -74,6 +90,13 @@ export default function Notifications() {
               <BellIcon className="w-5 h-5" />
               Notifications
             </h2>
+            {notifications.length>0 &&
+            <Button
+            variant="danger"
+             onClick={()=>setShowConfirmationModal(true)}
+            >
+              Clear Notifications
+            </Button>}
           </div>
 
           {/* Notifications List */}
@@ -111,6 +134,36 @@ export default function Notifications() {
           setCurrentPage={setCurrentPage}
         />
       </div>
+        {/* Confirmation Modal */}
+            <Modal
+              isOpen={showConfirmationModal}
+              onClose={()=>setShowConfirmationModal(false)}
+              title="Clear All Notifications"
+            >
+              <div className="space-y-4 p-3">
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Are you sure you want to clear all notifications?
+                    </h4>
+                  </div>
+                </div>
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button variant="secondary" onClick={()=>setShowConfirmationModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                     clearNotifications();
+                     setShowConfirmationModal(false)
+                    }}
+                  >
+                    Proceed
+                  </Button>
+                </div>
+              </div>
+            </Modal>
     </div>
   );
 }
