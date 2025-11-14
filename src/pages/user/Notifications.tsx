@@ -1,63 +1,86 @@
 import { useContext, useEffect, useState } from "react";
-import { fetchNotificationsAPI, markAllNotificationsReadAPI } from "../../services/userService"; 
+import {
+  clearNotificationsAPI,
+  fetchNotificationsAPI,
+  markAllNotificationsReadAPI,
+} from "../../services/userService";
 
 import { produce } from "immer";
-import { BellIcon} from "lucide-react";
+import { BellIcon } from "lucide-react";
 import type { NotificationListingItem } from "../../types/domain/Notification.types";
 import Pagination from "../../components/Pagination";
 import type paginationData from "../../types/pagination.types";
 import { NotificationContext } from "../../contexts/NotificationContext";
+import { toast } from "sonner";
+import Modal from "../../components/UI/Modal";
+import Button from "../../components/UI/Button";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<NotificationListingItem[]>([]);
-  const [paginationData,setPagingationData]=useState<paginationData>({
-    currentPage:1,
-    totalPages:1,
-    totalItems:0,
-    pageSize:10
-  })
-    const { setUnreadNotificationCount} = useContext(NotificationContext);
-  
-  function setCurrentPage(page:number){
-    setPagingationData(
-        produce((draft)=>draft.currentPage=page)
-    )
+  const [notifications, setNotifications] = useState<NotificationListingItem[]>(
+    []
+  );
+  const [paginationData, setPagingationData] = useState<paginationData>({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    pageSize: 10,
+  });
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  const { setUnreadNotificationCount } = useContext(NotificationContext);
+
+  function setCurrentPage(page: number) {
+    setPagingationData(produce((draft) => (draft.currentPage = page)));
   }
   useEffect(() => {
     fetchNotifications();
   }, [paginationData.currentPage]);
-  useEffect(()=>{
+  useEffect(() => {
     markAllAsRead();
-  },[])
+  }, []);
 
   async function fetchNotifications() {
     try {
-      const result = await fetchNotificationsAPI({ page:paginationData.currentPage, limit:paginationData.pageSize} );
-    if(result.data){
-      setNotifications(
-        produce((draft) => {
-          if (paginationData.currentPage === 1) draft.splice(0, draft.length, ...result.data.notifications);
-          else draft.push(...result.data.notifications);
-        })
-      );
-      setPagingationData(
-        result.data.paginationData
-      )
-    }
+      const result = await fetchNotificationsAPI({
+        page: paginationData.currentPage,
+        limit: paginationData.pageSize,
+      });
+      if (result.data) {
+        setNotifications(
+          produce((draft) => {
+            if (paginationData.currentPage === 1)
+              draft.splice(0, draft.length, ...result.data.notifications);
+            else draft.push(...result.data.notifications);
+          })
+        );
+        setPagingationData(result.data.paginationData);
+      }
     } catch (error) {
       console.error(error);
-    } 
+    }
   }
 
-  async function markAllAsRead(){
-     try{
-     const result=await markAllNotificationsReadAPI();
-       if(result.data){
-        setUnreadNotificationCount(0)
-       }
-     }catch(err){
-        console.log(err)
-     }
+  async function markAllAsRead() {
+    try {
+      const result = await markAllNotificationsReadAPI();
+      if (result.data) {
+        setUnreadNotificationCount(0);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function clearNotifications() {
+    try {
+      const result = await clearNotificationsAPI();
+      if (result.data) {
+        toast.success(result.data.message);
+        fetchNotifications();
+      }
+    } catch (error) {
+      console.log("error clearing messages", error);
+    }
   }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
@@ -69,6 +92,14 @@ export default function Notifications() {
               <BellIcon className="w-5 h-5" />
               Notifications
             </h2>
+            {notifications.length > 0 && (
+              <Button
+                variant="danger"
+                onClick={() => setShowConfirmationModal(true)}
+              >
+                Clear Notifications
+              </Button>
+            )}
           </div>
 
           {/* Notifications List */}
@@ -100,14 +131,45 @@ export default function Notifications() {
               No notifications yet.
             </p>
           )}
-
-      
         </section>
         <Pagination
-         paginationData={paginationData}
-         setCurrentPage={setCurrentPage}
+          paginationData={paginationData}
+          setCurrentPage={setCurrentPage}
         />
       </div>
+      {/* Confirmation Modal */}
+      <Modal
+        isOpen={showConfirmationModal}
+        onClose={() => setShowConfirmationModal(false)}
+        title="Clear All Notifications"
+      >
+        <div className="space-y-4 p-3">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                Are you sure you want to clear all notifications?
+              </h4>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmationModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                clearNotifications();
+                setShowConfirmationModal(false);
+              }}
+            >
+              Proceed
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -29,3 +29,7 @@ export interface TransactionListingPayload{
   page?:number;
   limit?:number
 }
+
+export interface ClearNotificationsRequest{
+  
+}

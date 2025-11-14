@@ -119,6 +119,11 @@ export const markAllNotificationsReadAPI = () => {
     .then((res) => res);
 };
 
+export const clearNotificationsAPI = () => {
+  return axiosInstance
+    .delete<MessageResponse>(`/user/notifications`)
+    .then((res) => res);
+};
 export const getUserUnreadNotificationsCountAPI = () => {
   return axiosInstance
     .get<GetUnreadNotificationCountResponse>(`/user/notifications/count`, {

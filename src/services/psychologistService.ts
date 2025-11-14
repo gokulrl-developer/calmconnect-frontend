@@ -148,6 +148,11 @@ export const markAllNotificationsReadAPI = () => {
     .then((res) => res);
 };
 
+export const clearNotificationsAPI = () => {
+  return axiosInstance
+    .delete<MessageResponse>(`/psychologist/notifications`)
+    .then((res) => res);
+};
 export const getPsychUnreadNotificationsCountAPI = () => {
   return axiosInstance
     .get<GetUnreadNotificationCountResponse>(`/psychologist/notifications/count`,{isSilentError:true} as any)
