@@ -11,9 +11,13 @@ import { handleApiError } from "../../services/axiosInstance";
 import type { SessionListingUserItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import Modal from "../../components/UI/Modal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { toast } from "sonner";
 import Table from "../../components/UI/Table";
+import Pagination from "../../components/Pagination";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import type PaginationData from "../../types/pagination.types";
 
 const UserSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -23,12 +27,12 @@ const UserSessions: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [pagination, setPagination] = useState<paginationData>({
-    totalItems: 0,
-    totalPages: 1,
-    currentPage: 1,
-    pageSize: 10,
-  });
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+      totalItems: 0,
+      totalPages: 1,
+      currentPage: 1,
+      pageSize: 10,
+    });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [cancelSessionId, setCancelSessionId] = useState<string | null>(null);
   const [showReportPsychologistModal, setShowReportPsychologistModal] =
@@ -43,10 +47,15 @@ const UserSessions: React.FC = () => {
   const [ratingError, setRatingError] = useState("");
   const [rating, setRating] = useState<number | null>(null);
   const [reviewSessionId, setReviewSessionId] = useState<string | null>(null);
-  const loadSessions = async (page: number = 1, status: string = "all") => {
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
+
+  const loadSessions = async (status: string = "all") => {
+    const page = queryParams["page"];
+    const currentPage = page ? page : 1;
     setLoading(true);
     try {
-      const queryParams = `?page=${page}&limit=${pagination.pageSize}${
+      const queryParams = `?page=${currentPage}&limit=${paginationData.pageSize}${
         status !== "all" ? `&status=${status}` : ""
       }`;
 
@@ -54,7 +63,7 @@ const UserSessions: React.FC = () => {
 
       if (result.data) {
         setSessions(result.data.sessions);
-        setPagination(result.data.paginationData);
+        setPaginationData(result.data.paginationData);
       }
     } catch (error) {
       handleApiError(error);
@@ -64,8 +73,8 @@ const UserSessions: React.FC = () => {
   };
 
   useEffect(() => {
-    loadSessions(pagination.currentPage, statusFilter);
-  }, [statusFilter]);
+    loadSessions(statusFilter);
+  }, [paginationData.currentPage, statusFilter]);
 
   const reportPsychologist = (sessionId: string) => {
     setReportSessionId(sessionId);
@@ -126,9 +135,8 @@ const UserSessions: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      loadSessions(newPage, statusFilter);
-    }
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const handleCancelSession = async () => {
@@ -193,6 +201,10 @@ const UserSessions: React.FC = () => {
   function markRating(star: number) {
     setRating(star);
   }
+  function setStatusValue(statusFilter: string) {
+    updateQueryParams({ page: 1 });
+    setStatusFilter(statusFilter);
+  }
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -206,7 +218,7 @@ const UserSessions: React.FC = () => {
         </span>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => setStatusValue(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
           <option value="all">All</option>
@@ -324,25 +336,10 @@ const UserSessions: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === 1}
-            onClick={() => handlePageChange(pagination.currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-            {pagination.currentPage} / {pagination.totalPages || 1}
-          </span>
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === pagination.totalPages}
-            onClick={() => handlePageChange(pagination.currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Confirmation Modal */}

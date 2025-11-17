@@ -15,6 +15,9 @@ import {
   getUserWalletAPI,
 } from "../../services/userService";
 import Table from "../../components/UI/Table";
+import { produce } from "immer";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 
 const Transactions: React.FC = () => {
   const [type, setType] = useState<"debit" | "credit" | undefined>(undefined);
@@ -23,7 +26,7 @@ const Transactions: React.FC = () => {
   >(undefined);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [walletBalance, setWalletBalance] = useState<WalletData["balance"]>(0);
-  const [paginationData, setPagingationData] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<paginationData>({
     totalItems: 0,
     totalPages: 1,
     currentPage: 1,
@@ -41,6 +44,8 @@ const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<TransactionListItem[]>(
     [] as TransactionListItem[]
   );
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
 
   async function handleFetchWallet() {
     try {
@@ -55,8 +60,11 @@ const Transactions: React.FC = () => {
 
   async function handleFetchTransactions() {
     try {
+      console.log("page state", paginationData.currentPage);
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
       const filter: TransactionListingPayload = {
-        page: paginationData.currentPage,
+        page: currentPage,
         limit: paginationData.pageSize,
         ...(type && { type }),
         ...(referenceType && { referenceType }),
@@ -65,6 +73,12 @@ const Transactions: React.FC = () => {
       const result = await getUserTransactionsAPI(filter);
       if (result.data) {
         setTransactions(result.data.transactions);
+        setPaginationData((prev) =>
+          produce(prev, (draft) => {
+            draft.totalItems = result.data.paginationData.totalItems;
+            draft.totalPages = result.data.paginationData.totalPages;
+          })
+        );
       }
     } catch (err) {
       console.log(err);
@@ -101,7 +115,10 @@ const Transactions: React.FC = () => {
       ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200"
       : "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200";
   };
-
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -132,13 +149,15 @@ const Transactions: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 mb-6">
           <select
             value={type ?? "all"}
-            onChange={(e) =>
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
               setType(
                 e.target.value === "all"
                   ? undefined
                   : (e.target.value as "debit" | "credit")
-              )
-            }
+              );
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Types</option>
@@ -148,13 +167,15 @@ const Transactions: React.FC = () => {
           {/* Purpose Filter */}
           <select
             value={referenceType ?? "all"}
-            onChange={(e) =>
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
               setReferenceType(
                 e.target.value === "all"
                   ? undefined
                   : (e.target.value as "booking" | "refund")
-              )
-            }
+              );
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Purposes</option>
@@ -165,9 +186,11 @@ const Transactions: React.FC = () => {
           <input
             type="date"
             value={date ? date.toISOString().split("T")[0] : ""}
-            onChange={(e) =>
-              setDate(e.target.value ? new Date(e.target.value) : undefined)
-            }
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setDate(e.target.value ? new Date(e.target.value) : undefined);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           />
         </div>
@@ -246,9 +269,7 @@ const Transactions: React.FC = () => {
         {/* Pagination */}
         <Pagination
           paginationData={paginationData}
-          setCurrentPage={(page: number) =>
-            setPagingationData((prev) => ({ ...prev, currentPage: page }))
-          }
+          setCurrentPage={(page: number) => handlePageChange(page)}
         />
       </Card>
     </div>

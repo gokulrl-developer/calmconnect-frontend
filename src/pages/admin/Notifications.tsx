@@ -14,6 +14,8 @@ import { NotificationContext } from "../../contexts/NotificationContext";
 import { toast } from "sonner";
 import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(
@@ -27,6 +29,8 @@ export default function Notifications() {
   });
   const [showConfirmationModal,setShowConfirmationModal]=useState(false);
   const { setUnreadNotificationCount } = useContext(NotificationContext);
+   const { updateQueryParams } = useUpdateQueryParams();
+    const queryParams = useGetQueryParams();
   function setCurrentPage(page: number) {
     setPaginationData(prev=>produce(prev,(draft) => {draft.currentPage = page}));
   }
@@ -39,8 +43,10 @@ export default function Notifications() {
 
   async function fetchNotifications() {
     try {
+      const page = queryParams["page"];
+    const currentPage = page ? Number(page) : 1;
       const result = await fetchNotificationsAPI({
-        page: paginationData.currentPage,
+        page: currentPage,
         limit: paginationData.pageSize,
       });
       if (result.data) {
@@ -83,6 +89,12 @@ export default function Notifications() {
       console.log("error clearing messages",error)
     }
   }
+
+   const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setCurrentPage(newPage)
+    //setPagination((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
@@ -134,7 +146,7 @@ export default function Notifications() {
         </section>
         <Pagination
           paginationData={paginationData}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={(page: number) => handlePageChange(page)}
         />
       </div>
         {/* Confirmation Modal */}

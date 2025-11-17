@@ -13,29 +13,15 @@ import {
 } from "../../services/userService";
 import Modal from "../../components/UI/Modal";
 import Table from "../../components/UI/Table";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import Pagination from "../../components/Pagination";
 
 const UserComplaints: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [complaints, setComplaints] = useState<ComplaintListingItem[]>([
-    {
-      complaintId: "complaint-001-ABCD",
-      psychologistFullName: "Dr. Sarah Johnson",
-      psychologistEmail: "sarah.johnson@example.com",
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      sessionId: "session-123",
-    },
-    {
-      complaintId: "complaint-002-EFGH",
-      psychologistFullName: "Dr. Alex Kumar",
-      psychologistEmail: "alex.kumar@example.com",
-      status: "resolved",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      sessionId: "session-456",
-    },
-  ]);
+  const [complaints, setComplaints] = useState<ComplaintListingItem[]>([ ]);
 
-  const [pagination, setPagination] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<paginationData>({
     totalItems: 2,
     totalPages: 1,
     currentPage: 1,
@@ -58,9 +44,10 @@ const UserComplaints: React.FC = () => {
     });
 
   useEffect(() => {
-    fetchComplaints(pagination.currentPage, pagination.pageSize);
-  }, [pagination.currentPage]);
-
+    fetchComplaints(paginationData.pageSize);
+  }, [paginationData.currentPage]);
+ const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   const fetchComplaintDetails = async (complaintId: string) => {
     try {
       const res = await fetchComplaintDetailsAPI(complaintId);
@@ -72,13 +59,15 @@ const UserComplaints: React.FC = () => {
       console.error("Failed to fetch complaint details:", error);
     }
   };
-  const fetchComplaints = async (page: number, limit: number) => {
+  const fetchComplaints = async (limit: number) => {
     try {
-      const res = await listComplaintsAPI(page, limit);
+      const page = queryParams["page"];
+    const currentPage = page ? Number(page) : 1;
+      const res = await listComplaintsAPI(currentPage, limit);
       const data: ComplaintListingResponse = res.data;
 
       setComplaints(data.complaints);
-      setPagination({
+      setPaginationData({
         totalItems: data.paginationData.totalItems,
         totalPages: data.paginationData.totalPages,
         currentPage: data.paginationData.currentPage,
@@ -133,20 +122,14 @@ const UserComplaints: React.FC = () => {
       minute: "2-digit",
     });
   };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, currentPage: newPage }));
-    }
+ const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const viewComplaintDetails = (complaintId: string) => {
     fetchComplaintDetails(complaintId);
     setIsDetailsModalOpen(true);
-  };
-
-  const viewSessionDetails = (sessionId?: string) => {
-    if (sessionId) console.log("Viewing session:", sessionId);
   };
 
   return (
@@ -205,13 +188,6 @@ const UserComplaints: React.FC = () => {
                     >
                       Details
                     </Button>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => viewSessionDetails(row!.sessionId)}
-                    >
-                      Session
-                    </Button>
                   </div>
                 ),
               },
@@ -220,25 +196,10 @@ const UserComplaints: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === 1}
-            onClick={() => handlePageChange(pagination.currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-            {pagination.currentPage} / {pagination.totalPages || 1}
-          </span>
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === pagination.totalPages}
-            onClick={() => handlePageChange(pagination.currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Complaint Details Modal */}

@@ -1,4 +1,4 @@
-import type paginationData from "../pagination.types";
+import type PaginationData from "../pagination.types"
 
 export interface TransactionListItem {
   transactionId: string;
@@ -10,7 +10,7 @@ export interface TransactionListItem {
 
 export interface TransactionListingResponse{
   transactions:TransactionListItem[];
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 export interface WalletData {

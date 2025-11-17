@@ -5,7 +5,6 @@ import {
 } from "@heroicons/react/24/outline";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
-import type paginationData from "../../types/pagination.types";
 import type {
   ComplaintListItem,
   ComplaintListingResponse,
@@ -18,11 +17,15 @@ import Modal from "../../components/UI/Modal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const AdminComplaints: React.FC = () => {
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState<ComplaintListItem[]>([]);
-  const [pagination, setPagination] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<PaginationData>({
     totalItems: 0,
     totalPages: 1,
     currentPage: 1,
@@ -38,38 +41,39 @@ const AdminComplaints: React.FC = () => {
   );
   const [adminNotes, setAdminNotes] = useState("");
   const [adminNotesError, setAdminNotesError] = useState("");
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   useEffect(() => {
-    fetchComplaints(
-      pagination.currentPage,
-      pagination.pageSize,
-      statusFilter,
-      searchQuery
-    );
-  }, [pagination.currentPage, statusFilter, searchQuery]);
+    fetchComplaints(paginationData.pageSize, statusFilter, searchQuery);
+  }, [paginationData.currentPage, statusFilter, searchQuery]);
 
   const fetchComplaints = async (
-    page: number,
     limit: number,
     status: "all" | "pending" | "resolved",
     search?: string
   ) => {
     try {
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
       const apiStatus = status === "all" ? undefined : status;
-      const res = await listComplaintsAPI(page, limit, apiStatus, search);
+      const res = await listComplaintsAPI(
+        currentPage,
+        limit,
+        apiStatus,
+        search
+      );
       const data: ComplaintListingResponse = res.data;
       setComplaints(data.complaints);
-      setPagination(data.paginationData);
+      setPaginationData(data.paginationData);
     } catch (error) {
       console.error("Failed to fetch complaints:", error);
     }
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, currentPage: newPage }));
-    }
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "resolved":
@@ -127,12 +131,7 @@ const AdminComplaints: React.FC = () => {
       if (res.data) {
         toast.success(res.data.message);
         closeResolveModal();
-        fetchComplaints(
-          pagination.currentPage,
-          pagination.pageSize,
-          statusFilter,
-          searchQuery
-        );
+        fetchComplaints(paginationData.pageSize, statusFilter, searchQuery);
       }
     } catch (error) {
       console.error("Error resolving complaint:", error);
@@ -140,13 +139,14 @@ const AdminComplaints: React.FC = () => {
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateQueryParams({ page: 1 });
     setSearchQuery(e.target.value);
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    updateQueryParams({ page: 1 });
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateQueryParams({ page: 1 });
     setStatusFilter(e.target.value as "all" | "pending" | "resolved");
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   const viewDetails = (complaintId: string) => {
@@ -286,25 +286,10 @@ const AdminComplaints: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === 1}
-            onClick={() => handlePageChange(pagination.currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-            {pagination.currentPage} / {pagination.totalPages || 1}
-          </span>
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === pagination.totalPages}
-            onClick={() => handlePageChange(pagination.currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
       {/* complaint resolve  Modal */}
       <Modal

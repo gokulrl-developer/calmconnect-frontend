@@ -1,4 +1,4 @@
-import type paginationData from "../pagination.types"
+import type PaginationData from "../pagination.types"
 
 export interface GetUnreadNotificationCountResponse{
  count:number,
@@ -12,7 +12,7 @@ export interface GetNotificationsPayload {
 
 export interface GetNotificationResponse {
   notifications:NotificationListingItem[],
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 export interface NotificationListingItem{

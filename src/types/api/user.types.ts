@@ -1,6 +1,6 @@
 import type { CheckoutData } from "../components/user.types";
 import type { Slot } from "../domain/AvailabiliityRule.types";
-import type paginationData from "../pagination.types";
+import type PaginationData from "../pagination.types"
 
 export interface ListPsychSummary {
   psychId: string;
@@ -84,7 +84,7 @@ export interface SessionListingUserItem {
 
 export interface SessionListingUserResponse {
   sessions: SessionListingUserItem[];
-  paginationData: paginationData;
+  paginationData: PaginationData;
 }
 
 export interface CheckSessionAccessResponse {
@@ -128,7 +128,7 @@ export interface ComplaintListingItem {
 
 export interface ComplaintListingResponse {
   complaints: ComplaintListingItem[];
-  paginationData: paginationData;
+  paginationData: PaginationData;
 }
 
 export interface CreateComplaintRequest {
@@ -149,7 +149,7 @@ export interface ListPsychReviewsItem {
   comment?: string; // 300 characters ...
 }
 export interface ListPsychReviewsResponse {
-  paginationData: paginationData;
+  paginationData: PaginationData;
   reviews: ListPsychReviewsItem[];
 }
 

@@ -1,4 +1,4 @@
-import type paginationData from "../pagination.types";
+import type PaginationData from "../pagination.types"
 
 export interface AdminPsychDetailsResponse {
   firstName: string;
@@ -46,7 +46,7 @@ export interface SessionListingAdminItem {
 
 export interface SessionListingAdminResponse {
   sessions:SessionListingAdminItem[],
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 export interface ComplaintDetailsResponse {
@@ -70,7 +70,7 @@ export interface ComplaintDetailsResponse {
 
 export interface ComplaintListingResponse{
   complaints:ComplaintListItem[],
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 export interface ComplaintListItem{
@@ -101,7 +101,7 @@ export interface ComplaintHistoryItem{
 
 export interface ComplaintHistoryResponse{
   complaints:ComplaintHistoryItem[],
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 

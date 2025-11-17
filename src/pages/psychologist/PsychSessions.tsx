@@ -11,6 +11,10 @@ import type { SessionListingPsychItem } from "../../types/api/psychologist.types
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
 import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const PsychSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +24,7 @@ const PsychSessions: React.FC = () => {
   const [sessionDetails, setSessionDetails] =
     useState<SessionListingPsychItem | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [pagination, setPagination] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<PaginationData>({
     totalItems: 0,
     totalPages: 1,
     currentPage: 1,
@@ -28,18 +32,23 @@ const PsychSessions: React.FC = () => {
   });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [cancelSessionId, setCancelSessionId] = useState<string | null>(null);
-  const loadSessions = async (page: number = 1, status: string = "all") => {
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
+
+  const loadSessions = async (status: string = "all") => {
     setLoading(true);
     try {
-      const queryParams = `?page=${page}&limit=${pagination.pageSize}${
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
+      const params = `?page=${currentPage}&limit=${paginationData.pageSize}${
         status !== "all" ? `&status=${status}` : ""
       }`;
 
-      const result = await fetchSessionsByPsychAPI(queryParams);
+      const result = await fetchSessionsByPsychAPI(params);
 
       if (result.data) {
         setSessions(result.data.sessions);
-        setPagination(result.data.paginationData);
+        setPaginationData(result.data.paginationData);
       }
     } catch (error) {
       handleApiError(error);
@@ -49,8 +58,8 @@ const PsychSessions: React.FC = () => {
   };
 
   useEffect(() => {
-    loadSessions(pagination.currentPage, statusFilter);
-  }, [statusFilter]);
+    loadSessions(statusFilter);
+  }, [statusFilter, paginationData.currentPage]);
 
   const joinSession = (sessionId: string) => {
     navigate(`/psychologist/sessions/${sessionId}/video`);
@@ -83,13 +92,8 @@ const PsychSessions: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      loadSessions(newPage, statusFilter);
-    }
-  };
-
-  const handleCancel = (sessionId: string) => {
-    console.log(`Cancel clicked for session ${sessionId}`);
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const handleCancelSession = async () => {
@@ -112,6 +116,7 @@ const PsychSessions: React.FC = () => {
     setSessionDetails(sessionDetails!);
     setShowDetailsModal(true);
   }
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -125,7 +130,11 @@ const PsychSessions: React.FC = () => {
         </span>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            updateQueryParams({ page: 1 });
+            setStatusFilter(e.target.value);
+            setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+          }}
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
           <option value="all">All</option>
@@ -222,25 +231,10 @@ const PsychSessions: React.FC = () => {
         />
 
         {/* Pagination */}
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === 1}
-            onClick={() => handlePageChange(pagination.currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-            {pagination.currentPage} / {pagination.totalPages || 1}
-          </span>
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === pagination.totalPages}
-            onClick={() => handlePageChange(pagination.currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
       {/* Confirmation Modal */}
       <Modal
