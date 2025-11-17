@@ -14,6 +14,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  Bar,
+  BarChart,
+  AreaChart,
+  Area,
 } from "recharts";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
@@ -300,7 +304,10 @@ const Dashboard: React.FC = () => {
             Session Volume Over Time
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={sessionData}>
+            <BarChart
+              data={sessionData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#374151"
@@ -310,21 +317,9 @@ const Dashboard: React.FC = () => {
               <YAxis stroke="#6B7280" />
               <Tooltip />
               <Legend />
-              <Line
-                type="monotone"
-                dataKey="sessions"
-                stroke="#8B5CF6"
-                strokeWidth={3}
-                dot={{ r: 3 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="cancelledSessions"
-                stroke="#EF4444"
-                strokeWidth={3}
-                dot={{ r: 3 }}
-              />
-            </LineChart>
+              <Bar dataKey="sessions" fill="#8B5CF6" barSize={20} />
+              <Bar dataKey="cancelledSessions" fill="#EF4444" barSize={20} />
+            </BarChart>
           </ResponsiveContainer>
         </Card>
 
@@ -333,31 +328,45 @@ const Dashboard: React.FC = () => {
             Psychologist & User Growth
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={registrationData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#374151"
-                opacity={0.3}
-              />
-              <XAxis dataKey="label" stroke="#6B7280" />
-              <YAxis stroke="#6B7280" />
+            <AreaChart data={registrationData}>
+              <defs>
+                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient
+                  id="colorPsychologists"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="label" />
+              <YAxis />
               <Tooltip />
               <Legend />
-              <Line
+
+              <Area
                 type="monotone"
                 dataKey="users"
                 stroke="#3B82F6"
-                strokeWidth={3}
-                dot={{ r: 3 }}
+                fillOpacity={1}
+                fill="url(#colorUsers)"
               />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="psychologists"
                 stroke="#10B981"
-                strokeWidth={3}
-                dot={{ r: 3 }}
+                fillOpacity={1}
+                fill="url(#colorPsychologists)"
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </Card>
       </div>
