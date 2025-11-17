@@ -19,7 +19,7 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(
     []
   );
-  const [paginationData, setPagingationData] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<paginationData>({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
@@ -30,7 +30,7 @@ export default function Notifications() {
   const { setUnreadNotificationCount } = useContext(NotificationContext);
 
   function setCurrentPage(page: number) {
-    setPagingationData(produce((draft) => (draft.currentPage = page)));
+    setPaginationData(produce(paginationData,(draft) => {draft.currentPage = page}));
   }
   useEffect(() => {
     fetchNotifications();
@@ -40,6 +40,7 @@ export default function Notifications() {
   }, []);
 
   async function fetchNotifications() {
+    console.log("fetching notifications")
     try {
       const result = await fetchNotificationsAPI({
         page: paginationData.currentPage,
@@ -47,13 +48,17 @@ export default function Notifications() {
       });
       if (result.data) {
         setNotifications(
-          produce((draft) => {
-            if (paginationData.currentPage === 1)
+          produce(notifications,(draft) => {
               draft.splice(0, draft.length, ...result.data.notifications);
-            else draft.push(...result.data.notifications);
           })
         );
-        setPagingationData(result.data.paginationData);
+        setPaginationData(
+          produce(paginationData,(draft) => {
+            draft.currentPage = result.data.paginationData.currentPage;
+            draft.totalItems = result.data.paginationData.totalItems;
+            draft.totalPages = result.data.paginationData.totalPages;
+          })
+        );
       }
     } catch (error) {
       console.error(error);
