@@ -3,10 +3,13 @@ import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
 import { handleApiError } from "../../services/axiosInstance";
-import type paginationData from "../../types/pagination.types";
 import type { SessionListingAdminItem } from "../../types/api/admin.types";
 import { fetchSessionListingByAdminAPI } from "../../services/adminService";
 import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import type PaginationData from "../../types/pagination.types";
+import Pagination from "../../components/Pagination";
 
 const AdminSessions: React.FC = () => {
   const [sessions, setSessions] = useState<SessionListingAdminItem[]>([]);
@@ -15,24 +18,28 @@ const AdminSessions: React.FC = () => {
   const [sessionDetails, setSessionDetails] =
     useState<SessionListingAdminItem | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [pagination, setPagination] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<PaginationData>({
     totalItems: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
   });
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
 
-  const loadSessions = async (page: number = 1, status: string = "all") => {
+  const loadSessions = async (status: string = "all") => {
     setLoading(true);
+    const page = queryParams["page"];
+    const currentPage = page ? Number(page) : 1;
     try {
-      const queryParams = `?page=${page}&limit=${pagination.pageSize}${
-        status !== "all" ? `&status=${status}` : ""
-      }`;
+      const queryParams = `?page=${currentPage}&limit=${
+        paginationData.pageSize
+      }${status !== "all" ? `&status=${status}` : ""}`;
 
       const result = await fetchSessionListingByAdminAPI(queryParams);
       if (result.data) {
         setSessions(result.data.sessions);
-        setPagination(result.data.paginationData);
+        setPaginationData(result.data.paginationData);
       }
     } catch (error) {
       handleApiError(error);
@@ -42,8 +49,8 @@ const AdminSessions: React.FC = () => {
   };
 
   useEffect(() => {
-    loadSessions(pagination.currentPage, statusFilter);
-  }, [statusFilter]);
+    loadSessions(statusFilter);
+  }, [paginationData.currentPage, statusFilter]);
 
   const formatDateTime = (dateString?: string | Date) => {
     if (!dateString) return "-";
@@ -73,9 +80,8 @@ const AdminSessions: React.FC = () => {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      loadSessions(newPage, statusFilter);
-    }
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const viewDetails = (sessionId: string) => {
@@ -97,7 +103,11 @@ const AdminSessions: React.FC = () => {
         </span>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            updateQueryParams({ page: 1 });
+            setStatusFilter(e.target.value);
+            updateQueryParams({ page: 1 });
+          }}
           className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
           <option value="all">All</option>
@@ -188,25 +198,10 @@ const AdminSessions: React.FC = () => {
         />
 
         {/* Pagination */}
-        <div className="flex justify-end space-x-2 mt-4">
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === 1}
-            onClick={() => handlePageChange(pagination.currentPage - 1)}
-          >
-            Previous
-          </Button>
-          <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-            {pagination.currentPage} / {pagination.totalPages || 1}
-          </span>
-          <Button
-            size="sm"
-            disabled={pagination.currentPage === pagination.totalPages}
-            onClick={() => handlePageChange(pagination.currentPage + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Session Details Modal */}

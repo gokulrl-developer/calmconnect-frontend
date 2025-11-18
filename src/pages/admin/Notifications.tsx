@@ -14,12 +14,14 @@ import { NotificationContext } from "../../contexts/NotificationContext";
 import { toast } from "sonner";
 import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(
     []
   );
-  const [paginationData, setPagingationData] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<paginationData>({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
@@ -27,8 +29,10 @@ export default function Notifications() {
   });
   const [showConfirmationModal,setShowConfirmationModal]=useState(false);
   const { setUnreadNotificationCount } = useContext(NotificationContext);
+   const { updateQueryParams } = useUpdateQueryParams();
+    const queryParams = useGetQueryParams();
   function setCurrentPage(page: number) {
-    setPagingationData(produce((draft) => (draft.currentPage = page)));
+    setPaginationData(prev=>produce(prev,(draft) => {draft.currentPage = page}));
   }
   useEffect(() => {
     fetchNotifications();
@@ -39,19 +43,24 @@ export default function Notifications() {
 
   async function fetchNotifications() {
     try {
+      const page = queryParams["page"];
+    const currentPage = page ? Number(page) : 1;
       const result = await fetchNotificationsAPI({
-        page: paginationData.currentPage,
+        page: currentPage,
         limit: paginationData.pageSize,
       });
       if (result.data) {
-        setNotifications(
-          produce((draft) => {
-            if (paginationData.currentPage === 1)
+        setNotifications(prev=>
+          produce(prev,(draft) => {
               draft.splice(0, draft.length, ...result.data.notifications);
-            else draft.push(...result.data.notifications);
           })
         );
-        setPagingationData(result.data.paginationData);
+        setPaginationData(prev=>
+          produce(prev,draft=>{
+            draft.totalItems=result.data.paginationData.totalItems;
+                        draft.totalPages=result.data.paginationData.totalPages;
+          })
+        );
       }
     } catch (error) {
       console.error(error);
@@ -80,6 +89,12 @@ export default function Notifications() {
       console.log("error clearing messages",error)
     }
   }
+
+   const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setCurrentPage(newPage)
+    //setPagination((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
@@ -131,7 +146,7 @@ export default function Notifications() {
         </section>
         <Pagination
           paginationData={paginationData}
-          setCurrentPage={setCurrentPage}
+          setCurrentPage={(page: number) => handlePageChange(page)}
         />
       </div>
         {/* Confirmation Modal */}

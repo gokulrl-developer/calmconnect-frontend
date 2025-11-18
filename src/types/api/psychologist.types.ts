@@ -1,4 +1,4 @@
-import type paginationData from "../pagination.types";
+import type PaginationData from "../pagination.types"
 
 export interface PsychProfile{
 profile: {
@@ -135,7 +135,7 @@ export interface SessionListingPsychItem {
 
 export interface SessionListingResponse{
   sessions:SessionListingPsychItem[],
-  paginationData:paginationData
+  paginationData:PaginationData
 }
 
 export interface RejectedApplication{

@@ -15,18 +15,22 @@ import {
   getPsychWalletAPI,
 } from "../../services/psychologistService";
 import Table from "../../components/UI/Table";
+import { produce } from "immer";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 
 const Transactions: React.FC = () => {
   const [type, setType] = useState<"debit" | "credit" | undefined>(undefined);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [walletBalance, setWalletBalance] = useState<WalletData["balance"]>(0);
-  const [paginationData, setPagingationData] = useState<paginationData>({
+  const [paginationData, setPaginationData] = useState<paginationData>({
     totalItems: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
   });
-
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   useEffect(() => {
     handleFetchTransactions();
     handleFetchWallet();
@@ -52,8 +56,10 @@ const Transactions: React.FC = () => {
 
   async function handleFetchTransactions() {
     try {
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
       const filter: TransactionListingPayload = {
-        page: paginationData.currentPage,
+        page: currentPage,
         limit: paginationData.pageSize,
         ...(type && { type }),
         ...(date && { date: date.toISOString() }),
@@ -61,6 +67,12 @@ const Transactions: React.FC = () => {
       const result = await getPsychTransactionsAPI(filter);
       if (result.data) {
         setTransactions(result.data.transactions);
+        setPaginationData((prev) =>
+          produce(prev, (draft) => {
+            draft.totalItems = result.data.paginationData.totalItems;
+            draft.totalPages = result.data.paginationData.totalPages;
+          })
+        );
       }
     } catch (err) {
       console.log(err);
@@ -97,7 +109,10 @@ const Transactions: React.FC = () => {
       ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200"
       : "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200";
   };
-
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -128,13 +143,15 @@ const Transactions: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0 mb-6">
           <select
             value={type ?? "all"}
-            onChange={(e) =>
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
               setType(
                 e.target.value === "all"
                   ? undefined
                   : (e.target.value as "debit" | "credit")
-              )
-            }
+              );
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Types</option>
@@ -225,9 +242,7 @@ const Transactions: React.FC = () => {
         {/* Pagination */}
         <Pagination
           paginationData={paginationData}
-          setCurrentPage={(page: number) =>
-            setPagingationData((prev) => ({ ...prev, currentPage: page }))
-          }
+          setCurrentPage={(page: number) => handlePageChange(page)}
         />
       </Card>
     </div>

@@ -15,12 +15,21 @@ import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
 import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [page, setPage] = useState(1);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -33,6 +42,8 @@ const Psychologists: React.FC = () => {
   });
 
   const navigate = useNavigate();
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   const openConfirmationModal = (
     psychId: string,
     currentStatus: "active" | "inactive"
@@ -55,7 +66,9 @@ const Psychologists: React.FC = () => {
   const loadPsychs = async () => {
     try {
       setLoading(true);
-      const res = await fetchPsychologists(page);
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
+      const res = await fetchPsychologists(currentPage);
       setPsychs(res.data);
     } catch (err) {
       console.error("Failed to fetch psychologists", err);
@@ -66,7 +79,7 @@ const Psychologists: React.FC = () => {
 
   useEffect(() => {
     loadPsychs();
-  }, [page]);
+  }, [paginationData.currentPage]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
   const handleView = (id: string) => {
@@ -111,6 +124,11 @@ const Psychologists: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -132,13 +150,21 @@ const Psychologists: React.FC = () => {
               type="text"
               placeholder="Search psychologists..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                updateQueryParams({ page: 1 });
+                setSearchTerm(e.target.value);
+                setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+              }}
               className="w-full pl-10 pr-4 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setFilterStatus(e.target.value);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Status</option>
@@ -214,26 +240,10 @@ const Psychologists: React.FC = () => {
         />
 
         {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Page {page}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Confirmation Modal */}

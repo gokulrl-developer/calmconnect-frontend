@@ -58,10 +58,8 @@ const Sidebar: React.FC = () => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/psychologist/dashboard' },
     { icon: Calendar, label: 'Sessions', path: '/psychologist/sessions' },
     { icon: Clock, label: 'Availability', path: '/psychologist/availability' },
-    { icon: AlertCircle, label: 'Raise Complaint', path: '/psychologist/dashboard' },
     { icon: Wallet, label: 'Transactions', path: '/psychologist/transactions' },
     { icon: User, label: 'Profile', path: '/psychologist/profile' },
-    { icon: Info, label: 'Wrong Actions', path: '/psychologist/dashboard' },
     { icon: Bell, label: 'Notifications', path: '/psychologist/notifications' },
   ];
 

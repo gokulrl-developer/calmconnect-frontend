@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { EyeIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
+import {
+  EyeIcon,
+  MagnifyingGlassIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import { fetchUsers, updateUserStatus } from "../../services/adminService";
@@ -7,30 +11,43 @@ import type { UserItem } from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
 import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [page, setPage] = useState(1);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 10,
+  });
   const [loading, setLoading] = useState(false);
-  const navigate=useNavigate();
-const [confirmationModal, setConfirmationModal] = useState<{
+  const navigate = useNavigate();
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
+  const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
-    currentStatus: 'active' | 'inactive' | null;
+    currentStatus: "active" | "inactive" | null;
     userId: string | null;
   }>({
     isOpen: false,
     currentStatus: null,
-    userId: null
+    userId: null,
   });
 
-  const openConfirmationModal = (userId:string,currentStatus:"active"|"inactive") => {
-
+  const openConfirmationModal = (
+    userId: string,
+    currentStatus: "active" | "inactive"
+  ) => {
     setConfirmationModal({
       isOpen: true,
       currentStatus,
-      userId
+      userId,
     });
   };
 
@@ -38,15 +55,16 @@ const [confirmationModal, setConfirmationModal] = useState<{
     setConfirmationModal({
       isOpen: false,
       currentStatus: null,
-      userId: null
+      userId: null,
     });
   };
-
 
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetchUsers(page);
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
+      const res = await fetchUsers(currentPage);
       setUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users", err);
@@ -57,10 +75,10 @@ const [confirmationModal, setConfirmationModal] = useState<{
 
   useEffect(() => {
     loadUsers();
-  }, [page]);
+  }, [paginationData.currentPage]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = (userId:string) => {
+  const handleView = (userId: string) => {
     navigate(`/admin/user-details/${userId}`);
   };
 
@@ -70,7 +88,7 @@ const [confirmationModal, setConfirmationModal] = useState<{
     try {
       await updateUserStatus(userId, newStatus as "active" | "inactive");
       closeConfirmationModal();
-      await loadUsers(); 
+      await loadUsers();
     } catch (err) {
       console.error("Failed to update user status", err);
     }
@@ -88,15 +106,19 @@ const [confirmationModal, setConfirmationModal] = useState<{
   };
 
   /* ---------------- FILTERING ---------------- */
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || user.status === filterStatus;
+    const matchesStatus =
+      filterStatus === "all" || user.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
-
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -105,7 +127,7 @@ const [confirmationModal, setConfirmationModal] = useState<{
           User Management
         </h1>
         <span className="text-sm text-gray-600 dark:text-gray-400">
-          {users.filter(u => u.status === "active").length} active users
+          {users.filter((u) => u.status === "active").length} active users
         </span>
       </div>
 
@@ -118,13 +140,21 @@ const [confirmationModal, setConfirmationModal] = useState<{
               type="text"
               placeholder="Search users..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                updateQueryParams({ page: 1 });
+                setSearchTerm(e.target.value);
+                setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+              }}
               className="w-full pl-10 pr-4 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setFilterStatus(e.target.value);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Status</option>
@@ -134,7 +164,7 @@ const [confirmationModal, setConfirmationModal] = useState<{
         </div>
 
         {/* Table */}
-       <Table<UserItem>
+        <Table<UserItem>
           loading={loading}
           data={filteredUsers}
           keyField="id"
@@ -200,60 +230,58 @@ const [confirmationModal, setConfirmationModal] = useState<{
         />
 
         {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">Page {page}</span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage(prev => prev + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
-     
-           {/* Confirmation Modal */}
-        <Modal
-          isOpen={confirmationModal.isOpen}
-          onClose={closeConfirmationModal}
-          title={`${confirmationModal.currentStatus === 'active' ? 'Deactivate' : 'Activate'} User`}
-        >
-          <div className="space-y-4 p-3">
-            <div className="flex items-center space-x-3">
-              <div>
-                <h4 className="text-lg font-semibold text-gray-800">
-                    Are you sure you want to {confirmationModal.currentStatus==='active'?'Deactivate':'Activate'} this User? <br/>
-               </h4>
-              
-              </div>
-            </div>
-            <div className="flex justify-end space-x-3 pt-4">
-              <Button
-                variant="secondary"
-                onClick={closeConfirmationModal}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant={confirmationModal.currentStatus === 'inactive' ? 'success' : 'danger'}
-                onClick={()=>{
-                  handleStatusToggle(confirmationModal.userId!,confirmationModal.currentStatus!);
-                }}
-              >
-                {confirmationModal.currentStatus === 'active' ? 'Deactivate User' : 'Activate User'}
-              </Button>
+
+      {/* Confirmation Modal */}
+      <Modal
+        isOpen={confirmationModal.isOpen}
+        onClose={closeConfirmationModal}
+        title={`${
+          confirmationModal.currentStatus === "active"
+            ? "Deactivate"
+            : "Activate"
+        } User`}
+      >
+        <div className="space-y-4 p-3">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                Are you sure you want to{" "}
+                {confirmationModal.currentStatus === "active"
+                  ? "Deactivate"
+                  : "Activate"}{" "}
+                this User? <br />
+              </h4>
             </div>
           </div>
-        </Modal>
-
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button variant="secondary" onClick={closeConfirmationModal}>
+              Cancel
+            </Button>
+            <Button
+              variant={
+                confirmationModal.currentStatus === "inactive"
+                  ? "success"
+                  : "danger"
+              }
+              onClick={() => {
+                handleStatusToggle(
+                  confirmationModal.userId!,
+                  confirmationModal.currentStatus!
+                );
+              }}
+            >
+              {confirmationModal.currentStatus === "active"
+                ? "Deactivate User"
+                : "Activate User"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

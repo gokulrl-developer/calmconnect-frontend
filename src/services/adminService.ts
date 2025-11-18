@@ -81,10 +81,18 @@ export interface IPsychResponse {
   success: boolean;
   message: string;
 }
-export const fetchApplications = (page: number = 1) =>
+export const fetchApplications = (
+  page: number = 1,
+  status?: "pending" | "accepted" | "rejected"
+) =>
   axiosInstance
-    .get<ApplicationList>(`/admin/applications?page=${page}`)
-    .then(res => res.data); 
+    .get<ApplicationList>(`/admin/applications`, {
+      params: {
+        page,
+        ...(status ? { status } : {}),
+      },
+    })
+    .then(res => res.data);
 
 export const fetchApplicationDetails = (applicationId:string) =>
   axiosInstance
