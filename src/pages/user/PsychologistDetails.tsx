@@ -19,7 +19,7 @@ import type { ListPsychReviewsItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import { produce } from "immer";
 import Pagination from "../../components/Pagination";
-declare var Razorpay: any;
+declare let Razorpay: any;
 
 export interface PsychDetails {
   availableSlots: Slot[];
@@ -71,7 +71,7 @@ const PsychologistDetails: React.FC = () => {
       params.append("psychId", psychId);
       const res = await fetchPsychDetailsByUser(params.toString());
       if (res.data) {
-        let data = res.data;
+        const data = res.data;
         console.log(res.data.availableSlots);
         setAvailableSlots(data.availableSlots);
         const { availableSlots: _, ...psychInfo } = data;
