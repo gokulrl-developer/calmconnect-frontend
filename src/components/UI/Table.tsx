@@ -1,52 +1,89 @@
+import React from "react";
 
-export interface Column<T> {
-  key: keyof T | string; 
-  header: string; 
-  render?: (row: T) => React.ReactNode; 
-  className?: string; 
+interface Column<T> {
+  header: string;
+  accessor?: keyof T;
+  render?: (value?: T[keyof T], row?: T) => React.ReactNode;
+  className?: string;
 }
 
-interface DataTableProps<T> {
-  data: T[];
+interface TableProps<T , K extends keyof T = keyof T> {
   columns: Column<T>[];
-  rowKey: (row: T) => string | number;
+  data: T[];
+  loading?: boolean;
+  keyField?: K
 }
 
-export function DataTable<T>({
-  data,
+const Table = <T, K extends keyof T = keyof T>({
   columns,
-  rowKey,
-}: DataTableProps<T>) {
+  data,
+  loading = false,
+  keyField,
+}: TableProps<T, K>) => {
+  if (loading) {
+    return (
+      <p className="text-center text-gray-600 dark:text-gray-400">Loading...</p>
+    );
+  }
+
   return (
-    <table className="w-full">
-      <thead>
-        <tr className="border-b border-gray-200 dark:border-gray-700">
-          {columns.map((col) => (
-            <th
-              key={String(col.key)}
-              className={`text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400 ${col.className || ""}`}
-            >
-              {col.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row) => (
-          <tr
-            key={rowKey(row)}
-            className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
-          >
-            {columns.map((col) => (
-              <td key={String(col.key)} className="p-4">
-                {col.render
-                  ? col.render(row) 
-                  : (row[col.key as keyof T] as any)} 
-              </td>
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-gray-200 dark:border-gray-700">
+            {columns.map((col, i) => (
+              <th
+                key={i}
+                className={`text-left p-4 text-sm font-medium text-gray-600 dark:text-gray-400 ${
+                  col.className ?? ""
+                }`}
+              >
+                {col.header}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {data.map((row, i) => {
+            const keyValue = keyField
+              ? (row[keyField] as string | number)
+              : i;
+
+            return (
+              <tr
+                key={keyValue}
+                className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200"
+              >
+                {columns.map((col, j) => {
+                  if (col.render ) {
+                    const value = col.accessor ? row[col.accessor] : undefined;
+                    return (
+                      <td key={j} className={`p-4 ${col.className ?? ""}`}>
+                        { col.render(value, row)}
+                      </td>
+                    );
+                  }
+
+                  if (col.accessor) {
+                    const value = row[col.accessor];
+                    return (
+                      <td key={j} className={`p-4 ${col.className ?? ""}`}>
+                        {String(value)}
+                      </td>
+                    );
+                  }
+
+                  return (
+                    <td key={j} className={`p-4 ${col.className ?? ""}`}></td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
-}
+};
+
+export default Table;

@@ -13,13 +13,23 @@ import {
 import type { PsychItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
-import { DataTable, type Column } from "../../components/UI/Table";
+import { useNavigate } from "react-router-dom";
+import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [page, setPage] = useState(1);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -31,6 +41,9 @@ const Psychologists: React.FC = () => {
     psychId: null,
   });
 
+  const navigate = useNavigate();
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   const openConfirmationModal = (
     psychId: string,
     currentStatus: "active" | "inactive"
@@ -53,7 +66,9 @@ const Psychologists: React.FC = () => {
   const loadPsychs = async () => {
     try {
       setLoading(true);
-      const res = await fetchPsychologists(page);
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
+      const res = await fetchPsychologists(currentPage);
       setPsychs(res.data);
     } catch (err) {
       console.error("Failed to fetch psychologists", err);
@@ -64,11 +79,11 @@ const Psychologists: React.FC = () => {
 
   useEffect(() => {
     loadPsychs();
-  }, [page]);
+  }, [paginationData.currentPage]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = async (psychId: string) => {
-    await loadPsychs();
+  const handleView = (id: string) => {
+    navigate(`/admin/psychologist-details/${id}`);
   };
 
   /* ------------ ACTIVATE/DEACTIVATE BUTTON ------------ */
@@ -109,63 +124,10 @@ const Psychologists: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  
-  const columns: Column<PsychItem>[] = [
-    {
-      key: "name",
-      header: "Psychologist",
-      render: (psych) => (
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <AcademicCapIcon className="w-5 h-5 text-white" />
-          </div>
-          <p className="font-medium text-gray-800 dark:text-white">
-            {psych.firstName} {psych.lastName}
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: "email",
-      header: "Email",
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (psych) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            psych.status
-          )}`}
-        >
-          {psych.status.charAt(0).toUpperCase() + psych.status.slice(1)}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (psych) => (
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => handleView(psych.id)}
-          >
-            <EyeIcon className="w-4 h-4 mr-1" />
-            View
-          </Button>
-          <Button
-            variant={psych.status === "active" ? "warning" : "success"}
-            size="sm"
-            onClick={() => openConfirmationModal(psych.id, psych.status)}
-          >
-            {psych.status === "active" ? "Deactivate" : "Activate"}
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
 
   return (
     <div className="space-y-6">
@@ -188,13 +150,21 @@ const Psychologists: React.FC = () => {
               type="text"
               placeholder="Search psychologists..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                updateQueryParams({ page: 1 });
+                setSearchTerm(e.target.value);
+                setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+              }}
               className="w-full pl-10 pr-4 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setFilterStatus(e.target.value);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Status</option>
@@ -204,41 +174,76 @@ const Psychologists: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          {loading ? (
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Loading...
-            </p>
-          ) : (
-            <DataTable
-              data={filteredPsychs}
-              columns={columns}
-              rowKey={(psych) => psych.id}
-            />
-          )}
-        </div>
+        <Table<PsychItem>
+          loading={loading}
+          data={filteredPsychs}
+          keyField="id"
+          columns={[
+            {
+              header: "Psychologist",
+              render: (_, psych) => (
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <AcademicCapIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800 dark:text-white">
+                      {psych?.firstName} {psych?.lastName}
+                    </p>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Email",
+              accessor: "email",
+              className: "text-gray-800 dark:text-white",
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (status, psych) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    status!
+                  )}`}
+                >
+                  {status?.charAt(0).toUpperCase() + status!.slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              render: (_, psych) => (
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleView(psych?.id!)}
+                  >
+                    <EyeIcon className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button
+                    variant={psych?.status === "active" ? "warning" : "success"}
+                    size="sm"
+                    onClick={() =>
+                      openConfirmationModal(psych?.id!, psych?.status!)
+                    }
+                  >
+                    {psych?.status === "active" ? "Deactivate" : "Activate"}
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+        />
 
         {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Page {page}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Confirmation Modal */}

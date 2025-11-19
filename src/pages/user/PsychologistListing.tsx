@@ -4,51 +4,58 @@ import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
 import Pagination from "../../components/Pagination";
 import type paginationData from "../../types/pagination.types";
-import {  fetchPsychologistsByUser } from "../../services/userService";
+import { fetchPsychologistsByUser } from "../../services/userService";
 import type { ListPsychSummary } from "../../types/api/user.types";
-
-
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 
 const BookSession: React.FC = () => {
   const navigate = useNavigate();
 
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
   const [selectedGender, setSelectedGender] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [sortOption, setSortOption] = useState("a-z");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [psychologists, setPsychologists] = useState<ListPsychSummary[]>([]);
+  const [search, setSearch] = useState<string>("");
   const [paginationData, setPaginationData] = useState<paginationData>({
     totalItems: 0,
     totalPages: 0,
     currentPage: 0,
     pageSize: 10, // default page size
   });
-
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   const pageSize = 10; // or any default you want
 
   // Fetch function
   const fetchPsychologists = async () => {
+    const page = queryParams["page"];
+    const currentPage = page ? Number(page) : 1;
     const skip = (currentPage - 1) * pageSize;
 
     const params = new URLSearchParams();
-    if (selectedSpecialization) params.append("specialization", selectedSpecialization);
+    if (selectedSpecialization)
+      params.append("specialization", selectedSpecialization);
     if (selectedGender) params.append("gender", selectedGender);
-    if (selectedLanguage) params.append("language", selectedLanguage);
     if (searchDate) params.append("date", searchDate);
     if (sortOption) params.append("sort", sortOption);
+    if (search && search !== "") {
+      params.append("search", search);
+    }
     params.append("skip", skip.toString());
     params.append("limit", pageSize.toString());
-
+    console.log(selectedGender, selectedSpecialization);
     try {
       const res = await fetchPsychologistsByUser(params.toString());
-      if(res.data){
-        console.log(res.data)
-      setPsychologists(res.data.psychologists);
-      setPaginationData(res.data.paginationData);
-    }
+      if (res.data) {
+        console.log(res.data);
+        setPsychologists(res.data.psychologists);
+        setPaginationData(res.data.paginationData);
+      }
     } catch (err) {
+      setPsychologists([]);
       console.error("Error fetching psychologists:", err);
     }
   };
@@ -56,11 +63,17 @@ const BookSession: React.FC = () => {
   // Fetch on page load and whenever filters/sort/currentPage changes
   useEffect(() => {
     fetchPsychologists();
-  }, [currentPage, selectedSpecialization, selectedGender, selectedLanguage, searchDate, sortOption]);
+  }, [
+    currentPage,
+    selectedSpecialization,
+    selectedGender,
+    searchDate,
+    sortOption,
+    search,
+  ]);
 
   const handlePsychologistClick = async (psychologistId: string) => {
-    navigate(`/user/psychologist-details?psychId=${psychologistId}`)
-   
+    navigate(`/user/psychologist-details?psychId=${psychologistId}`);
   };
 
   // Specializations, genders, languages can stay the same
@@ -74,9 +87,11 @@ const BookSession: React.FC = () => {
     "Addiction Counseling",
     "Child Psychology",
   ];
-  const genders = ["Male", "Female", "Other"];
-  const languages = ["English", "Spanish", "French", "German", "Hindi"];
-
+  const genders = ["male", "female", "other"];
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <Card>
       <div className="min-h-screen bg-gradient-background py-6">
@@ -92,10 +107,27 @@ const BookSession: React.FC = () => {
 
           {/* Filters */}
           <Card className="p-4 mb-6 shadow-glass bg-gradient-glass">
+            <div className="flex items-center space-x-2 my-2">
+              <input
+                type="text"
+                placeholder="Search by name or specializations or languages"
+                value={search}
+                onChange={(e) => {
+                  updateQueryParams({ page: 1 });
+                  setSearch(e.target.value);
+                  setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+                }}
+                className="border w-[50vw] border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <select
                 value={selectedSpecialization}
-                onChange={(e) => setSelectedSpecialization(e.target.value)}
+                onChange={(e) => {
+                  updateQueryParams({ page: 1 });
+                  setSelectedSpecialization(e.target.value);
+                  setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+                }}
                 className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
               >
                 <option value="">All Specializations</option>
@@ -108,7 +140,11 @@ const BookSession: React.FC = () => {
 
               <select
                 value={selectedGender}
-                onChange={(e) => setSelectedGender(e.target.value)}
+                onChange={(e) => {
+                  updateQueryParams({ page: 1 });
+                  setSelectedGender(e.target.value);
+                  setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+                }}
                 className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
               >
                 <option value="">All Genders</option>
@@ -119,23 +155,14 @@ const BookSession: React.FC = () => {
                 ))}
               </select>
 
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">All Languages</option>
-                {languages.map((l) => (
-                  <option key={l} value={l}>
-                    {l}
-                  </option>
-                ))}
-              </select>
-
               <input
                 type="date"
                 value={searchDate}
-                onChange={(e) => setSearchDate(e.target.value)}
+                onChange={(e) => {
+                  updateQueryParams({ page: 1 });
+                  setSearchDate(e.target.value);
+                  setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+                }}
                 className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
               />
 
@@ -155,7 +182,9 @@ const BookSession: React.FC = () => {
           {/* Psychologists List */}
           <div className="space-y-4">
             {psychologists.map((psych) => {
-              const specs = psych.specializations ? psych.specializations.split(",") : [];
+              const specs = psych.specializations
+                ? psych.specializations.split(",")
+                : [];
 
               return (
                 <Card
@@ -237,7 +266,10 @@ const BookSession: React.FC = () => {
           )}
 
           {/* Pagination */}
-          <Pagination paginationData={paginationData} setCurrentPage={setCurrentPage} />
+          <Pagination
+            paginationData={paginationData}
+            setCurrentPage={(page: number) => handlePageChange(page)}
+          />
         </div>
       </div>
     </Card>

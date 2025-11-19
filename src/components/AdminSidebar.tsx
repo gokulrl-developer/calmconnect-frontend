@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   HomeIcon,
   UserGroupIcon,
@@ -6,6 +6,7 @@ import {
   AcademicCapIcon,
   WalletIcon,
   BellIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/24/outline';
 import { FlagIcon } from '@heroicons/react/24/solid'; 
 import { logout } from '../features/authentication/authSlice';
@@ -14,11 +15,14 @@ import { useNavigate } from 'react-router-dom';
 import type{ IRootState } from '../store';
 import { handleApiError } from '../services/axiosInstance';
 import { logOut } from '../services/authService';
+import { NotificationContext } from '../contexts/NotificationContext';
 
 
 const Sidebar: React.FC = () => {
  const dispatch=useAppDispatch();
  const navigate=useNavigate();
+   const { unreadNotificationCount} = useContext(NotificationContext);
+ 
  const isAuthenticated=useAppSelector((state:IRootState)=>state.auth.isAuthenticated)
  const handleLogout=async ()=>{
  try{
@@ -39,7 +43,7 @@ const Sidebar: React.FC = () => {
       <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
-         >
+         onClick={()=>{navigate("/admin/dashboard")}}>
           <HomeIcon className="w-5 h-5 mr-3" />
           Dashboard
         </button>
@@ -52,14 +56,14 @@ const Sidebar: React.FC = () => {
         </button>
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
-          >
-          <ClipboardDocumentListIcon className="w-5 h-5 mr-3" />
+          onClick={()=>{navigate("/admin/sessions")}}>
+          <VideoCameraIcon className="w-5 h-5 mr-3" /> 
           Sessions
         </button>
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
-          >
-          <FlagIcon className="w-5 h-5 mr-3 text-yellow-500" /> 
+          onClick={()=>{navigate("/admin/complaints")}}>
+          <FlagIcon className="w-5 h-5 mr-3" /> 
           Complaints
         </button>
         <button
@@ -76,15 +80,22 @@ const Sidebar: React.FC = () => {
         </button>
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
+                   onClick={()=>{navigate("/admin/transactions")}}
          >
           <WalletIcon className="w-5 h-5 mr-3" />
-          Wallet
+          Transactions
         </button>
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
+                   onClick={()=>{navigate("/admin/notifications")}}
          >
           <BellIcon className="w-5 h-5 mr-3" />
           Notifications
+           {unreadNotificationCount>0 && (
+              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {unreadNotificationCount}
+              </span>
+            )}
         </button>
       </nav>
       <div className="p-6 border-t border-gray-200 dark:border-gray-800">

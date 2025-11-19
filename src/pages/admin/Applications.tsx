@@ -10,7 +10,11 @@ import type { ApplicationItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/UI/Modal";
-import { DataTable, type Column } from "../../components/UI/Table";
+import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const PAGE_SIZE = 10;
 
@@ -18,10 +22,20 @@ const Applications: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 10,
+  });
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [rejectionReasonError, setRejectionReasonError] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<
+    "accepted" | "pending" | "rejected" | undefined
+  >(undefined);
   const navigate = useNavigate();
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
 
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
@@ -66,7 +80,9 @@ const Applications: React.FC = () => {
     const loadApplications = async () => {
       setLoading(true);
       try {
-        const response = await fetchApplications();
+        const page = queryParams["page"];
+        const currentPage = page ? Number(page) : 1;
+        const response = await fetchApplications(currentPage, filterStatus);
         setApplications(response.data);
       } catch (error) {
         handleApiError(error);
@@ -76,7 +92,7 @@ const Applications: React.FC = () => {
     };
 
     loadApplications();
-  }, []);
+  }, [paginationData.currentPage, filterStatus]);
 
   const handleStatusChange = async (
     id: string,
@@ -117,7 +133,6 @@ const Applications: React.FC = () => {
     }
   };
 
-  // Search and pagination logic
   const filteredApplications = applications.filter(
     (app) =>
       `${app.firstName} ${app.lastName}`
@@ -128,88 +143,19 @@ const Applications: React.FC = () => {
 
   const totalPages = Math.ceil(filteredApplications.length / PAGE_SIZE);
   const paginatedApplications = filteredApplications.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (paginationData.currentPage - 1) * PAGE_SIZE,
+    paginationData.currentPage * PAGE_SIZE
   );
 
   useEffect(() => {
-    if (currentPage > totalPages) setCurrentPage(1);
-  }, [totalPages, currentPage]);
+    if (paginationData.currentPage > totalPages)
+      setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  }, [totalPages, paginationData.currentPage]);
 
-  const columns: Column<ApplicationItem>[] = [
-    {
-      key: "name",
-      header: "Name",
-      render: (app) => (
-        <span className="text-gray-800 dark:text-white">
-          {app.firstName} {app.lastName}
-        </span>
-      ),
-    },
-    {
-      key: "specialization",
-      header: "Specialization",
-      render: (app) => (
-        <span className="text-gray-800 dark:text-white">
-          {app.specializations.join(", ")}
-        </span>
-      ),
-    },
-    {
-      key: "email",
-      header: "Email",
-      render: (app) => (
-        <span className="text-gray-800 dark:text-white">{app.email}</span>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (app) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            app.status
-          )}`}
-        >
-          {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (app) => (
-        <div className="flex space-x-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => handleView(app.id)}
-          >
-            <EyeIcon className="w-4 h-4 mr-1" /> View
-          </Button>
-          {app.status === "pending" && (
-            <>
-              <Button
-                variant="success"
-                size="sm"
-                onClick={() => openConfirmationModal("approve", app.id)}
-              >
-                <CheckIcon className="w-4 h-4 mr-1" /> Approve
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => openConfirmationModal("reject", app.id)}
-              >
-                <XMarkIcon className="w-4 h-4 mr-1" /> Reject
-              </Button>
-            </>
-          )}
-        </div>
-      ),
-    },
-  ];
-
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <>
       <div className="space-y-6">
@@ -217,14 +163,33 @@ const Applications: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
             Psychologist Applications
           </h1>
+          <select
+            value={filterStatus ?? ""}
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setFilterStatus(
+                e.target.value === ""
+                  ? undefined
+                  : (e.target.value as "pending" | "accepted" | "rejected")
+              );
+              updateQueryParams({ page: 1 });
+            }}
+            className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
           <div className="flex items-center space-x-2">
             <input
               type="text"
               placeholder="Search by name or email"
               value={search}
               onChange={(e) => {
+                updateQueryParams({ page: 1 });
                 setSearch(e.target.value);
-                setCurrentPage(1);
+                updateQueryParams({ page: 1 });
               }}
               className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
             />
@@ -239,44 +204,92 @@ const Applications: React.FC = () => {
         </div>
 
         <Card>
-          <div className="overflow-x-auto">
-            {loading ? (
-              <div className="p-6 text-center text-gray-500 dark:text-gray-300">
-                Loading...
-              </div>
-            ) : (
-              <DataTable
-                data={paginatedApplications}
-                columns={columns}
-                rowKey={(app) => app.id}
-              />
-            )}
-          </div>
+          <Table<ApplicationItem, "id">
+            keyField="id"
+            data={paginatedApplications}
+            columns={[
+              {
+                header: "Name",
+                render: (_, row) => (
+                  <span className="text-gray-800 dark:text-white">
+                    {row!.firstName} {row!.lastName}
+                  </span>
+                ),
+              },
+              {
+                header: "Specialization",
+                render: (_, row) => (
+                  <span className="text-gray-800 dark:text-white">
+                    {row!.specializations.join(", ")}
+                  </span>
+                ),
+              },
+              {
+                header: "Email",
+                render: (_, row) => (
+                  <span className="text-gray-800 dark:text-white">
+                    {row!.email}
+                  </span>
+                ),
+              },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (value) => (
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      value ? getStatusColor(value as string) : ""
+                    }`}
+                  >
+                    {typeof value === "string" &&
+                      value.charAt(0).toUpperCase() + value.slice(1)}
+                  </span>
+                ),
+              },
+              {
+                header: "Actions",
+                render: (_, row) => (
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleView(row!.id)}
+                    >
+                      <EyeIcon className="w-4 h-4 mr-1" /> View
+                    </Button>
+                    {row!.status === "pending" && (
+                      <>
+                        <Button
+                          variant="success"
+                          size="sm"
+                          onClick={() =>
+                            openConfirmationModal("approve", row!.id)
+                          }
+                        >
+                          <CheckIcon className="w-4 h-4 mr-1" /> Approve
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() =>
+                            openConfirmationModal("reject", row!.id)
+                          }
+                        >
+                          <XMarkIcon className="w-4 h-4 mr-1" /> Reject
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
 
           {/* Pagination */}
-          <div className="flex justify-end space-x-2 mt-4">
-            <Button
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            >
-              Previous
-            </Button>
-            <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-              {currentPage} / {totalPages || 1}
-            </span>
-            <Button
-              size="sm"
-              disabled={
-                currentPage === totalPages || paginatedApplications.length === 0
-              }
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination
+            paginationData={paginationData}
+            setCurrentPage={(page: number) => handlePageChange(page)}
+          />
         </Card>
 
         {/* Confirmation Modal */}

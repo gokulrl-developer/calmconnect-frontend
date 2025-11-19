@@ -17,13 +17,15 @@ import {
 import { useAppDispatch, useAppSelector } from '../hooks/customReduxHooks';
 import { logOut } from '../services/authService';
 import { handleApiError } from '../services/axiosInstance';
+import { NotificationContext } from '../contexts/NotificationContext';
+import { useContext } from 'react';
 
 export default function UserSidebar() {
  const {firstName,isAuthenticated, role} = useAppSelector((state: IRootState) => state.auth);
  const navigate=useNavigate();
-  const unreadCount =5;
   const location = useLocation();
   const dispatch = useAppDispatch();
+  const { unreadNotificationCount} = useContext(NotificationContext);
 
   const handleLogout=async ()=>{
  try{
@@ -43,10 +45,7 @@ export default function UserSidebar() {
     { path: '/user/psychologists', label: 'Book Session', icon: Calendar },
     { path: '/user/sessions', label: 'My Sessions', icon: Target },
     { path: '/user/transactions', label: 'Transactions', icon: CreditCard },
-    { path: '/user/treatment-plans', label: 'Treatment Plans', icon: FileText },
-    { path: '/user/warnings-actions', label: 'Warnings & Actions', icon: AlertTriangle },
-    { path: '/user/followup-chats', label: 'Follow-up Chats', icon: MessageCircle },
-    { path: '/user/complaints', label: 'Support', icon: HelpCircle },
+    { path: '/user/complaints', label: 'Complaints', icon: AlertTriangle },
     { path: '/user/notifications', label: 'Notifications', icon: Bell },
   ] : [];
 
@@ -69,9 +68,9 @@ export default function UserSidebar() {
           >
             <item.icon className="w-5 h-5 mr-3" />
             <span className="flex-1 text-left">{item.label}</span>
-            {item.path === '/user/notifications' && unreadCount > 0 && (
+            {item.path === '/user/notifications' && unreadNotificationCount > 0 && (
               <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {unreadCount}
+                {unreadNotificationCount}
               </span>
             )}
           </button>

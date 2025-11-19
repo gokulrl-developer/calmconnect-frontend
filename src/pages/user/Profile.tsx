@@ -7,14 +7,18 @@ import {
   updateUserProfile,
 } from "../../services/userService";
 import { toast } from "sonner";
-import type { UserProfile } from "../../types/components/user.types";
+import type { ProfileErrors, UserProfile } from "../../types/components/user.types";
 
 const UserProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile["profile"]>(
     {} as UserProfile["profile"]
   );
+   const [originalProfile, setOriginalProfile] = useState<
+    UserProfile["profile"] | null
+  >(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [errors, setErrors] = useState<ProfileErrors>({});
 
   useEffect(() => {
     fetchProfile();
@@ -25,6 +29,7 @@ const UserProfilePage: React.FC = () => {
       const result = await fetchUserProfile();
       if (result.data) {
         setProfile(result.data.profile);
+        setOriginalProfile(result.data.profile)
         if (result.data.profile.profilePicture)
           setPreviewUrl(result.data.profile.profilePicture);
       }
@@ -64,18 +69,62 @@ const UserProfilePage: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
-    if (!profile) return;
+  // ---------------- VALIDATION FUNCTION ----------------
+  const validateProfile = (data: UserProfile["profile"]) => {
+    const newErrors: ProfileErrors = {};
+
+    if (!data.firstName?.trim()) newErrors.firstName = "First name is required.";
+    if (!data.lastName?.trim()) newErrors.lastName = "Last name is required.";
+    if (data.gender && !["male", "female", "others"].includes(data.gender))
+      newErrors.gender = "Invalid gender selected.";
+    if (data.dob) {
+      const date = new Date(data.dob);
+      if (isNaN(date.getTime())) newErrors.dob = "Invalid date format.";
+      else if (date > new Date())
+        newErrors.dob = "Date of birth cannot be in the future.";
+    }
+
+    return newErrors;
+  }
+
+const handleSave = async () => {
+    if (!profile || !originalProfile) return;
+
+    const validationErrors = validateProfile(profile);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     try {
       const formData = new FormData();
-      if (profile.profilePicture)
-        formData.append("profilePicture", profile.profilePicture);
-      if (profile.address) formData.append("address", profile.address);
-      if (profile.firstName) formData.append("firstName", profile.firstName);
-      if (profile.lastName) formData.append("lastName", profile.lastName);
-      if (profile.gender) formData.append("gender", profile.gender);
-      if (profile.dob)
-        formData.append("dob", new Date(profile.dob).toISOString());
+
+      const changedFields = Object.keys(profile).filter((key) => {
+        const field = key as keyof UserProfile["profile"];
+        if (field === "email") return false; 
+        const current = profile[field];
+        const original = originalProfile[field];
+
+        if (current instanceof File || original instanceof File)
+          return current !== original;
+
+        return JSON.stringify(current) !== JSON.stringify(original);
+      });
+
+      if (changedFields.length === 0) {
+        toast("No changes detected.");
+        setIsEditing(false);
+        return;
+      }
+
+      changedFields.forEach((field) => {
+        const key = field as keyof UserProfile["profile"];
+        const value = profile[key];
+        if (key === "dob" && value)
+          formData.append("dob", new Date(value as string).toISOString());
+        else if (value !== undefined && value !== null)
+          formData.append(key, value as any);
+      });
 
       const result = await updateUserProfile(formData);
       if (result.data) {
@@ -118,23 +167,33 @@ const UserProfilePage: React.FC = () => {
         <div className="flex-1 space-y-2">
           <div className="flex items-center justify-between">
             {isEditing ? (
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  name="firstName"
-                  value={profile.firstName || ""}
-                  onChange={handleInputChange}
-                  placeholder="First Name"
-                  className="px-2 py-1 rounded border text-gray-800 dark:text-white"
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  value={profile.lastName || ""}
-                  onChange={handleInputChange}
-                  placeholder="Last Name"
-                  className="px-2 py-1 rounded border text-gray-800 dark:text-white"
-                />
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={profile.firstName || ""}
+                    onChange={handleInputChange}
+                    placeholder="First Name"
+                    className="px-2 py-1 rounded border text-gray-800 dark:text-white"
+                  />
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={profile.lastName || ""}
+                    onChange={handleInputChange}
+                    placeholder="Last Name"
+                    className="px-2 py-1 rounded border text-gray-800 dark:text-white"
+                  />
+                </div>
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.firstName}
+                  </p>
+                )}
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                )}
               </div>
             ) : (
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -157,20 +216,23 @@ const UserProfilePage: React.FC = () => {
           <div>
             {isEditing ? (
               <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Gender
-            </label>
-              <select
-                name="gender"
-                value={profile.gender || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="others">Others</option>
-              </select>
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={profile.gender || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="others">Others</option>
+                </select>
+                {errors.gender && (
+                  <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
+                )}
               </div>
             ) : (
               <p className="text-gray-800 dark:text-white">
@@ -186,20 +248,23 @@ const UserProfilePage: React.FC = () => {
           <div>
             {isEditing ? (
               <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Date of Birth
-            </label>
-              <input
-                type="date"
-                name="dob"
-                value={
-                  profile.dob
-                    ? new Date(profile.dob).toISOString().split("T")[0]
-                    : ""
-                }
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  name="dob"
+                  value={
+                    profile.dob
+                      ? new Date(profile.dob).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
+                />
+                {errors.dob && (
+                  <p className="text-red-500 text-sm mt-1">{errors.dob}</p>
+                )}
               </div>
             ) : (
               <p className="text-gray-800 dark:text-white">
@@ -224,13 +289,18 @@ const UserProfilePage: React.FC = () => {
               Address
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                name="address"
-                value={profile.address || ""}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
-              />
+              <>
+                <input
+                  type="text"
+                  name="address"
+                  value={profile.address || ""}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white text-sm"
+                />
+                {errors.address && (
+                  <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+                )}
+              </>
             ) : (
               <p className="text-gray-800 dark:text-white">
                 {profile.address || "-"}

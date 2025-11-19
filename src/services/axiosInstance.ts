@@ -31,16 +31,16 @@ export function setupAxiosInterceptors(logoutCallback: () => Promise<any>) {
             handleApiError(logoutError);
           }
         }
-      }
-      if (error.response?.status === 403 && !originalRequest._retry && error.response?.data?.code==="BLOCKED") {
+      }else if (error.response?.status === 403 && !originalRequest._retry && error.response?.data?.code==="BLOCKED") {
         originalRequest._retry = true;
           try {
             await logoutCallback();
           } catch (logoutError) {
             handleApiError(logoutError);
           }
+      }else{
+        handleApiError(error)
       }
-     handleApiError(error)
       return Promise.reject(error);
     }
   );

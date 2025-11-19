@@ -9,14 +9,27 @@ import Button from "../../components/UI/Button";
 import { fetchUsers, updateUserStatus } from "../../services/adminService";
 import type { UserItem } from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
-import { DataTable, type Column } from "../../components/UI/Table";
+import { useNavigate } from "react-router-dom";
+import Table from "../../components/UI/Table";
+import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { useGetQueryParams } from "../../hooks/useGetQueryParams";
+import Pagination from "../../components/Pagination";
+import type PaginationData from "../../types/pagination.types";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [page, setPage] = useState(1);
+  const [paginationData, setPaginationData] = useState<PaginationData>({
+    totalItems: 0,
+    totalPages: 1,
+    currentPage: 1,
+    pageSize: 10,
+  });
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { updateQueryParams } = useUpdateQueryParams();
+  const queryParams = useGetQueryParams();
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean;
     currentStatus: "active" | "inactive" | null;
@@ -49,7 +62,9 @@ const Users: React.FC = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetchUsers(page);
+      const page = queryParams["page"];
+      const currentPage = page ? Number(page) : 1;
+      const res = await fetchUsers(currentPage);
       setUsers(res.data);
     } catch (err) {
       console.error("Failed to fetch users", err);
@@ -60,11 +75,11 @@ const Users: React.FC = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [page]);
+  }, [paginationData.currentPage]);
 
   /* ------------ VIEW BUTTON (just refresh page) ------------ */
-  const handleView = async (useId: string) => {
-    await loadUsers();
+  const handleView = (userId: string) => {
+    navigate(`/admin/user-details/${userId}`);
   };
 
   /* ------------ ACTIVATE/DEACTIVATE BUTTON ------------ */
@@ -100,66 +115,10 @@ const Users: React.FC = () => {
       filterStatus === "all" || user.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
-
-  const columns: Column<UserItem>[] = [
-    {
-      key: "name",
-      header: "User",
-      render: (user) => (
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <UserIcon className="w-5 h-5 text-white" />
-          </div>
-          <p className="font-medium text-gray-800 dark:text-white">
-            {user.firstName} {user.lastName}
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: "email",
-      header: "Email",
-      render: (user) => (
-        <span className="text-gray-800 dark:text-white">{user.email}</span>
-      ),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (user) => (
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            user.status
-          )}`}
-        >
-          {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-        </span>
-      ),
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (user) => (
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => handleView(user.id)}
-          >
-            <EyeIcon className="w-4 h-4 mr-1" />
-            View
-          </Button>
-          <Button
-            variant={user.status === "active" ? "warning" : "success"}
-            size="sm"
-            onClick={() => openConfirmationModal(user.id, user.status)}
-          >
-            {user.status === "active" ? "Deactivate" : "Activate"}
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const handlePageChange = (newPage: number) => {
+    updateQueryParams({ page: newPage });
+    setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -181,13 +140,21 @@ const Users: React.FC = () => {
               type="text"
               placeholder="Search users..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                updateQueryParams({ page: 1 });
+                setSearchTerm(e.target.value);
+                setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+              }}
               className="w-full pl-10 pr-4 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              updateQueryParams({ page: 1 });
+              setFilterStatus(e.target.value);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
             className="px-3 py-2 rounded-lg glass-card border border-white/20 dark:border-gray-600/20 text-sm text-gray-800 dark:text-white"
           >
             <option value="all">All Status</option>
@@ -197,41 +164,76 @@ const Users: React.FC = () => {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          {loading ? (
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Loading...
-            </p>
-          ) : (
-            <DataTable
-              data={filteredUsers}
-              columns={columns}
-              rowKey={(user) => user.id}
-            />
-          )}
-        </div>
+        <Table<UserItem>
+          loading={loading}
+          data={filteredUsers}
+          keyField="id"
+          columns={[
+            {
+              header: "User",
+              render: (_, user) => (
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <UserIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-800 dark:text-white">
+                      {user!.firstName} {user!.lastName}
+                    </p>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              header: "Email",
+              accessor: "email",
+              className: "text-gray-800 dark:text-white",
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (status, user) => (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    status!
+                  )}`}
+                >
+                  {status!.charAt(0).toUpperCase() + status!.slice(1)}
+                </span>
+              ),
+            },
+            {
+              header: "Actions",
+              render: (_, user) => (
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleView(user!.id)}
+                  >
+                    <EyeIcon className="w-4 h-4 mr-1" />
+                    View
+                  </Button>
+                  <Button
+                    variant={user!.status === "active" ? "warning" : "success"}
+                    size="sm"
+                    onClick={() =>
+                      openConfirmationModal(user!.id, user!.status)
+                    }
+                  >
+                    {user!.status === "active" ? "Deactivate" : "Activate"}
+                  </Button>
+                </div>
+              ),
+            },
+          ]}
+        />
 
         {/* Pagination */}
-        <div className="flex justify-between items-center mt-4">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Page {page}
-          </span>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination
+          paginationData={paginationData}
+          setCurrentPage={(page: number) => handlePageChange(page)}
+        />
       </Card>
 
       {/* Confirmation Modal */}
