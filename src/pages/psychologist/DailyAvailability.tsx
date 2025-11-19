@@ -108,7 +108,7 @@ export default function DailyAvailability() {
           setSpecialDaySlots(slots);
         } else if (availabilityRules.length>0) {
           let slots:Slot[]=[];
-          for(let availabilityRule of availabilityRules){
+          for(const availabilityRule of availabilityRules){
             const availabilityRuleSlots = useGenerateSlots({
               startTime: availabilityRule.startTime,
               endTime: availabilityRule.endTime,

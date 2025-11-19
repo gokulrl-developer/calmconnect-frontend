@@ -166,7 +166,7 @@ export const createComplaintAPI = (sessionId: string, description: string) => {
     .then((res) => res);
 };
 export const listComplaintsAPI = (page: number, limit: number) => {
-  let params = new URLSearchParams();
+  const params = new URLSearchParams();
   params.append("page", page.toString());
   params.append("limit", limit.toString());
   return axiosInstance.get<ComplaintListingResponse>(`/user/complaints?${params}`).then((res) => res);

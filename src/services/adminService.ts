@@ -209,7 +209,7 @@ export const resolveComplaintAPI = (complaintId:string,adminNotes:string) => {
     .then((res) => res);
 };
 export const listComplaintsAPI = (page:number,limit:number,status?:"pending"|"resolved",search?:string) => {
-  let params=new URLSearchParams();
+  const params=new URLSearchParams();
 params.append("page",page.toString());
 params.append("limit",limit.toString());
 if(status){
@@ -224,7 +224,7 @@ if(search){
     .then((res) => res);
 };
 export const fetchComplaintHistoryAPI = (psychId:string,page:number,limit:number) => {
-  let params=new URLSearchParams();
+  const params=new URLSearchParams();
 params.append("page",page.toString());
 params.append("limit",limit.toString());
 params.append("psychId",psychId);
