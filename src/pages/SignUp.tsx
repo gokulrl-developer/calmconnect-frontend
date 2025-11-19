@@ -106,12 +106,11 @@ const SignUp = () => {
 }, [role, dispatch]); */
 
    const handleGoogleAuth = () => {
-    const GOOGLE_CLIENT_ID="234773295146-iq4gpjmfq765v1rojtuqjft46d3tqar4.apps.googleusercontent.com";
 
     // Build Google OAuth URL with state = role
     const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: "http://localhost:5173/auth/google/callback",
+      client_id: import.meta.env.GOOGLE_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
       response_type: 'code',
       scope: 'openid email profile',
       prompt: 'consent',  
