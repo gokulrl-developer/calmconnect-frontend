@@ -7,7 +7,6 @@ import { Mail, Lock, User,ArrowLeft } from 'lucide-react';
 import { registerPsychologistAsync, registerUserAsync, signupUserAsync,
   resendPsychologistOtpAsync,resendUserOtpAsync, 
   signupPsychologistAsync} from '../features/authentication/authThunk';
-import { removeRole, setRole } from '../features/authentication/authSlice';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -51,11 +50,21 @@ const SignUp = () => {
   const handleSignUpSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const {confirmPassword,...input}=formData
+      const {firstName,lastName,email,password}=formData
       if(role==="user"){
-        const result=await dispatch(signupUserAsync(input)).unwrap()
+        await dispatch(signupUserAsync({
+          firstName,
+          lastName,
+          email,
+          password
+        })).unwrap()
       }else if(role==="psychologist"){
-        const result=await dispatch(signupPsychologistAsync(input)).unwrap()
+        await dispatch(signupPsychologistAsync({
+          firstName,
+          lastName,
+          email,
+          password
+        })).unwrap()
       }
       setStep("otp");
     }
@@ -63,12 +72,11 @@ const SignUp = () => {
 
    const handleOtpSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-            const {confirmPassword,email,...input}=formData
     if (otp.length === 4) {
       if(role==="user"){
-        const result=await dispatch(registerUserAsync({email,otp})).unwrap()
+        await dispatch(registerUserAsync({email:formData.email,otp})).unwrap()
       }else if (role==="psychologist"){
-        const result=await dispatch(registerPsychologistAsync({email,otp})).unwrap()
+        await dispatch(registerPsychologistAsync({email:formData.email,otp})).unwrap()
       }
       navigate('/');
     }
@@ -81,11 +89,10 @@ const SignUp = () => {
   };
 
   const handleResendCode = async() => {
-   const {confirmPassword,email,...rest}=formData
     if(role==="user"){
-      const result =await dispatch(resendUserOtpAsync({email})).unwrap();
+      await dispatch(resendUserOtpAsync({email:formData.email})).unwrap();
     }else if(role==="psychologist"){
-      const result=await dispatch(resendPsychologistOtpAsync({email})).unwrap();
+      await dispatch(resendPsychologistOtpAsync({email:formData.email})).unwrap();
     }
     setCountdown(60);
     setOtp('');

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { fetchDashboard } from "../../services/psychologistService";
-import { setVerification } from "../../features/authentication/authSlice";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
 import { Calendar, Clock, Users, Star, DollarSign } from "lucide-react";
 import Card from "../../components/UI/Card";

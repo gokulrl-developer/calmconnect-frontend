@@ -108,11 +108,11 @@ const Transactions: React.FC = () => {
       console.log(err);
     }
   }
-  const getTypeColor = (type: "credit" | "debit") => {
+  /* const getTypeColor = (type: "credit" | "debit") => {
     return type === "credit"
       ? "bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200"
       : "bg-red-100 text-red-700 dark:bg-red-800 dark:text-red-200";
-  };
+  }; */
   const handlePageChange = (newPage: number) => {
     updateQueryParams({ page: newPage });
     setPaginationData((prev) => ({ ...prev, currentPage: newPage }));

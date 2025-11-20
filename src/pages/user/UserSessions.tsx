@@ -9,7 +9,6 @@ import {
 } from "../../services/userService";
 import { handleApiError } from "../../services/axiosInstance";
 import type { SessionListingUserItem } from "../../types/api/user.types";
-import type paginationData from "../../types/pagination.types";
 import Modal from "../../components/UI/Modal";
 import { useNavigate} from "react-router-dom";
 import { toast } from "sonner";

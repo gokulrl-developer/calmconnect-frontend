@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import {
   Calendar,
   Clock,
-  CreditCard,
   AlertTriangle,
   Star,
 } from "lucide-react";

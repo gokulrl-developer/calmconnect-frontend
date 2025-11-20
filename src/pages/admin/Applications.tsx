@@ -20,7 +20,6 @@ const PAGE_SIZE = 10;
 
 const Applications: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [paginationData, setPaginationData] = useState<PaginationData>({
     totalItems: 0,
@@ -78,7 +77,6 @@ const Applications: React.FC = () => {
 
   useEffect(() => {
     const loadApplications = async () => {
-      setLoading(true);
       try {
         const page = queryParams["page"];
         const currentPage = page ? Number(page) : 1;
@@ -86,8 +84,6 @@ const Applications: React.FC = () => {
         setApplications(response.data);
       } catch (error) {
         handleApiError(error);
-      } finally {
-        setLoading(false);
       }
     };
 

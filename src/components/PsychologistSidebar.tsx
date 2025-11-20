@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Calendar, 
-  AlertCircle, 
   User, 
   Clock, 
   LogOut,
   Menu,
   X,
   Wallet,
-  Info,
   Bell,
 } from 'lucide-react';
 import { useAppDispatch } from '../hooks/customReduxHooks';

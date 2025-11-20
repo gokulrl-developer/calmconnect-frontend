@@ -32,9 +32,7 @@ export default function Notifications() {
   const { setUnreadNotificationCount } = useContext(NotificationContext);
  const { updateQueryParams } = useUpdateQueryParams();
   const queryParams = useGetQueryParams();
-  function setCurrentPage(page: number) {
-    setPaginationData(produce(paginationData,(draft) => {draft.currentPage = page}));
-  }
+ 
   useEffect(() => {
     fetchNotifications();
   }, [paginationData.currentPage]);

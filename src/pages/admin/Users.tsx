@@ -192,7 +192,7 @@ const Users: React.FC = () => {
             {
               header: "Status",
               accessor: "status",
-              render: (status, user) => (
+              render: (status) => (
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                     status!

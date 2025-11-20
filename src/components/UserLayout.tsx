@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import UserSidebar from './UserSidebar';
 import UserHeader from './UserHeader';
 
-const UserLayout = ({}) => {
+const UserLayout = () => {
   document.documentElement.classList.remove("dark");
   return (
     <>

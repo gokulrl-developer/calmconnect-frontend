@@ -47,7 +47,7 @@ const ApplicationDetailsPage: React.FC= () => {
       closeConfirmationModal();
     }
     }catch(error){
-
+     console.log(error)
     }
     
   };
@@ -56,11 +56,11 @@ const ApplicationDetailsPage: React.FC= () => {
       try {
         const data = await fetchApplicationDetails(applicationId!);
         setApplication(data.details);
-      } catch (err:any) {
-        console.log("error fetching app details",err?.response?.data);
-        if(err.response?.data?.code==="NOT_FOUND"){
+      } catch (err) {
+        console.log("error fetching app details",err);
+       /*  if(err?.response?.data?.code==="NOT_FOUND"){
           backToList()
-        }
+        } */
       }
     };
     loadApplication();

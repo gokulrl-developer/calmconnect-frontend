@@ -10,9 +10,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { FlagIcon } from '@heroicons/react/24/solid'; 
 import { logout } from '../features/authentication/authSlice';
-import {useAppSelector,useAppDispatch} from '../hooks/customReduxHooks';
+import {useAppDispatch} from '../hooks/customReduxHooks';
 import { useNavigate } from 'react-router-dom';
-import type{ IRootState } from '../store';
 import { handleApiError } from '../services/axiosInstance';
 import { logOut } from '../services/authService';
 import { NotificationContext } from '../contexts/NotificationContext';
@@ -23,7 +22,6 @@ const Sidebar: React.FC = () => {
  const navigate=useNavigate();
    const { unreadNotificationCount} = useContext(NotificationContext);
  
- const isAuthenticated=useAppSelector((state:IRootState)=>state.auth.isAuthenticated)
  const handleLogout=async ()=>{
  try{
   const result=await logOut();

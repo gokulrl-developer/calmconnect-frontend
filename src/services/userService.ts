@@ -31,12 +31,6 @@ import type {
 import type paginationData from "../types/pagination.types";
 import axiosInstance from "./axiosInstance";
 
-interface DashboardData {
-  user: {
-    id: string;
-    role: string;
-  };
-}
 
 export const fetchDashboard = () =>
   axiosInstance.get<{dashboard:UserDashboardResponse}>("/user/dashboard").then((res) => res);
