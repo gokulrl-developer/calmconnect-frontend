@@ -1,9 +1,8 @@
 import React, { useState,useEffect } from 'react';
-import { Link, useNavigate,useLocation } from 'react-router-dom';
-import { useAppDispatch } from '../hooks/customReduxHooks';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/UI/Card';
 import Button from '../components/UI/Button';
-import { Mail, Lock, User,ArrowLeft } from 'lucide-react';
+import { Mail, Lock,ArrowLeft } from 'lucide-react';
 
 import { forgotPasswordPsych, forgotPasswordUser, resendOtpResetPsych, resendOtpResetUser, resetPasswordPsych, resetPasswordUser } from '../services/authService';
 
@@ -14,7 +13,6 @@ const ForgotPassword :React.FC<ForgotPasswordProps>=({role}) => {
   const navigate = useNavigate();
    const [step, setStep] = useState<'email' | 'otp'|'password'>('email');
   const [countdown, setCountdown] = useState(60);
-  const dispatch=useAppDispatch()
   const [formData, setFormData] = useState({
     otp:'',
     email: '',
@@ -56,9 +54,9 @@ const ForgotPassword :React.FC<ForgotPasswordProps>=({role}) => {
     if (validateForm()) {
       const {email}=formData
       if(role==="user"){
-        const result=await forgotPasswordUser({email})
+        await forgotPasswordUser({email})
       }else if(role==="psychologist"){
-        const result=await forgotPasswordPsych({email})
+       await forgotPasswordPsych({email})
       }
       setStep("otp");
     }
@@ -70,24 +68,24 @@ const ForgotPassword :React.FC<ForgotPasswordProps>=({role}) => {
     if (validateForm()) {
       const {password,otp,email}=formData
       if(role==="user"){
-        const result=await resetPasswordUser({email,password,otp})
+        await resetPasswordUser({email,password,otp})
       navigate("/user/login")
 
       }else if(role==="psychologist"){
-        const result=await resetPasswordPsych({email,password,otp})
+        await resetPasswordPsych({email,password,otp})
       navigate("/psychologist/login")
 
       }
     }
     }catch(error){
-
+        console.log("error on resetting password",error)
     }
     
   };
 
    const handleOtpSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-            const {email,otp}=formData
+            const {otp}=formData
     if (otp.length === 4) {
       setStep("password")
     }
@@ -110,13 +108,12 @@ const ForgotPassword :React.FC<ForgotPasswordProps>=({role}) => {
   };
 
   const handleResendCode = async() => {
-   const {email,...rest}=formData;
-   console.log("inside resend code handler",email)
+   
    try{
     if(role==="user"){
-      const result =await resendOtpResetUser({email});
+      await resendOtpResetUser({email:formData.email});
     }else if(role==="psychologist"){
-      const result=await resendOtpResetPsych({email});
+      await resendOtpResetPsych({email:formData.email});
     }
     setCountdown(60);
     setFormData({otp:"",
@@ -126,7 +123,7 @@ const ForgotPassword :React.FC<ForgotPasswordProps>=({role}) => {
     });
     setErrors({})
 }catch(error){
-
+  console.log("error on resending code",error)
 }
   };
 // Countdown timer effect

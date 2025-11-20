@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
 
-const AdminLayout = ({}) => {
+const AdminLayout = () => {
   document.documentElement.classList.remove("dark");
   return (
     <>

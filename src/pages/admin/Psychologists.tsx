@@ -202,7 +202,7 @@ const Psychologists: React.FC = () => {
             {
               header: "Status",
               accessor: "status",
-              render: (status, psych) => (
+              render: (status) => (
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                     status!

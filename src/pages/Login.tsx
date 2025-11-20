@@ -6,8 +6,7 @@ import Card from "../components/UI/Card";
 import { loginUserAsync } from "../features/authentication/authThunk";
 import { loginPsychologistAsync } from "../features/authentication/authThunk";
 import { loginAdminAsync } from "../features/authentication/authThunk";
-import { useAppDispatch, useAppSelector } from "../hooks/customReduxHooks";
-import { setRole, removeRole } from "../features/authentication/authSlice";
+import { useAppDispatch} from "../hooks/customReduxHooks";
 
 interface LoginProps {
   role: string;

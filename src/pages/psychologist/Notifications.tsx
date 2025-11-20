@@ -32,13 +32,6 @@ export default function Notifications() {
   const { updateQueryParams } = useUpdateQueryParams();
   const queryParams = useGetQueryParams();
 
-  function setCurrentPage(page: number) {
-    setPaginationData((prev) =>
-      produce(prev, (draft) => {
-        draft.currentPage = page;
-      })
-    );
-  }
   useEffect(() => {
     fetchNotifications();
   }, [paginationData.currentPage]);

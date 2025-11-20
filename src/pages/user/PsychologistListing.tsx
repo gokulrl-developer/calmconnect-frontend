@@ -16,7 +16,6 @@ const BookSession: React.FC = () => {
   const [selectedGender, setSelectedGender] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [sortOption, setSortOption] = useState("a-z");
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [psychologists, setPsychologists] = useState<ListPsychSummary[]>([]);
   const [search, setSearch] = useState<string>("");
   const [paginationData, setPaginationData] = useState<paginationData>({
@@ -64,7 +63,7 @@ const BookSession: React.FC = () => {
   useEffect(() => {
     fetchPsychologists();
   }, [
-    currentPage,
+    paginationData.currentPage,
     selectedSpecialization,
     selectedGender,
     searchDate,

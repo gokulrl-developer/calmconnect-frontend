@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import axios from "axios";
 import { useAppSelector } from "../../hooks/customReduxHooks";
 import type { IRootState } from "../../store";
 import { checkSessionAccessAPI } from "../../services/userService";

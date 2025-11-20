@@ -6,7 +6,6 @@ import {
   fetchSessionsByPsychAPI,
 } from "../../services/psychologistService";
 import { handleApiError } from "../../services/axiosInstance";
-import type paginationData from "../../types/pagination.types";
 import type { SessionListingPsychItem } from "../../types/api/psychologist.types";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
