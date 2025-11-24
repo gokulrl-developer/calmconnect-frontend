@@ -182,9 +182,9 @@ export default function DailyAvailability() {
 
       // Include only fields that differ from originalSpecialDay
       if (originalSpecialDay.startTime !== currentSpecialDay.startTime)
-        payload.startTime = HHMMToIso(currentSpecialDay.startTime!, date);
+        payload.startTime = currentSpecialDay.startTime;
       if (originalSpecialDay.endTime !== currentSpecialDay.endTime)
-        payload.endTime = HHMMToIso(currentSpecialDay.endTime!, date);
+        payload.endTime =currentSpecialDay.endTime;
       if (
         originalSpecialDay.durationInMins !== currentSpecialDay.durationInMins
       )
