@@ -297,7 +297,7 @@ export default function Availability() {
       }
 
       const res = await editAvailabilityRuleAPI(
-        (originalAvailabilityRule as any).availabilityRuleId,
+        (originalAvailabilityRule as AvailabilityRuleDetails).availabilityRuleId,
         payload
       );
 
@@ -610,10 +610,10 @@ export default function Availability() {
               <input
                 type="time"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.startTime ?? ""}
+                value={(currentAvailabilityRule as CurrentAvailabilityRule)?.startTime ?? ""}
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     startTime: e.target.value,
                   }))
                 }
@@ -628,10 +628,10 @@ export default function Availability() {
               <input
                 type="time"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.endTime ?? ""}
+                value={(currentAvailabilityRule as CurrentAvailabilityRule)?.endTime ?? ""}
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     endTime: e.target.value,
                   }))
                 }
@@ -646,10 +646,10 @@ export default function Availability() {
               <input
                 type="number"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.durationInMins ?? 0}
+                value={(currentAvailabilityRule as CurrentAvailabilityRule)?.durationInMins ?? 0}
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     durationInMins: Number(e.target.value),
                   }))
                 }
@@ -664,10 +664,10 @@ export default function Availability() {
               <input
                 type="number"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.bufferTimeInMins ?? 0}
+                value={(currentAvailabilityRule as CurrentAvailabilityRule)?.bufferTimeInMins ?? 0}
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     bufferTimeInMins: Number(e.target.value),
                   }))
                 }

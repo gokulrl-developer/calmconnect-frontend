@@ -214,12 +214,12 @@ const Psychologists: React.FC = () => {
             },
             {
               header: "Actions",
-              render: (_, psych) => (
+              render: (_, psych ) => (
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleView(psych?.id!)}
+                    onClick={() => handleView((psych as PsychItem).id!)}
                   >
                     <EyeIcon className="w-4 h-4 mr-1" />
                     View
@@ -228,7 +228,7 @@ const Psychologists: React.FC = () => {
                     variant={psych?.status === "active" ? "warning" : "success"}
                     size="sm"
                     onClick={() =>
-                      openConfirmationModal(psych?.id!, psych?.status!)
+                      openConfirmationModal((psych as PsychItem).id!, (psych as PsychItem).status!)
                     }
                   >
                     {psych?.status === "active" ? "Deactivate" : "Activate"}
