@@ -6,7 +6,7 @@ import { Upload, Camera, Globe, LogOut, Download } from "lucide-react";
 import {
   fetchLatestApplicationAPI,
   psychologistApply,
-  type LatestApplicationData,
+ 
 } from "../../services/psychologistService";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
 import {
@@ -16,6 +16,7 @@ import {
 import { handleApiError } from "../../services/axiosInstance";
 import { toast } from "sonner";
 import { logOut } from "../../services/authService";
+import type { LatestApplicationData } from "../../types/api/psychologist.types";
 
 const PsychologistApplication = () => {
   const navigate = useNavigate();

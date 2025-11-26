@@ -7,7 +7,6 @@ import {
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
 import { fetchUsers, updateUserStatus } from "../../services/adminService";
-import type { UserItem } from "../../services/adminService";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
 import Table from "../../components/UI/Table";
@@ -15,6 +14,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import type { UserItem } from "../../types/api/admin.types";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);

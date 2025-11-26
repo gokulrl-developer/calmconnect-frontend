@@ -4,8 +4,8 @@ import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import { fetchApplicationDetails, updateApplication } from '../../services/adminService';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { ApplicationDetails } from '../../services/adminService';
 import Modal from '../../components/UI/Modal';
+import type { ApplicationDetails } from '../../types/api/admin.types';
 
 
 

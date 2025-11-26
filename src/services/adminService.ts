@@ -1,86 +1,10 @@
-import type { AdminRegistrationTrendsResponse, AdminPsychDetailsResponse, AdminRevenueTrendsResponse, AdminSessionTrendsResponse, AdminTopPsychologistResponse, AdminUserDetailsResponse, ComplaintDetailsResponse, ComplaintHistoryResponse, ComplaintListingResponse, FetchRevenueGraphRequest, FetchSessionsGraphRequest, FetchTopPsychologistRequest, SessionListingAdminResponse, FetchRegistrationTrendsRequest, FetchDashboardDataRequest, DashboardSummaryCardResponse } from "../types/api/admin.types";
+import type { AdminRegistrationTrendsResponse, AdminPsychDetailsResponse, AdminRevenueTrendsResponse, AdminSessionTrendsResponse, AdminTopPsychologistResponse, AdminUserDetailsResponse, ComplaintDetailsResponse, ComplaintHistoryResponse, ComplaintListingResponse, FetchRevenueGraphRequest, FetchSessionsGraphRequest, FetchTopPsychologistRequest, SessionListingAdminResponse, FetchRegistrationTrendsRequest, FetchDashboardDataRequest, DashboardSummaryCardResponse, ApplicationList, ApplicationDetailsResponse, IApplicationResponse, UserList, IUserResponse, PsychList, IPsychResponse } from "../types/api/admin.types";
 import type { MessageResponse } from "../types/api/psychologist.types";
 import type { TransactionListingPayload, TransactionListingResponse, WalletResponse } from "../types/api/shared.types";
 import type { GetNotificationResponse, GetNotificationsPayload, GetUnreadNotificationCountResponse, MarkNotificationsReadResponse } from "../types/domain/Notification.types";
 import axiosInstance from "./axiosInstance";
 
-export interface ApplicationItem {
-  firstName: string;
-  lastName: string;
-  email: string;
-  status: string;
-  specializations: string[];
-  id:string
-}
 
-export interface ApplicationList {
-  success: boolean;
-  data: ApplicationItem[];
-}
-
-export interface ApplicationDetails{
-    firstName:string,
-    lastName:string,
-    email:string,
-    submittedAt:string, 
-    phone:string | null, 
-    gender:string,
-    dob:string,
-    profilePicture:string,
-    address:string,
-    languages:string,
-    specializations:string[],
-    bio:string,
-    licenseUrl:string,
-    resume:string,
-    qualifications:string,
-    status:string,
-}
-
-export interface ApplicationDetailsResponse{
-  details:ApplicationDetails,
-  message:string
-}
-export interface IApplicationResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface UserItem {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  status: "active" | "inactive" ;
-}
-
-export interface UserList {
-  success: boolean;
-  data: UserItem[];
-}
-
-export interface IUserResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface PsychItem {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  status: "active" | "inactive" ;
-}
-
-export interface PsychList {
-  success: boolean;
-  data: PsychItem[];
-}
-
-export interface IPsychResponse {
-  success: boolean;
-  message: string;
-}
 export const fetchApplications = (
   page: number = 1,
   status?: "pending" | "accepted" | "rejected"

@@ -215,3 +215,36 @@ export interface PsychologistDashboardResponse {
   revenueTrend: RevenueTrendEntry[];
   recentSessions: RecentSessionEntry[];
 }
+
+export interface IApplicationResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface LatestApplicationData{
+    firstName:string,
+    lastName:string,
+    email:string,
+    submittedAt:Date, 
+    phone:string, 
+    gender:"male"|"female"|"others",
+    dob:Date,
+    profilePicture:string,
+    address:string,
+    languages:string,
+    specializations:string[],
+    bio:string,
+    licenseUrl:string,
+    resume:string,
+    qualifications:string,
+    status:"pending"|"accepted"|"rejected",
+    rejectionReason?:string
+}
+export interface LatestApplicationDataResponse {
+  psych: {
+    id: string;
+    role: string;
+    isVerified: boolean;
+  };
+  application:LatestApplicationData | null
+}

@@ -10,7 +10,6 @@ import {
   fetchPsychologists,
   updatePsychologistStatus,
 } from "../../services/adminService";
-import type { PsychItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +18,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import type { PsychItem } from "../../types/api/admin.types";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
