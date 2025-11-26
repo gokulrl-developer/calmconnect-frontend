@@ -36,7 +36,9 @@ const PsychologistApplication = () => {
         console.log("fetching application", result.data.application);
         setExistingApplication(result.data.application);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("error on fetching application",error)
+    }
   }
 
   const handleLogout = async () => {
@@ -51,17 +53,7 @@ const PsychologistApplication = () => {
     }
   };
 
-  /*  async function fetchRejectedApplication(){
-      try{
-        const result=await fetchRejectedApplicationAPI();
-        if(result.data){
-          const application:any=result.data.application.dob.toISOString()
-          setFormData({...application})
-        }
-      }catch(error){
-        console.log(error)
-      }
-    } */
+
   const [formData, setFormData] = useState({
     bio: "",
     specializations: [] as string[],
@@ -92,7 +84,7 @@ const PsychologistApplication = () => {
     "Stress Management",
   ];
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: unknown) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
       setErrors({ ...errors, [field]: "" });
@@ -103,7 +95,7 @@ const PsychologistApplication = () => {
     const updatedSpecializations = formData.specializations.includes(
       specialization
     )
-      ? formData.specializations.filter((s: any) => s !== specialization)
+      ? formData.specializations.filter((s: unknown) => s !== specialization)
       : [...formData.specializations, specialization];
     setFormData({ ...formData, specializations: updatedSpecializations });
   };
