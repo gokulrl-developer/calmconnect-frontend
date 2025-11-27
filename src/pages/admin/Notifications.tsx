@@ -7,7 +7,6 @@ import {
 
 import { produce } from "immer";
 import { BellIcon } from "lucide-react";
-import type { NotificationListingItem } from "../../types/domain/Notification.types";
 import Pagination from "../../components/Pagination";
 import type paginationData from "../../types/pagination.types";
 import { NotificationContext } from "../../contexts/NotificationContext";
@@ -16,6 +15,7 @@ import Button from "../../components/UI/Button";
 import Modal from "../../components/UI/Modal";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import type { NotificationListingItem } from "../../types/api/shared.types";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(

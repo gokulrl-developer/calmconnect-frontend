@@ -6,7 +6,6 @@ import {
   fetchApplications,
   updateApplication,
 } from "../../services/adminService";
-import type { ApplicationItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../components/UI/Modal";
@@ -15,6 +14,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import type { ApplicationItem } from "../../types/api/admin.types";
 
 const PAGE_SIZE = 10;
 
