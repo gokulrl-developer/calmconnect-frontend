@@ -6,6 +6,7 @@ import {
   fetchComplaintDetailsAPI,
   fetchComplaintHistoryAPI,
   resolveComplaintAPI,
+  updatePsychologistStatus,
 } from "../../services/adminService";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "../../components/UI/Modal";
@@ -17,6 +18,7 @@ import type {
 import { toast } from "sonner";
 import type paginationData from "../../types/pagination.types";
 import Table from "../../components/UI/Table";
+import { produce } from "immer";
 
 const AdminComplaintDetails: React.FC = () => {
   const { complaintId } = useParams();
@@ -37,6 +39,8 @@ const AdminComplaintDetails: React.FC = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedComplaintDetails, setSelectedComplaintDetails] =
     useState<ComplaintDetailsResponse | null>(null);
+  const [showUpdateStatusModal, setShowUpdateStatusModal] =
+    useState<boolean>(false);
   useEffect(() => {
     fetchComplaints(pagination.currentPage, pagination.pageSize);
   }, [pagination.currentPage, complaint]);
@@ -146,6 +150,22 @@ const AdminComplaintDetails: React.FC = () => {
     setSelectedComplaintDetails(null);
   };
   if (!complaint) return <div>Loading...</div>;
+
+  const handleStatusToggle = async () => {
+    const newStatus =
+      complaint.psychologistStatus === "active" ? "inactive" : "active";
+    try {
+      await updatePsychologistStatus(complaint.psychologistId, newStatus);
+      setShowUpdateStatusModal(false);
+      setComplaint((prev) =>
+        produce(prev, (draft) => {
+          draft!.psychologistStatus = newStatus;
+        })
+      );
+    } catch (err) {
+      console.error("Failed to update psychologist status", err);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -270,10 +290,24 @@ const AdminComplaintDetails: React.FC = () => {
               </h3>
               <Button
                 variant="success"
-                className="w-full flex items-center justify-center"
+                className="w-full flex items-center justify-center mb-1"
                 onClick={() => setShowResolveModal(true)}
               >
                 <CheckIcon className="w-4 h-4 mr-2" /> Resolve Complaint
+              </Button>
+              <Button
+                variant={
+                  complaint.psychologistStatus === "active"
+                    ? "danger"
+                    : "success"
+                }
+                className="w-full flex items-center justify-center mt-1"
+                onClick={() => setShowUpdateStatusModal(true)}
+              >
+                <CheckIcon className="w-4 h-4 mr-2" />{" "}
+                {complaint.psychologistStatus === "active"
+                  ? "Block"
+                  : "Unblock"}
               </Button>
             </Card>
           )}
@@ -524,6 +558,51 @@ const AdminComplaintDetails: React.FC = () => {
             Loading details...
           </div>
         )}
+      </Modal>
+
+      {/* Confirmation Modal */}
+      <Modal
+        isOpen={showUpdateStatusModal}
+        onClose={() => setShowUpdateStatusModal(false)}
+        title={`${
+          complaint.psychologistStatus === "active" ? "Deactivate" : "Activate"
+        } Psychologist`}
+      >
+        <div className="space-y-4 p-3">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800">
+                Are you sure you want to{" "}
+                {complaint.psychologistStatus === "active"
+                  ? "Deactivate"
+                  : "Activate"}{" "}
+                this Psychologist? <br />
+              </h4>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              variant="secondary"
+              onClick={() => setShowUpdateStatusModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={
+                complaint.psychologistStatus === "inactive"
+                  ? "success"
+                  : "danger"
+              }
+              onClick={() => {
+                handleStatusToggle();
+              }}
+            >
+              {complaint.psychologistStatus === "active"
+                ? "Deactivate Psychologist"
+                : "Activate Psychologist"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
