@@ -56,6 +56,7 @@ export interface ComplaintDetailsResponse {
   psychologistId: string;
   psychologistFullName: string;
   psychologistEmail: string;
+  psychologistStatus:"active"|"inactive";
   sessionId?: string;
   sessionStartTime: string;
   sessionEndTime: string;
