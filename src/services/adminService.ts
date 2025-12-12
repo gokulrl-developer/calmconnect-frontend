@@ -79,13 +79,13 @@ return axiosInstance.get<GetNotificationResponse>(`${ADMIN_ENDPOINTS.FETCH_NOTIF
 };
 
 export const markAllNotificationsReadAPI = () =>
-axiosInstance.patch<MarkNotificationsReadResponse>(ADMIN_ENDPOINTS.MARK_NOTIFICATIONS_READ, {}, { isSilentError: true } as any).then(res => res);
+axiosInstance.patch<MarkNotificationsReadResponse>(ADMIN_ENDPOINTS.MARK_NOTIFICATIONS_READ, {}).then(res => res);
 
 export const clearNotificationsAPI = () =>
 axiosInstance.delete<MessageResponse>(ADMIN_ENDPOINTS.CLEAR_NOTIFICATIONS).then(res => res);
 
 export const getAdminUnreadNotificationsCountAPI = () =>
-axiosInstance.get<GetUnreadNotificationCountResponse>(ADMIN_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT, { isSilentError: true } as any).then(res => res);
+axiosInstance.get<GetUnreadNotificationCountResponse>(ADMIN_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT).then(res => res);
 
 // ---------- Transactions ----------
 export const getAdminTransactionsAPI = (payload: TransactionListingPayload) => {

@@ -108,7 +108,7 @@ export const PsychVideoRoom = () => {
       if (!pcRef.current) await initPeerConnection();
       const pc = pcRef.current!;
       if (payload.type === "offer") {
-        await pc.setRemoteDescription(new RTCSessionDescription(payload.data));
+        await pc.setRemoteDescription(new RTCSessionDescription(payload.data as RTCSessionDescriptionInit));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         s.emit("signal", {
@@ -117,10 +117,10 @@ export const PsychVideoRoom = () => {
           data: pc.localDescription,
         });
       } else if (payload.type === "answer") {
-        await pc.setRemoteDescription(new RTCSessionDescription(payload.data));
+        await pc.setRemoteDescription(new RTCSessionDescription(payload.data as RTCSessionDescriptionInit));
       } else if (payload.type === "ice") {
         try {
-          await pc.addIceCandidate(payload.data);
+          await pc.addIceCandidate(payload.data as RTCIceCandidateInit);
         } catch (e: unknown) {
           console.warn("addIceCandidate failed", e);
         }

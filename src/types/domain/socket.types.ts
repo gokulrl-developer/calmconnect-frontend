@@ -7,7 +7,7 @@ export type JoinDeniedPayload = {
 export type SignalPayload = {
   sessionId: string;
   type: "offer" | "answer" | "ice";
-  data: any;
+  data: RTCSessionDescriptionInit | RTCIceCandidateInit;
 };
 
 export type ChatMessagePayload = {
