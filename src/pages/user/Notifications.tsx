@@ -16,6 +16,7 @@ import Button from "../../components/UI/Button";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import type { NotificationListingItem } from "../../types/api/shared.types";
+import { Link } from "react-router-dom";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<NotificationListingItem[]>(
@@ -130,6 +131,9 @@ export default function Notifications() {
                     <p className="text-gray-600 dark:text-gray-300 text-sm">
                       {n.message}
                     </p>
+                     {n.link && <p className="text-blue-800 dark:text-gray-300 text-sm">
+                       <Link to={n.link}> Click here</Link>
+                      </p>}
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {new Date(n.createdAt).toLocaleString()}
                     </span>
