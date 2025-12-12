@@ -108,13 +108,13 @@ export const fetchNotificationsAPI = (data: GetNotificationsPayload) =>
 axiosInstance.get<GetNotificationResponse>(PSYCHOLOGIST_ENDPOINTS.FETCH_NOTIFICATIONS(data.page, data.limit)).then(res => res);
 
 export const markAllNotificationsReadAPI = () =>
-axiosInstance.patch<MarkNotificationsReadResponse>(PSYCHOLOGIST_ENDPOINTS.MARK_NOTIFICATIONS_READ, {}, { isSilentError: true } as any).then(res => res);
+axiosInstance.patch<MarkNotificationsReadResponse>(PSYCHOLOGIST_ENDPOINTS.MARK_NOTIFICATIONS_READ, {}).then(res => res);
 
 export const clearNotificationsAPI = () =>
 axiosInstance.delete<MessageResponse>(PSYCHOLOGIST_ENDPOINTS.CLEAR_NOTIFICATIONS).then(res => res);
 
 export const getPsychUnreadNotificationsCountAPI = () =>
-axiosInstance.get<GetUnreadNotificationCountResponse>(PSYCHOLOGIST_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT, { isSilentError: true } as any).then(res => res);
+axiosInstance.get<GetUnreadNotificationCountResponse>(PSYCHOLOGIST_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT).then(res => res);
 
 // ---------- Transactions ----------
 export const getPsychTransactionsAPI = (payload: TransactionListingPayload) => {

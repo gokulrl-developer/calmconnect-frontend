@@ -149,10 +149,21 @@ registrationTrends:AdminRegistrationTrendsEntry[]
 export interface AdminRevenueTrendsResponse{
   revenueTrends:AdminRevenueTrendsEntry[]
 }
-export interface FetchRevenueGraphRequest extends FetchDashboardDataRequest {}
-export interface FetchRegistrationTrendsRequest extends FetchDashboardDataRequest {}
-export interface FetchSessionsGraphRequest extends FetchDashboardDataRequest {}
-export interface FetchTopPsychologistRequest extends FetchDashboardDataRequest {
+export interface FetchRevenueGraphRequest{
+fromDate: string;
+  toDate: string;
+}
+export interface FetchRegistrationTrendsRequest {
+  fromDate: string;
+  toDate: string;
+}
+export interface FetchSessionsGraphRequest {
+  fromDate: string;
+  toDate: string;
+}
+export interface FetchTopPsychologistRequest {
+  fromDate: string;
+  toDate: string;
   limit: number; 
 }
 

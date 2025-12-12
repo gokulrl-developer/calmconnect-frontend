@@ -30,9 +30,6 @@ export interface TransactionListingPayload{
   limit?:number
 }
 
-export interface ClearNotificationsRequest{
-  
-}
 
 export interface GetUnreadNotificationCountResponse{
  count:number,
