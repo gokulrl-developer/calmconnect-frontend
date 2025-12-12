@@ -71,25 +71,22 @@ const Sidebar: React.FC = () => {
         />
       )}
       
-      <div className={`fixed left-0 top-0 h-full z-50 transition-all duration-300 ${
-        isCollapsed ? (isMobile ? '-translate-x-full' : 'w-20') : 'w-64'
+      <div className={`fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] z-40 transition-all duration-300 ${
+        isCollapsed ? (isMobile ? '-translate-x-full' : 'w-20') : 'md:w-1/5'
       }`}>
         <div className="h-full bg-white shadow-lg flex flex-col">
           
           {/* Header */}
-          <div className="flex items-center justify-between h-16 border-b border-gray-200 px-6">
-            {!isCollapsed && (
-              <span className="text-xl font-bold text-blue-600">CalmConnect</span>
-            )}
             {isMobile && (
+          <div className="flex items-center justify-between h-16 border-b border-gray-200 px-6">
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 {isCollapsed ? <Menu size={20} /> : <X size={20} />}
               </button>
-            )}
           </div>
+            )}
 
           {/* Navigation */}
           <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
@@ -134,7 +131,7 @@ const Sidebar: React.FC = () => {
       {isMobile && isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed top-4 left-4 z-50 p-3 rounded-lg bg-white shadow-lg border border-gray-200 hover:scale-105 transition-all duration-200"
+          className="fixed top-4 left-4 z-40 p-3 rounded-lg bg-white shadow-lg border border-gray-200 hover:scale-105 transition-all duration-200"
         >
           <Menu size={20} />
         </button>
