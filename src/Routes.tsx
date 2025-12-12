@@ -46,6 +46,7 @@ import UserTransactions from "./pages/user/Transactions"
 import UserComplaints from "./pages/user/UserComplaints";
 import AdminComplaints from "./pages/admin/AdminComplaints";
 import AdminComplaintDetails from "./pages/admin/AdminComplaintDetails";
+import { CallProvider } from "./contexts/CallContext";
 
 function AppRoutes() {
   return (
@@ -54,6 +55,7 @@ function AppRoutes() {
         <ErrorWatcher />
 
             <NotificationProvider>
+            <CallProvider>
         <Routes>
           {/* Common Routes */}
           <Route path="/unauthorised" element={<Unauthorised />} />
@@ -206,6 +208,7 @@ function AppRoutes() {
             </Route>
           </Route>
         </Routes>
+        </CallProvider>
       </NotificationProvider>
     </>
   );
