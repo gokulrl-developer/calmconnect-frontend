@@ -24,7 +24,7 @@ const GoogleCallback: React.FC = () => {
       }     
       try {
         if (role === "user") {
-          const result = await dispatch(googleAuthUserThunk({ code })).unwrap();
+          await dispatch(googleAuthUserThunk({ code })).unwrap();
           navigate("/user/dashboard");
         } else if (role === "psychologist") {
           const result = await dispatch(googleAuthPsyThunk({ code })).unwrap();
@@ -35,6 +35,7 @@ const GoogleCallback: React.FC = () => {
           }
         }
       } catch (error) {
+        console.log("error on authentication",error)
         dispatch(setError("error occured"));
         navigate("/");
       }

@@ -66,12 +66,15 @@ export default function Availability() {
     string[]
   >([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [showEditConfirmation, setShowEditConfirmation] = useState(false);
   const [editAvailabilityErrors, setEditAvailabilityErrors] = useState<
     string[]
   >([]);
-  const [showDeleteRuleModal,setShowDeleteRuleModal]=useState(false);
-  const [deleteAvailabilityRuleId,setDeleteAvailabilityRuleId]=useState<null|string>(null);
+  const [showDeleteRuleModal, setShowDeleteRuleModal] = useState(false);
+  const [deleteAvailabilityRuleId, setDeleteAvailabilityRuleId] = useState<
+    null | string
+  >(null);
 
   const navigate = useNavigate();
 
@@ -297,7 +300,8 @@ export default function Availability() {
       }
 
       const res = await editAvailabilityRuleAPI(
-        (originalAvailabilityRule as any).availabilityRuleId,
+        (originalAvailabilityRule as AvailabilityRuleDetails)
+          .availabilityRuleId,
         payload
       );
 
@@ -322,9 +326,37 @@ export default function Availability() {
     saveAvailabilityRule();
   }
 
-  async function handleViewAvailabilityRule(availabilityRuleId: string) {
+  async function openEditAvailabilityRule(availabilityRuleId: string) {
     await fetchAvailabilityRule(availabilityRuleId);
     setIsEditModalOpen(true);
+  }
+  async function viewAvailabilityRule(availabilityRuleId: string) {
+    try {
+      const res = await fetchAvailabilityRuleAPI(availabilityRuleId);
+      if (res.data) {
+        setOriginalAvailabilityRule({ ...res.data.availabilityRule });
+        setCurrentAvailabilityRule({
+          startTime: res.data.availabilityRule.startTime ?? "",
+          endTime: res.data.availabilityRule.endTime ?? "",
+          durationInMins: res.data.availabilityRule.durationInMins,
+          bufferTimeInMins: res.data.availabilityRule.bufferTimeInMins ?? 0,
+          availabilityRuleId: res.data.availabilityRule.availabilityRuleId,
+        });
+        const { startTime, endTime, durationInMins, bufferTimeInMins } =
+          res.data.availabilityRule;
+        const generatedSlots = useGenerateSlots({
+          startTime: startTime!,
+          endTime: endTime!,
+          durationInMins: durationInMins!,
+          bufferTimeInMins,
+        });
+
+        setAvailabilityRuleSlots(generatedSlots);
+        setIsViewModalOpen(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function handleDateSelection(date: Date) {
@@ -333,19 +365,21 @@ export default function Availability() {
     navigate(`/psychologist/daily-availability?${params.toString()}`);
   }
 
- async function handleDeleteAvailabilityRule(){
-      try{
-        const result=await deleteAvailabilityRuleAPI(deleteAvailabilityRuleId!);
-        if(result.data){
-          toast.success(result.data.message|| "The availability rule deleted successfully");
-          setDeleteAvailabilityRuleId(null);
-          setShowDeleteRuleModal(false);
-          fetchAvailabilityRuleSummaries();
-        }
-      }catch(error){
-        console.log(error)
+  async function handleDeleteAvailabilityRule() {
+    try {
+      const result = await deleteAvailabilityRuleAPI(deleteAvailabilityRuleId!);
+      if (result.data) {
+        toast.success(
+          result.data.message || "The availability rule deleted successfully"
+        );
+        setDeleteAvailabilityRuleId(null);
+        setShowDeleteRuleModal(false);
+        fetchAvailabilityRuleSummaries();
       }
- }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
@@ -389,16 +423,28 @@ export default function Availability() {
                       variant="secondary"
                       size="sm"
                       onClick={() =>
-                        handleViewAvailabilityRule(summary.availabilityRuleId)
+                        viewAvailabilityRule(summary.availabilityRuleId)
+                      }
+                    >
+                      <EyeIcon className="w-4 h-4 mr-1" /> View
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        openEditAvailabilityRule(summary.availabilityRuleId)
                       }
                     >
                       <EyeIcon className="w-4 h-4 mr-1" /> Edit
                     </Button>
 
-                    <Button variant="warning" onClick={() => {
-                      setDeleteAvailabilityRuleId(summary.availabilityRuleId);
-                      setShowDeleteRuleModal(true);
-                    }}>
+                    <Button
+                      variant="warning"
+                      onClick={() => {
+                        setDeleteAvailabilityRuleId(summary.availabilityRuleId);
+                        setShowDeleteRuleModal(true);
+                      }}
+                    >
                       Delete
                     </Button>
                   </div>
@@ -610,10 +656,13 @@ export default function Availability() {
               <input
                 type="time"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.startTime ?? ""}
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.startTime ?? ""
+                }
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     startTime: e.target.value,
                   }))
                 }
@@ -628,10 +677,13 @@ export default function Availability() {
               <input
                 type="time"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.endTime ?? ""}
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.endTime ?? ""
+                }
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     endTime: e.target.value,
                   }))
                 }
@@ -646,10 +698,13 @@ export default function Availability() {
               <input
                 type="number"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.durationInMins ?? 0}
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.durationInMins ?? 0
+                }
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     durationInMins: Number(e.target.value),
                   }))
                 }
@@ -664,10 +719,13 @@ export default function Availability() {
               <input
                 type="number"
                 className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
-                value={(currentAvailabilityRule as any)?.bufferTimeInMins ?? 0}
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.bufferTimeInMins ?? 0
+                }
                 onChange={(e) =>
                   setCurrentAvailabilityRule((prev) => ({
-                    ...(prev as any),
+                    ...(prev as CurrentAvailabilityRule),
                     bufferTimeInMins: Number(e.target.value),
                   }))
                 }
@@ -744,6 +802,104 @@ export default function Availability() {
               </div>
             </div>
           )}
+        </div>
+      </Modal>
+      {/* View Avaialbility rule Modal */}
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setCurrentAvailabilityRule({} as CurrentAvailabilityRule);
+          setAvailabilityRuleSlots([]);
+        }}
+        title="View Availability Rule"
+      >
+        <div className="space-y-4 m-5">
+          <div className="grid grid-cols-3 gap-4">
+            {/* Start Time */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 dark:text-gray-200 text-sm">
+                Start Time
+              </label>
+              <input
+                type="time"
+                className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.startTime ?? ""
+                }
+                readOnly
+              />
+            </div>
+
+            {/* End Time */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 dark:text-gray-200 text-sm">
+                End Time
+              </label>
+              <input
+                type="time"
+                className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.endTime ?? ""
+                }
+                readOnly
+              />
+            </div>
+
+            {/* Duration */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 dark:text-gray-200 text-sm">
+                Duration (minutes)
+              </label>
+              <input
+                type="number"
+                className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.durationInMins ?? 0
+                }
+                readOnly
+              />
+            </div>
+
+            {/* Buffer Time */}
+            <div className="flex flex-col">
+              <label className="text-gray-700 dark:text-gray-200 text-sm">
+                Buffer Time (minutes)
+              </label>
+              <input
+                type="number"
+                className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm"
+                value={
+                  (currentAvailabilityRule as CurrentAvailabilityRule)
+                    ?.bufferTimeInMins ?? 0
+                }
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Slot Grid */}
+          {availabilityRuleSlots.length > 0 && (
+            <SlotGrid
+              availableSlots={availabilityRuleSlots}
+              onSlotClick={() => {}}
+              emptyText="No slots generated"
+            />
+          )}
+
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setIsViewModalOpen(false);
+              setCurrentAvailabilityRule({} as CurrentAvailabilityRule);
+              setAvailabilityRuleSlots([]);
+            }}
+          >
+            Cancel
+          </Button>
         </div>
       </Modal>
 

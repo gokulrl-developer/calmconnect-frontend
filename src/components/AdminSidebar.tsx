@@ -10,9 +10,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { FlagIcon } from '@heroicons/react/24/solid'; 
 import { logout } from '../features/authentication/authSlice';
-import {useAppSelector,useAppDispatch} from '../hooks/customReduxHooks';
+import {useAppDispatch} from '../hooks/customReduxHooks';
 import { useNavigate } from 'react-router-dom';
-import type{ IRootState } from '../store';
 import { handleApiError } from '../services/axiosInstance';
 import { logOut } from '../services/authService';
 import { NotificationContext } from '../contexts/NotificationContext';
@@ -23,7 +22,6 @@ const Sidebar: React.FC = () => {
  const navigate=useNavigate();
    const { unreadNotificationCount} = useContext(NotificationContext);
  
- const isAuthenticated=useAppSelector((state:IRootState)=>state.auth.isAuthenticated)
  const handleLogout=async ()=>{
  try{
   const result=await logOut();
@@ -36,10 +34,7 @@ const Sidebar: React.FC = () => {
  }
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 flex flex-col">
-      <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-800">
-        <span className="text-xl font-bold text-blue-600 dark:text-blue-400">CalmConnect Admin</span>
-      </div>
+    <aside className="fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] md:w-1/5 bg-white dark:bg-gray-900 shadow-lg z-40 flex flex-col">
       <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}

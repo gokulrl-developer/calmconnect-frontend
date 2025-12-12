@@ -10,7 +10,6 @@ import {
   fetchPsychologists,
   updatePsychologistStatus,
 } from "../../services/adminService";
-import type { PsychItem } from "../../services/adminService";
 import { handleApiError } from "../../services/axiosInstance";
 import Modal from "../../components/UI/Modal";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +18,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import type { PsychItem } from "../../types/api/admin.types";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
@@ -202,7 +202,7 @@ const Psychologists: React.FC = () => {
             {
               header: "Status",
               accessor: "status",
-              render: (status, psych) => (
+              render: (status) => (
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                     status!
@@ -214,12 +214,12 @@ const Psychologists: React.FC = () => {
             },
             {
               header: "Actions",
-              render: (_, psych) => (
+              render: (_, psych ) => (
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleView(psych?.id!)}
+                    onClick={() => handleView((psych as PsychItem).id!)}
                   >
                     <EyeIcon className="w-4 h-4 mr-1" />
                     View
@@ -228,7 +228,7 @@ const Psychologists: React.FC = () => {
                     variant={psych?.status === "active" ? "warning" : "success"}
                     size="sm"
                     onClick={() =>
-                      openConfirmationModal(psych?.id!, psych?.status!)
+                      openConfirmationModal((psych as PsychItem).id!, (psych as PsychItem).status!)
                     }
                   >
                     {psych?.status === "active" ? "Deactivate" : "Activate"}

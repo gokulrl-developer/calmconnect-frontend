@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import type {
-  AvailabilityRuleDetails,
   SpecialDay,
   QuickSlot,
   CreateSpecialDayPayload,
@@ -25,7 +24,6 @@ import {
 import { useGenerateSlots } from "../../hooks/generateSlotsHooks";
 import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
-import { useNavigate } from "react-router-dom";
 import { PlusIcon, PencilIcon, TrashIcon } from "lucide-react";
 import type { Slot } from "../../types/domain/AvailabiliityRule.types";
 import SlotGrid from "../../components/UI/SlotGrid";
@@ -33,8 +31,7 @@ import Modal from "../../components/UI/Modal";
 import { toast } from "sonner";
 
 export default function DailyAvailability() {
-  const [availabilityRules, setAvailabilityRule] =
-    useState<AvailabilityRuleDetails[]>([] as AvailabilityRuleDetails[]);
+  
   const [originalSpecialDay, setOriginalSpecialDay] = useState<SpecialDay>(
     {} as SpecialDay
   );
@@ -66,7 +63,6 @@ export default function DailyAvailability() {
   const [editQuickSlotConfirmation,setEditQuickSlotConfirmation]=useState(false);
   const [showDeleteQuickSlot,setShowDeleteQuickSlot]=useState(false);
   const [deleteQuickSlotId,setDeleteQuickSlotId]=useState<null|string>(null)
-  const navigate = useNavigate();
 
   useEffect(() => {
     const dateFromUrl = new URLSearchParams(window.location.search).get("date");
@@ -89,7 +85,6 @@ export default function DailyAvailability() {
 
       if (result.data) {
         const { availabilityRules, specialDay, quickSlots } = result.data;
-        setAvailabilityRule(availabilityRules);
         if (specialDay) {
           setOriginalSpecialDay(specialDay);
           setCurrentSpecialDay(specialDay);
@@ -187,9 +182,9 @@ export default function DailyAvailability() {
 
       // Include only fields that differ from originalSpecialDay
       if (originalSpecialDay.startTime !== currentSpecialDay.startTime)
-        payload.startTime = HHMMToIso(currentSpecialDay.startTime!, date);
+        payload.startTime = currentSpecialDay.startTime;
       if (originalSpecialDay.endTime !== currentSpecialDay.endTime)
-        payload.endTime = HHMMToIso(currentSpecialDay.endTime!, date);
+        payload.endTime =currentSpecialDay.endTime;
       if (
         originalSpecialDay.durationInMins !== currentSpecialDay.durationInMins
       )

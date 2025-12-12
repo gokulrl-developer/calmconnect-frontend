@@ -9,7 +9,7 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*.{ts,tsx}"],
     plugins: {
       import: importPlugin,
     },
@@ -21,7 +21,10 @@ export default [
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "warn",
-        { argsIgnorePattern: "^_" },
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
       ],
     },
   },

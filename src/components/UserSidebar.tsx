@@ -5,10 +5,7 @@ import {
   Calendar,
   Target,
   CreditCard,
-  FileText,
   AlertTriangle,
-  MessageCircle,
-  HelpCircle,
   Bell,
   User,
   LogOut,
@@ -52,10 +49,7 @@ export default function UserSidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-40 flex flex-col">
-      <div className="flex items-center justify-center h-16 border-b border-gray-200">
-        <span className="text-xl font-bold text-blue-600">CalmConnect</span>
-      </div>
+    <aside className="fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] w-64 bg-white shadow-lg z-40 flex flex-col">
       
       <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => (
@@ -77,8 +71,8 @@ export default function UserSidebar() {
         ))}
       </nav>
       
-      <div className="p-6 border-t border-gray-200">
-        <div className="flex items-center justify-between mb-4">
+      <div className="border-t p-3 border-gray-200">
+        <div className="flex items-center justify-between ">
           <div className="flex items-center">
             <User className="w-5 h-5 mr-3 text-gray-600" />
             <span className="text-sm text-gray-700">{firstName}</span>

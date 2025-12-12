@@ -152,7 +152,7 @@ const PsychologistProfile: React.FC = () => {
             key,
             key === "specializations" && Array.isArray(value)
               ? JSON.stringify(value)
-              : (value as any)
+              : (value as string|Blob)
           );
         }
       });

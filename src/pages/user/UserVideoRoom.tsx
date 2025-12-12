@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import axios from "axios";
 import { useAppSelector } from "../../hooks/customReduxHooks";
 import type { IRootState } from "../../store";
 import { checkSessionAccessAPI } from "../../services/userService";
@@ -14,6 +13,7 @@ import type {
   SocketErrorPayload,
 } from "../../types/domain/socket.types";
 import { logOut, refreshTokenAPI } from "../../services/authService";
+import { CallContext } from "../../contexts/CallContext";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 
@@ -35,12 +35,23 @@ export const UserVideoRoom = () => {
   const [text, setText] = useState("");
   const [joined, setJoined] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const { sessionId } = useParams<{ sessionId: string }>();
   const userId = useAppSelector((state: IRootState) => state.auth.accountId);
   const isAuthenticated = useAppSelector(
     (state: IRootState) => state.auth.isAuthenticated
   );
+  const { setInCall } = useContext(CallContext)!;
+  // -------Mute toggling
+  useEffect(() => {
+    toggleMute();
+  }, [isMuted]);
+
+  useEffect(()=>{
+    return ()=>{
+      setInCall(false)
+    }
+    },[])
 
   // --- SOCKET SETUP ---
   useEffect(() => {
@@ -68,7 +79,7 @@ export const UserVideoRoom = () => {
       toast.error(payload.message);
     });
 
-    s.on("join-accepted", () => {
+    s.on("join-accepted", async () => {
       setJoined(true);
       toast.success("Successfully joined");
     });
@@ -114,9 +125,10 @@ export const UserVideoRoom = () => {
         tracks.forEach((track) => track.stop());
         remoteRef.current.srcObject = null;
       }
+      setJoined(false);
+      handleLeave();
       pcRef.current?.close();
       pcRef.current = null;
-      setJoined(false);
       setInfo("Peer left the session");
     });
 
@@ -126,6 +138,7 @@ export const UserVideoRoom = () => {
   }, []);
 
   // --- JOIN CALL ---
+
   async function checkAndJoin() {
     try {
       const res = await checkSessionAccessAPI(sessionId!);
@@ -133,8 +146,11 @@ export const UserVideoRoom = () => {
         socket?.emit("join-room", { sessionId });
         await startLocalStream();
         await initPeerConnection(true);
+        setInCall(true);
+        setInfo("You joined the meeting.");
       } else {
         setInfo("Not allowed to join");
+        toast.warning("Not allowed to join");
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Cannot join session";
@@ -151,6 +167,7 @@ export const UserVideoRoom = () => {
         audio: true,
         video: true,
       });
+      stream.getAudioTracks().forEach((track) => (track.enabled = false));
       localStreamRef.current = stream;
       if (localRef.current) localRef.current.srcObject = stream;
     } catch (err) {
@@ -194,6 +211,24 @@ export const UserVideoRoom = () => {
     return pc;
   }
 
+  const handleLeave = async () => {
+    socket?.emit("leave-room", { sessionId });
+    setJoined(false);
+
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+      localStreamRef.current = null;
+    }
+
+    pcRef.current?.close();
+    pcRef.current = null;
+
+    if (localRef.current) localRef.current.srcObject = null;
+    if (remoteRef.current) remoteRef.current.srcObject = null;
+    setInCall(false);
+    toast.info("You left the meeting");
+  };
+
   // --- CHAT ---
   async function sendMessage() {
     if (!text.trim()) return;
@@ -204,9 +239,8 @@ export const UserVideoRoom = () => {
   function toggleMute() {
     if (localStreamRef.current) {
       localStreamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = !track.enabled;
+        track.enabled = !isMuted;
       });
-      setIsMuted((prev) => !prev);
     }
   }
   return (
@@ -227,25 +261,7 @@ export const UserVideoRoom = () => {
           </button>
           {joined && (
             <button
-              onClick={async () => {
-                socket?.emit("leave-room", { sessionId });
-                setJoined(false);
-
-                if (localStreamRef.current) {
-                  localStreamRef.current
-                    .getTracks()
-                    .forEach((track) => track.stop());
-                  localStreamRef.current = null;
-                }
-
-                pcRef.current?.close();
-                pcRef.current = null;
-
-                if (localRef.current) localRef.current.srcObject = null;
-                if (remoteRef.current) remoteRef.current.srcObject = null;
-
-                toast.info("You left the meeting");
-              }}
+              onClick={handleLeave}
               className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
             >
               Leave
@@ -253,7 +269,7 @@ export const UserVideoRoom = () => {
           )}
           {joined && (
             <button
-              onClick={toggleMute}
+              onClick={() => setIsMuted((prev) => !prev)}
               className={`px-4 py-2 rounded-lg font-medium text-white transition ${
                 isMuted
                   ? "bg-gray-500 hover:bg-gray-600"
@@ -284,47 +300,49 @@ export const UserVideoRoom = () => {
       </div>
 
       {/* Right side: Chat */}
-      <div className="w-96 border-l border-gray-200 bg-white flex flex-col">
-        <div className="p-4 border-b border-gray-100">
-          <h4 className="font-semibold text-lg">Chat</h4>
-        </div>
+      {joined && (
+        <div className="w-96 border-l border-gray-200 bg-white flex flex-col">
+          <div className="p-4 border-b border-gray-100">
+            <h4 className="font-semibold text-lg">Chat</h4>
+          </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {messages.map((m) => (
-            <div
-              key={m.id || `${m.senderId}:${m.createdAt}`}
-              className={`max-w-[80%] px-3 py-2 rounded-xl shadow-sm ${
-                m.senderId === userId
-                  ? "self-end bg-green-100 text-right ml-auto"
-                  : "self-start bg-gray-100"
-              }`}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((m) => (
+              <div
+                key={m.id || `${m.senderId}:${m.createdAt}`}
+                className={`max-w-[80%] px-3 py-2 rounded-xl shadow-sm ${
+                  m.senderId === userId
+                    ? "self-end bg-green-100 text-right ml-auto"
+                    : "self-start bg-gray-100"
+                }`}
+              >
+                <div className="text-xs text-gray-500 mb-1">
+                  {m.senderId === userId ? "You" : m.senderName}
+                </div>
+                <div className="text-sm">{m.text}</div>
+                <div className="text-[10px] text-gray-400 mt-1">
+                  {new Date(m.createdAt).toLocaleTimeString()}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 border-t border-gray-100 flex gap-2">
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type message..."
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-sm"
+            />
+            <button
+              onClick={sendMessage}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
             >
-              <div className="text-xs text-gray-500 mb-1">
-                {m.senderId === userId ? "You" : m.senderName}
-              </div>
-              <div className="text-sm">{m.text}</div>
-              <div className="text-[10px] text-gray-400 mt-1">
-                {new Date(m.createdAt).toLocaleTimeString()}
-              </div>
-            </div>
-          ))}
+              Send
+            </button>
+          </div>
         </div>
-
-        <div className="p-4 border-t border-gray-100 flex gap-2">
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type message..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-sm"
-          />
-          <button
-            onClick={sendMessage}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
-          >
-            Send
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

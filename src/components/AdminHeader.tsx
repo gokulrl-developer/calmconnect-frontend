@@ -7,10 +7,13 @@ const Header: React.FC = () => {
     const { unreadNotificationCount} = useContext(NotificationContext);
      const navigate=useNavigate()
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 glass-card border-b border-white/20 dark:border-gray-600/20 z-30">
+    <header className="fixed top-0 left-0 right-0 h-16 glass-card border-b border-white/20 dark:border-gray-600/20 z-30">
       <div className="flex items-center justify-between h-full px-6">
+         <div className="flex items-center justify-between h-16 border-b border-gray-200 px-6">
+          <span className="text-xl font-bold text-blue-600">CalmConnect</span>
+        </div>
         <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">CalmConnect Admin</h2>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Admin</h2>
         </div>
 
         <div className="flex items-center space-x-4">

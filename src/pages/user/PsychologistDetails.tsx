@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
 import { format } from "date-fns";
@@ -19,8 +18,8 @@ import type { ListPsychReviewsItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import { produce } from "immer";
 import Pagination from "../../components/Pagination";
-declare let Razorpay: any;
-
+ declare let Razorpay: any;
+ 
 export interface PsychDetails {
   availableSlots: Slot[];
   psychId: string;
@@ -52,9 +51,7 @@ const PsychologistDetails: React.FC = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
   const [reviews, setReviews] = useState<ListPsychReviewsItem[]>([]);
-  const [sortReviews, setSortReviews] = useState<"recent" | "top-rated">(
-    "recent"
-  );
+  //const [sortReviews, setSortReviews] = useState<"recent" | "top-rated">( "recent" );
   const [pagination, setPagination] = useState<paginationData>({
     totalItems: 0,
     totalPages: 1,
@@ -74,7 +71,7 @@ const PsychologistDetails: React.FC = () => {
         const data = res.data;
         console.log(res.data.availableSlots);
         setAvailableSlots(data.availableSlots);
-        const { availableSlots: _, ...psychInfo } = data;
+        const { availableSlots: _unused, ...psychInfo } = data;
         setPsychologist(psychInfo);
       }
     } catch (error) {
@@ -85,48 +82,47 @@ const PsychologistDetails: React.FC = () => {
 
   useEffect(() => {
     fetchPsychologistDetails(selectedDate);
-  }, [psychId, selectedDate]); 
+  }, [psychId, selectedDate]);
   useEffect(() => {
     loadReviews();
-  }, [psychId, pagination.currentPage,sortReviews]);
+  }, [psychId, pagination.currentPage]);
 
-   const loadReviews = async () => {
-      try {
-        if(!psychId){
-          return;
-        }
-        const queryParams = new URLSearchParams();
-        queryParams.set("page",pagination.currentPage.toString());
-        queryParams.set("limit",pagination.pageSize.toString());
-        queryParams.set("psychId",psychId);
-        queryParams.set("sort",sortReviews)
-        const result = await listPsychReviewsAPI(queryParams.toString());
-  
-        if (result.data) {
-          setReviews(result.data.reviews)
-          setPagination(result.data.paginationData);
-        }
-      } catch (error) {
-        console.log("error fetching reviews",error)
+  const loadReviews = async () => {
+    try {
+      if (!psychId) {
+        return;
       }
-    };
-  
-  const handleSlotClick = async (slot: string) => {
-    try{
-    setSelectedSlot(slot);
-    const result = await fetchCheckoutData({
-      startTime: slot,
-      date: selectedDate.toISOString(),
-      psychId: psychologist!.psychId,
-    });
-    if (result.data) {
-      setCheckoutData({ ...result.data.data });
-      setShowCheckoutModal(true);
-    }
-  }catch(error){
-    console.log(error)
+      const queryParams = new URLSearchParams();
+      queryParams.set("page", pagination.currentPage.toString());
+      queryParams.set("limit", pagination.pageSize.toString());
+      queryParams.set("psychId", psychId);
+      queryParams.set("sort", "recent");
+      const result = await listPsychReviewsAPI(queryParams.toString());
 
-  }
+      if (result.data) {
+        setReviews(result.data.reviews);
+        setPagination(result.data.paginationData);
+      }
+    } catch (error) {
+      console.log("error fetching reviews", error);
+    }
+  };
+
+  const handleSlotClick = async (slot: string) => {
+    try {
+      setSelectedSlot(slot);
+      const result = await fetchCheckoutData({
+        startTime: slot,
+        date: selectedDate.toISOString(),
+        psychId: psychologist!.psychId,
+      });
+      if (result.data) {
+        setCheckoutData({ ...result.data.data });
+        setShowCheckoutModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async function handleProceedPayment() {
@@ -330,21 +326,26 @@ const PsychologistDetails: React.FC = () => {
                     ))}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {"Anonymous"} • {new Date(review.createdAt).toLocaleDateString()}{" "}
+                    {"Anonymous"} •{" "}
+                    {new Date(review.createdAt).toLocaleDateString()}{" "}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">{review.comment}</p>
+                <p className="text-sm text-muted-foreground">
+                  {review.comment}
+                </p>
               </div>
             ))}
           </div>
         </Card>
         <Pagination
-         paginationData={pagination}
-         setCurrentPage={(page:number)=>setPagination(
-          produce(draft=>{
-            draft.currentPage=page
-          })
-         )}
+          paginationData={pagination}
+          setCurrentPage={(page: number) =>
+            setPagination(
+              produce((draft) => {
+                draft.currentPage = page;
+              })
+            )
+          }
         />
       </div>
 

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
-  ArrowLeftIcon,
   UserIcon,
   CalendarDaysIcon,
   MapPinIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import Card from "../../components/UI/Card";
-import Button from "../../components/UI/Button";
 import { fetchUserDetailsByAdminAPI } from "../../services/adminService";
 
 export interface AdminUserDetailsResponse {
@@ -25,7 +23,6 @@ export interface AdminUserDetailsResponse {
 
 const UserDetails: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate();
   const [user, setUser] = useState<AdminUserDetailsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 

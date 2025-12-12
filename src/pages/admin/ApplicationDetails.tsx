@@ -4,8 +4,8 @@ import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import { fetchApplicationDetails, updateApplication } from '../../services/adminService';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { ApplicationDetails } from '../../services/adminService';
 import Modal from '../../components/UI/Modal';
+import type { ApplicationDetails } from '../../types/api/admin.types';
 
 
 
@@ -47,7 +47,7 @@ const ApplicationDetailsPage: React.FC= () => {
       closeConfirmationModal();
     }
     }catch(error){
-
+     console.log(error)
     }
     
   };
@@ -56,11 +56,11 @@ const ApplicationDetailsPage: React.FC= () => {
       try {
         const data = await fetchApplicationDetails(applicationId!);
         setApplication(data.details);
-      } catch (err:any) {
-        console.log("error fetching app details",err?.response?.data);
-        if(err.response?.data?.code==="NOT_FOUND"){
+      } catch (err) {
+        console.log("error fetching app details",err);
+       /*  if(err?.response?.data?.code==="NOT_FOUND"){
           backToList()
-        }
+        } */
       }
     };
     loadApplication();

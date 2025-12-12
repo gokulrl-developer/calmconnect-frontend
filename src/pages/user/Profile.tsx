@@ -123,7 +123,7 @@ const handleSave = async () => {
         if (key === "dob" && value)
           formData.append("dob", new Date(value as string).toISOString());
         else if (value !== undefined && value !== null)
-          formData.append(key, value as any);
+          formData.append(key, value as string|Blob);
       });
 
       const result = await updateUserProfile(formData);
