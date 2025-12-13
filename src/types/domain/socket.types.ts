@@ -1,4 +1,5 @@
-
+import { Role } from "../../constants/Role";
+import type { SignalPayloadType } from "../../constants/signal-payload.-type";
 export type JoinRoomPayload = { sessionId: string };
 export type LeaveRoomPayload = { accountId: string };
 export type JoinDeniedPayload = {
@@ -6,7 +7,7 @@ export type JoinDeniedPayload = {
 };
 export type SignalPayload = {
   sessionId: string;
-  type: "offer" | "answer" | "ice";
+  type: SignalPayloadType;
   data: RTCSessionDescriptionInit | RTCIceCandidateInit;
 };
 
@@ -35,7 +36,7 @@ export type PeerLeftPayload = {
 
 export interface SocketData {
   accountId: string;
-  role: "user" | "psychologist";
+  role: typeof Role.USER| typeof Role.PSYCHOLOGIST;
   sessionId?: string;
 }
 

@@ -1,3 +1,7 @@
+import type { AvailabilityRuleStatus } from "../../constants/availability-rule.status";
+import type { PsychologistGender } from "../../constants/psychologist-gender";
+import type { SpecialDayStatus } from "../../constants/SpecialDayStatus";
+import type { SpecialDayType } from "../../constants/SpecialDayType";
 import type { Slot } from "../domain/AvailabiliityRule.types";
 
 export interface PsychProfile{
@@ -5,7 +9,7 @@ profile: {
     firstName: string;
     lastName: string;
     email: string;
-    gender?: 'male' | 'female' | 'others';
+    gender?: PsychologistGender;
     dob?: Date;
     profilePicture?: string | File;
     address?: string;
@@ -31,21 +35,21 @@ export interface CurrentAvailabilityRule {
   endTime?: string;
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status?: "active" | "inactive";
+  status?: AvailabilityRuleStatus;
 }
 
 export interface CurrentSpecialDay {
-  type: "override" | "absent";
+  type: SpecialDayType;
   startTime?: string; // ISO string
   endTime?: string;   // ISO string
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status?: "active" | "inactive";
+  status?: SpecialDayStatus;
   specialDayId: string;
 }
 
 export interface CreateSpecialDay {
-  type: "override" | "absent";
+  type:SpecialDayType;
   startTime?: string; // ISO string
   endTime?: string;   // ISO string
   durationInMins?: number;

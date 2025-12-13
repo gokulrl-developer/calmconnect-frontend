@@ -1,3 +1,4 @@
+import type { UserGender } from "../../constants/UserGender";
 
 
 export interface UserProfile{
@@ -5,7 +6,7 @@ export interface UserProfile{
     firstName: string;
     lastName: string;
     email: string;
-    gender?: 'male' | 'female' | 'others';
+    gender?: UserGender;
     dob?: Date;
     profilePicture?: string | File;
     address?: string;
