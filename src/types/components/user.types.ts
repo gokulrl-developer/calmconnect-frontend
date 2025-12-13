@@ -1,3 +1,4 @@
+import type { UserGender } from "../../constants/UserGender";
 
 
 export interface UserProfile{
@@ -5,7 +6,7 @@ export interface UserProfile{
     firstName: string;
     lastName: string;
     email: string;
-    gender?: 'male' | 'female' | 'others';
+    gender?: UserGender;
     dob?: Date;
     profilePicture?: string | File;
     address?: string;
@@ -27,3 +28,33 @@ export interface ProfileErrors {
   address?: string;
   profilePicture?: string;
 }
+
+export type RazorpayCheckoutHandler = (response: {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}) => void;
+
+export type RazorpayOptions = {
+  key: string;
+  amount: number;
+  currency: string;
+  name?: string;
+  description?: string;
+  order_id: string;
+  handler: RazorpayCheckoutHandler;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  theme?: {
+    color?: string;
+  };
+};
+
+export type RazorPayType= {
+  new (options: RazorpayOptions): {
+    open: () => void;
+  };
+};

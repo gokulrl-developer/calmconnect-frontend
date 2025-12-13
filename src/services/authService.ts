@@ -1,4 +1,4 @@
-import { AUTH_ROUTES } from "../constants/auth.endpoints";
+import { AUTH_ROUTES } from "../constants/auth-endpoints";
 import type { IAdminLoginResponse, ILoginCredentials, IPsychologistLoginResponse, IRegisterPayload, IRegisterResponse, ISignupCredentials, ISignupResponse, IUserLoginResponse, ResetPassword } from "../types/api/auth.types";
 import axiosInstance from "./axiosInstance";
 

@@ -106,9 +106,7 @@ export const fetchNotificationsAPI = (data: GetNotificationsPayload) =>
 
 export const markAllNotificationsReadAPI = () =>
   axiosInstance
-    .patch<MarkNotificationsReadResponse>(USER_ENDPOINTS.MARK_NOTIFICATIONS_READ, {}, {
-      isSilentError: true,
-    } as any)
+    .patch<MarkNotificationsReadResponse>(USER_ENDPOINTS.MARK_NOTIFICATIONS_READ, {})
     .then((res) => res);
 
 export const clearNotificationsAPI = () =>
@@ -118,9 +116,7 @@ export const clearNotificationsAPI = () =>
 
 export const getUserUnreadNotificationsCountAPI = () =>
   axiosInstance
-    .get<GetUnreadNotificationCountResponse>(USER_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT, {
-      isSilentError: true,
-    } as any)
+    .get<GetUnreadNotificationCountResponse>(USER_ENDPOINTS.UNREAD_NOTIFICATIONS_COUNT)
     .then((res) => res);
 
 // Wallet & Transactions ----------------

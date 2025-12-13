@@ -1,3 +1,9 @@
+import type { ComplaintStatus } from "../../constants/complaint-status";
+import type { PsychologistGender } from "../../constants/psychologist-gender";
+import type { PsychologistStatus } from "../../constants/psychologist-status";
+import type { SessionStatus } from "../../constants/SessionStatus";
+import type { UserGender } from "../../constants/UserGender";
+import type { UserStatus } from "../../constants/UserStatus";
 import type PaginationData from "../pagination.types"
 
 export interface AdminPsychDetailsResponse {
@@ -6,7 +12,7 @@ export interface AdminPsychDetailsResponse {
   email: string;
   isBlocked: boolean;
   psychId: string;
-  gender?: "male" | "female" | "others";
+  gender?: PsychologistGender;
   dob?: Date;
   profilePicture?: string;
   address?: string;
@@ -25,7 +31,7 @@ export interface AdminUserDetailsResponse {
   email: string;
   isBlocked: boolean;
   userId: string;
-  gender?: "male" | "female" | "others";
+  gender?: UserGender;
   dob?: Date;
   profilePicture?: string;
   address?: string;
@@ -39,7 +45,7 @@ export interface SessionListingAdminItem {
   startTime: Date;
   endTime:Date;
   durationInMins: number;
-  status:  "scheduled"|"ended"|"cancelled"|"pending";
+  status:  SessionStatus;
   fees: number;
   sessionId: string;
 }
@@ -56,14 +62,14 @@ export interface ComplaintDetailsResponse {
   psychologistId: string;
   psychologistFullName: string;
   psychologistEmail: string;
-  psychologistStatus:"active"|"inactive";
+  psychologistStatus:PsychologistStatus;
   sessionId?: string;
   sessionStartTime: string;
   sessionEndTime: string;
-  sessionStatus: "scheduled" | "cancelled" | "ended" | "pending";
+  sessionStatus: SessionStatus;
   sessionFees: number;
   description: string;
-  status: "pending" | "resolved";
+  status: ComplaintStatus;
   createdAt: string;
   adminNotes?: string;
   resolvedAt?: string;
@@ -81,7 +87,7 @@ export interface ComplaintListItem{
     psychologistFullName:string,
     psychologistEmail:string,
     sessionId?:string,
-    status:"pending"|"resolved",
+    status:ComplaintStatus,
     createdAt:string
 }
 
@@ -96,7 +102,7 @@ export interface ComplaintHistoryItem{
     psychologistFullName:string,
     psychologistEmail:string,
     sessionId?:string,
-    status:"pending"|"resolved",
+    status:ComplaintStatus,
     createdAt:string
 }
 
@@ -149,10 +155,21 @@ registrationTrends:AdminRegistrationTrendsEntry[]
 export interface AdminRevenueTrendsResponse{
   revenueTrends:AdminRevenueTrendsEntry[]
 }
-export interface FetchRevenueGraphRequest extends FetchDashboardDataRequest {}
-export interface FetchRegistrationTrendsRequest extends FetchDashboardDataRequest {}
-export interface FetchSessionsGraphRequest extends FetchDashboardDataRequest {}
-export interface FetchTopPsychologistRequest extends FetchDashboardDataRequest {
+export interface FetchRevenueGraphRequest{
+fromDate: string;
+  toDate: string;
+}
+export interface FetchRegistrationTrendsRequest {
+  fromDate: string;
+  toDate: string;
+}
+export interface FetchSessionsGraphRequest {
+  fromDate: string;
+  toDate: string;
+}
+export interface FetchTopPsychologistRequest {
+  fromDate: string;
+  toDate: string;
   limit: number; 
 }
 
@@ -215,7 +232,7 @@ export interface UserItem {
   firstName: string;
   lastName: string;
   email: string;
-  status: "active" | "inactive" ;
+  status: UserStatus ;
 }
 
 export interface UserList {
@@ -233,7 +250,7 @@ export interface PsychItem {
   firstName: string;
   lastName: string;
   email: string;
-  status: "active" | "inactive" ;
+  status: PsychologistStatus ;
 }
 
 export interface PsychList {

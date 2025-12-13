@@ -1,3 +1,9 @@
+import type { ComplaintStatus } from "../../constants/complaint-status";
+import type { ListPsychByUserSort } from "../../constants/list-psych-by-user-sort";
+import type { SessionStatus } from "../../constants/SessionStatus";
+import type { TransactionReferenceType } from "../../constants/TransactionReferenceType";
+import type { TransactionType } from "../../constants/TransactionType";
+import type { UserGender } from "../../constants/UserGender";
 import type { CheckoutData } from "../components/user.types";
 import type { Slot } from "../domain/AvailabiliityRule.types";
 import type PaginationData from "../pagination.types"
@@ -29,7 +35,7 @@ export interface UserProfile {
     firstName: string;
     lastName: string;
     email: string;
-    gender?: "male" | "female" | "others";
+    gender?: UserGender;
     dob?: Date;
     profilePicture?: string;
     address?: string;
@@ -77,7 +83,7 @@ export interface SessionListingUserItem {
   startTime: Date;
   endTime: Date;
   durationInMins: number;
-  status: "scheduled" | "ended" | "cancelled" | "pending";
+  status:SessionStatus;
   fees: number;
   sessionId: string;
 }
@@ -108,10 +114,10 @@ export interface ComplaintDetailsResponse {
   sessionId?: string;
   sessionStartTime: string;
   sessionEndTime: string;
-  sessionStatus: "scheduled" | "cancelled" | "ended" | "pending";
+  sessionStatus: SessionStatus;
   sessionFees: number;
   description: string;
-  status: "pending" | "resolved";
+  status: ComplaintStatus;
   createdAt: string;
   adminNotes?: string;
   resolvedAt?: string;
@@ -122,7 +128,7 @@ export interface ComplaintListingItem {
   psychologistFullName: string;
   psychologistEmail: string;
   sessionId?: string;
-  status: "pending" | "resolved";
+  status: ComplaintStatus;
   createdAt: string;
 }
 
@@ -155,7 +161,7 @@ export interface ListPsychReviewsResponse {
 
 export interface ListPsychReviewsRequest{
  psychId:string;
- sort:"recent"|"top-rated";
+ sort:ListPsychByUserSort;
  skip:number;
  limit:number;
 }
@@ -173,14 +179,14 @@ export interface UserRecentSessionsEntry{
     lastName:string;
     profilePicture:string;
     startTime: string;
-    status:"scheduled"|"cancelled"|"ended"|"pending"
+    status:SessionStatus
 }
 
 export interface UserRecentTransactionsEntry{
     transactionId:string;
     time:string;
-    type:"credit"|"debit";
-    referenceType?:"booking"|"refund";
+    type:TransactionType;
+    referenceType?:TransactionReferenceType;
     psychFirstName:string;
     psychLastName:string
 }
@@ -190,7 +196,7 @@ export interface UserRecentComplaintsEntry{
     psychFirstName:string;
     psychLastName:string;
     raisedTime:string;
-    status:"pending"|"resolved"
+    status:ComplaintStatus
 }
 export interface UserDashboardResponse{
     sessionSummary:UserSessionSummary,

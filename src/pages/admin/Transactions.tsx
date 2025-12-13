@@ -275,8 +275,8 @@ const Transactions: React.FC = () => {
                   variant="secondary"
                   size="sm"
                   onClick={() => {
-                    {
-                      typeof value === "string" && handleReceiptDownload(value);
+                    if (typeof value === "string") {
+                      handleReceiptDownload(value);
                     }
                   }}
                 >

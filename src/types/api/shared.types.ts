@@ -1,10 +1,13 @@
+import type { TransactionReferenceType } from "../../constants/TransactionReferenceType";
+import type { TransactionType } from "../../constants/TransactionType";
+import type { WalletOwnerType } from "../../constants/wallet-owner-type";
 import type PaginationData from "../pagination.types"
 
 export interface TransactionListItem {
   transactionId: string;
-  type: "credit" | "debit";
+  type: TransactionType;
   amount: number;
-  referenceType?: "booking" | "psychologistPayment" | "refund";
+  referenceType?: TransactionReferenceType;
   createdAt: Date;
 }
 
@@ -15,7 +18,7 @@ export interface TransactionListingResponse{
 
 export interface WalletData {
   walletId: string;
-  ownerType: "user" | "psychologist" | "platform";
+  ownerType: WalletOwnerType;
   balance: number;
 }
 
@@ -23,16 +26,13 @@ export interface WalletResponse{
     wallet:WalletData
 }
 export interface TransactionListingPayload{
- type?:"credit"|"debit",
-  referenceType?:"booking" | "psychologistPayment" | "refund",
+ type?:TransactionType,
+  referenceType?:TransactionReferenceType,
   date?:string,
   page?:number;
   limit?:number
 }
 
-export interface ClearNotificationsRequest{
-  
-}
 
 export interface GetUnreadNotificationCountResponse{
  count:number,

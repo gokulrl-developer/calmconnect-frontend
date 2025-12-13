@@ -1,3 +1,11 @@
+import type { ApplicationStatus } from "../../constants/application-status";
+import type { AvailabilityRuleStatus } from "../../constants/availability-rule.status";
+import type { PsychologistGender } from "../../constants/psychologist-gender";
+import type { PsychologistStatus } from "../../constants/psychologist-status";
+import type { QuickSlotStatus } from "../../constants/quick-slot-status";
+import type { SessionStatus } from "../../constants/SessionStatus";
+import type { SpecialDayStatus } from "../../constants/SpecialDayStatus";
+import type { SpecialDayType } from "../../constants/SpecialDayType";
 import type PaginationData from "../pagination.types"
 
 export interface PsychProfile{
@@ -5,7 +13,7 @@ profile: {
     firstName: string;
     lastName: string;
     email: string;
-    gender?: 'male' | 'female' | 'others';
+    gender?: PsychologistStatus;
     dob?: Date;
     profilePicture?: string;
     address?: string;
@@ -30,7 +38,7 @@ export interface AvailabilityRuleDetails {
   endTime: string;   // "17:00"
   durationInMins: number;
   bufferTimeInMins: number;
-  status: "active" | "inactive";
+  status: AvailabilityRuleStatus;
   availabilityRuleId: string;
 }
 
@@ -41,12 +49,12 @@ export interface AvailabilityRuleSummary {
 
 // ---------- Special Days ----------
 export interface SpecialDay {
-  type: "override" | "absent";
+  type: SpecialDayType;
   startTime?: string; // ISO string
   endTime?: string;   // ISO string
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status: "active" | "inactive";
+  status: SpecialDayStatus;
   specialDayId: string;
 }
 
@@ -56,7 +64,7 @@ export interface QuickSlot {
   endTime: string;   // ISO string
   durationInMins: number;
   bufferTimeInMins: number;
-  status: "active" | "inactive";
+  status: QuickSlotStatus;
   quickSlotId: string;
 }
 
@@ -81,12 +89,12 @@ export interface EditAvailabilityRulePayload {
   endTime?: string;
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status?: "active" | "inactive";
+  status?: AvailabilityRuleStatus;
 }
 
 export interface CreateSpecialDayPayload {
   date: string; // ISO date
-  type: "override" | "absent";
+  type: SpecialDayType;
   startTime?: string;  // ISO string
   endTime?: string;    // ISO string
   durationInMins?: number;
@@ -94,12 +102,12 @@ export interface CreateSpecialDayPayload {
 }
 
 export interface EditSpecialDayPayload {
-  type?: "override" | "absent";
+  type?: SpecialDayType;
   startTime?: string;  // ISO string
   endTime?: string;    // ISO string
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status?: "active" | "inactive";
+  status?: SpecialDayStatus;
 }
 
 export interface CreateQuickSlotPayload {
@@ -115,7 +123,7 @@ export interface EditQuickSlotPayload {
   endTime?: string;    // ISO string
   durationInMins?: number;
   bufferTimeInMins?: number;
-  status?: "active" | "inactive";
+  status?: QuickSlotStatus;
 }
 
 export interface FetchDailyAvailabilityPayload {
@@ -128,7 +136,7 @@ export interface SessionListingPsychItem {
   startTime: Date;
   endTime:Date;
   durationInMins: number;
-  status: "scheduled"|"ended"|"cancelled"|"pending";
+  status: SessionStatus;
   fees: number;
   sessionId: string;
 }
@@ -141,7 +149,7 @@ export interface SessionListingResponse{
 export interface RejectedApplication{
   submittedAt: Date;
   phone: string;
-  gender: "male" | "female" | "others";
+  gender: PsychologistGender;
   dob: Date;
   profilePicture: string;
   address: string;
@@ -206,7 +214,7 @@ export interface RecentSessionEntry {
   lastName: string;
   profilePicture: string;
   startTime: string;
-  status: "scheduled" | "cancelled" | "ended" | "pending";
+  status: SessionStatus;
 }
 
 export interface PsychologistDashboardResponse {
@@ -227,7 +235,7 @@ export interface LatestApplicationData{
     email:string,
     submittedAt:Date, 
     phone:string, 
-    gender:"male"|"female"|"others",
+    gender:PsychologistGender,
     dob:Date,
     profilePicture:string,
     address:string,
@@ -237,7 +245,7 @@ export interface LatestApplicationData{
     licenseUrl:string,
     resume:string,
     qualifications:string,
-    status:"pending"|"accepted"|"rejected",
+    status:ApplicationStatus,
     rejectionReason?:string
 }
 export interface LatestApplicationDataResponse {

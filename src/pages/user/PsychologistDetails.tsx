@@ -11,14 +11,14 @@ import {
   verifyPayment,
 } from "../../services/userService";
 import Modal from "../../components/UI/Modal";
-import type { CheckoutData } from "../../types/components/user.types";
+import type { CheckoutData, RazorpayOptions, RazorPayType } from "../../types/components/user.types";
 import { toast } from "sonner";
 import type { Slot } from "../../types/domain/AvailabiliityRule.types";
 import type { ListPsychReviewsItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import { produce } from "immer";
 import Pagination from "../../components/Pagination";
- declare let Razorpay: any;
+ declare let Razorpay: RazorPayType;
  
 export interface PsychDetails {
   availableSlots: Slot[];
@@ -152,14 +152,14 @@ const PsychologistDetails: React.FC = () => {
   ) {
     try {
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
-      const options = {
+      const options:RazorpayOptions = {
         key: razorpayKey,
         amount: amount,
         currency: "INR",
         name: "CalmConnect",
         description: "Therapy Session Payment",
         order_id: orderId,
-        handler: async function (response: any) {
+        handler: async function (response) {
           try {
             const result = await verifyPayment({
               providerPaymentId: response.razorpay_payment_id,
