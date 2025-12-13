@@ -11,7 +11,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-export function setupAxiosInterceptors(logoutCallback: () => Promise<void>) {
+export function setupAxiosInterceptors(logoutCallback: () => Promise<unknown>) {
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
