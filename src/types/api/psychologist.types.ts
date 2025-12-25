@@ -1,7 +1,6 @@
 import type { ApplicationStatus } from "../../constants/application-status";
 import type { AvailabilityRuleStatus } from "../../constants/availability-rule.status";
 import type { PsychologistGender } from "../../constants/psychologist-gender";
-import type { PsychologistStatus } from "../../constants/psychologist-status";
 import type { QuickSlotStatus } from "../../constants/quick-slot-status";
 import type { SessionStatus } from "../../constants/SessionStatus";
 import type { SpecialDayStatus } from "../../constants/SpecialDayStatus";
@@ -13,7 +12,7 @@ profile: {
     firstName: string;
     lastName: string;
     email: string;
-    gender?: PsychologistStatus;
+    gender?: PsychologistGender;
     dob?: Date;
     profilePicture?: string;
     address?: string;

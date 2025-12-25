@@ -26,8 +26,7 @@ import type {
   IRegisterPayload,
   ISignupCredentials,
   ISignupResponse
-} from "../../services/authService"
-console.log("thunk imported")
+} from "../../types/api/auth.types"
 
 export const loginUserAsync = createAsyncThunk<
   IUserLoginResponse,
