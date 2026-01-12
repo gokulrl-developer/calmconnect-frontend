@@ -11,6 +11,7 @@ import type {
   ProfileErrors,
   PsychProfile,
 } from "../../types/components/psychologist.types"; 
+import { Check, PencilIcon } from "lucide-react";
 
 const PsychologistProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -205,7 +206,7 @@ const PsychologistProfile: React.FC = () => {
               size="sm"
               onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
             >
-              {isEditing ? "Save" : "Edit"}
+              {isEditing ? <><Check/></> : <><PencilIcon/></>}
             </Button>
           </div>
 

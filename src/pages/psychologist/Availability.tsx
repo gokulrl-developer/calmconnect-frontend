@@ -7,7 +7,7 @@ import type {
 import { produce } from "immer";
 import { toast } from "sonner";
 import Button from "../../components/UI/Button";
-import { EyeIcon } from "lucide-react";
+import {  Check, Edit, EyeIcon, PlusCircle, Trash2, X } from "lucide-react";
 import type {
   AvailabilityRuleDetails,
   AvailabilityRuleSummary,
@@ -386,8 +386,8 @@ export default function Availability() {
       <div className="max-w-6xl mx-auto flex flex-col align-middle gap-5">
         {/* Availability Exceptions */}
         <div className="mx-auto">
-          <section className="glass-card p-6 animate-in w-max">
-            <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-200 mb-4">
+          <section className=" bg-gray-200 p-6 animate-in w-max">
+            <h2 className="text-xl font-semibold text-secondary-1000 dark:text-secondary-200 mb-4">
               Set Availability Exceptions
             </h2>
             <Calendar onDateSelect={handleDateSelection} />
@@ -404,7 +404,7 @@ export default function Availability() {
               className="bg-primary-500 hover:bg-primary-600 text-white rounded-lg px-4 py-2 font-medium shadow hover:shadow-xl"
               onClick={() => setIsModalOpen(true)}
             >
-              Create Rule
+             <PlusCircle/>
             </button>
           </div>
 
@@ -426,7 +426,7 @@ export default function Availability() {
                         viewAvailabilityRule(summary.availabilityRuleId)
                       }
                     >
-                      <EyeIcon className="w-4 h-4 mr-1" /> View
+                      <EyeIcon/>
                     </Button>
                     <Button
                       variant="secondary"
@@ -435,17 +435,17 @@ export default function Availability() {
                         openEditAvailabilityRule(summary.availabilityRuleId)
                       }
                     >
-                      <EyeIcon className="w-4 h-4 mr-1" /> Edit
+                      <Edit/>
                     </Button>
 
                     <Button
-                      variant="warning"
+                      variant="danger"
                       onClick={() => {
                         setDeleteAvailabilityRuleId(summary.availabilityRuleId);
                         setShowDeleteRuleModal(true);
                       }}
                     >
-                      Delete
+                      <Trash2/>
                     </Button>
                   </div>
                 </li>
@@ -572,7 +572,7 @@ export default function Availability() {
           {/* Preview button */}
           <div className="pt-4 flex gap-3">
             <Button variant="secondary" onClick={handlePreviewSlots}>
-              Preview Slots
+              <EyeIcon/>
             </Button>
           </div>
 
@@ -605,10 +605,10 @@ export default function Availability() {
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-6">
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={() => setShowConfirmation(true)}>
-              Save
+              <Check/>
             </Button>
           </div>
 
@@ -623,10 +623,10 @@ export default function Availability() {
                   variant="secondary"
                   onClick={() => setShowConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={handleConfirmSave}>
-                  Proceed
+                  <Check/>
                 </Button>
               </div>
             </div>
@@ -736,7 +736,7 @@ export default function Availability() {
           {/* Preview button */}
           <div className="pt-4 flex gap-3">
             <Button variant="secondary" onClick={handleEditPreviewSlots}>
-              Preview Slots
+              <EyeIcon/>
             </Button>
           </div>
 
@@ -773,13 +773,13 @@ export default function Availability() {
               variant="secondary"
               onClick={() => setIsEditModalOpen(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button
               variant="success"
               onClick={() => setShowEditConfirmation(true)}
             >
-              Save
+              <Check/>
             </Button>
           </div>
 
@@ -794,10 +794,10 @@ export default function Availability() {
                   variant="secondary"
                   onClick={() => setShowEditConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={editAvailabilityRule}>
-                  Proceed
+                 <Check/>
                 </Button>
               </div>
             </div>
@@ -898,7 +898,7 @@ export default function Availability() {
               setAvailabilityRuleSlots([]);
             }}
           >
-            Cancel
+            <X/>
           </Button>
         </div>
       </Modal>
@@ -921,10 +921,10 @@ export default function Availability() {
               variant="secondary"
               onClick={() => setShowDeleteRuleModal(false)}
             >
-              Cancel
+              <X/>
             </Button>
-            <Button variant="success" onClick={handleDeleteAvailabilityRule}>
-              Proceed
+            <Button variant="danger" onClick={handleDeleteAvailabilityRule}>
+              <Check/>
             </Button>
           </div>
         </div>

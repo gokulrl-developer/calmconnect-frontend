@@ -8,6 +8,7 @@ import { fetchPsychologistsByUser } from "../../services/userService";
 import type { ListPsychSummary } from "../../types/api/user.types";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
+import { Calendar } from "lucide-react";
 
 const BookSession: React.FC = () => {
   const navigate = useNavigate();
@@ -211,11 +212,11 @@ const BookSession: React.FC = () => {
                         {psych.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-s text-muted-foreground">
                           ⭐ {psych.rating ?? "N/A"}
                         </span>
-                        <span className="text-xs font-semibold text-success">
-                          ${psych.hourlyFees ?? "--"}/hr
+                        <span className="text-s font-semibold text-success">
+                          ₹{psych.hourlyFees ?? "--"}/hr
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-2">
@@ -242,7 +243,7 @@ const BookSession: React.FC = () => {
                         onClick={() => handlePsychologistClick(psych.psychId)}
                         className="text-sm px-3 py-1"
                       >
-                        Book session
+                        <Calendar/>
                       </Button>
                     </div>
                   </div>

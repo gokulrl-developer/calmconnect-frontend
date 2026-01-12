@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  EyeIcon,
   MagnifyingGlassIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
@@ -15,6 +14,7 @@ import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
 import type { UserItem } from "../../types/api/admin.types";
+import { Ban, EyeIcon, UserCheck, X } from "lucide-react";
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
@@ -211,17 +211,16 @@ const Users: React.FC = () => {
                     size="sm"
                     onClick={() => handleView(user!.id)}
                   >
-                    <EyeIcon className="w-4 h-4 mr-1" />
-                    View
+                    <EyeIcon />
                   </Button>
                   <Button
-                    variant={user!.status === "active" ? "warning" : "success"}
+                    variant={user!.status === "active" ? "danger" : "success"}
                     size="sm"
                     onClick={() =>
                       openConfirmationModal(user!.id, user!.status)
                     }
                   >
-                    {user!.status === "active" ? "Deactivate" : "Activate"}
+                    {user!.status === "active" ? <><Ban/> <p>Block</p></> : <><UserCheck/> Unblock</>}
                   </Button>
                 </div>
               ),
@@ -260,7 +259,7 @@ const Users: React.FC = () => {
           </div>
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeConfirmationModal}>
-              Cancel
+              <X/>
             </Button>
             <Button
               variant={
@@ -276,8 +275,8 @@ const Users: React.FC = () => {
               }}
             >
               {confirmationModal.currentStatus === "active"
-                ? "Deactivate User"
-                : "Activate User"}
+                ? <><Ban/> <p>Block</p></>
+                : <><UserCheck/> <p>Unblock</p></>}
             </Button>
           </div>
         </div>

@@ -24,7 +24,7 @@ import {
 import { useGenerateSlots } from "../../hooks/generateSlotsHooks";
 import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
-import { PlusIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { PlusIcon, PencilIcon, TrashIcon, Edit, X, Check } from "lucide-react";
 import type { Slot } from "../../types/domain/AvailabiliityRule.types";
 import SlotGrid from "../../components/UI/SlotGrid";
 import Modal from "../../components/UI/Modal";
@@ -409,7 +409,7 @@ async function handleQuickSlotDeletion(){
                     }}
                     variant="primary"
                   >
-                    Edit Special Day
+                    <Edit/>
                   </Button>
                 </>
               ) : (
@@ -430,7 +430,7 @@ async function handleQuickSlotDeletion(){
               originalSpecialDay.type === "override" ? (
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">
-                    Special Day Slots
+                    Slots (special day)
                   </h4>
                   {/* Container for specialDaySlots */}
                   <div>
@@ -444,7 +444,7 @@ async function handleQuickSlotDeletion(){
               ) : (
                 <div>
                   <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Availability Rule Slots
+                    Slots (Normal day)
                   </h4>
                   {/* Container for availabilityRuleSlots */}
                   <div>
@@ -472,7 +472,7 @@ async function handleQuickSlotDeletion(){
                 className="flex items-center"
                 onClick={() => setShowCreateQuickSlotModal(true)}
               >
-                <PlusIcon className="w-4 h-4 mr-2" /> Create Quick Slot
+                <PlusIcon className="w-4 h-4 mr-2" />
               </Button>
             </div>
 
@@ -488,7 +488,7 @@ async function handleQuickSlotDeletion(){
                 >
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-medium text-gray-700 dark:text-gray-300">
-                      Quick Slot Group
+                      Quick Slot Block
                     </h4>
                     <div className="flex gap-2">
                       <Button variant="secondary" size="sm"
@@ -498,14 +498,14 @@ async function handleQuickSlotDeletion(){
                         setCurrentQuickSlot({...selectedOriginalQuickSlot})
                       }}
                       >
-                        <PencilIcon className="w-4 h-4 mr-1" /> Edit
+                        <PencilIcon className="w-4 h-4 mr-1" /> 
                       </Button>
                       <Button variant="danger" size="sm"
                        onClick={()=>{
                         setDeleteQuickSlotId(qs.quickSlotId);
                         setShowDeleteQuickSlot(true);
                        }}>
-                        <TrashIcon className="w-4 h-4 mr-1" /> Delete
+                        <TrashIcon className="w-4 h-4 mr-1" /> 
                       </Button>
                     </div>
                   </div>
@@ -632,13 +632,13 @@ async function handleQuickSlotDeletion(){
                 variant="secondary"
                 onClick={() => setShowSpecialDayModal(false)}
               >
-                Cancel
+                <X/>
               </Button>
               <Button
                 variant="success"
                 onClick={() => setShowEditConfirmation(true)}
               >
-                Save
+                <Check/>
               </Button>
             </div>
           )}
@@ -654,10 +654,10 @@ async function handleQuickSlotDeletion(){
                   variant="secondary"
                   onClick={() => setShowEditConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={handleSpecialDayCreation}>
-                  Proceed
+                  <Check/>
                 </Button>
               </div>
             </div>
@@ -775,13 +775,13 @@ async function handleQuickSlotDeletion(){
                 variant="secondary"
                 onClick={() => setEditSpecialDayModal(false)}
               >
-                Cancel
+                <X/>
               </Button>
               <Button
                 variant="success"
                 onClick={() => setShowEditConfirmation(true)}
               >
-                Save
+                <Check/>
               </Button>
             </div>
           )}
@@ -797,10 +797,10 @@ async function handleQuickSlotDeletion(){
                   variant="secondary"
                   onClick={() => setShowEditConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={handleSpecialDayEdit}>
-                  Proceed
+                  <Check/>
                 </Button>
               </div>
             </div>
@@ -823,10 +823,10 @@ async function handleQuickSlotDeletion(){
               variant="secondary"
               onClick={() => setShowDeleteSpecialDay(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={handleSpecialDayDeletion}>
-              Proceed
+             <Check/>
             </Button>
           </div>
         </div>
@@ -850,10 +850,10 @@ async function handleQuickSlotDeletion(){
               variant="secondary"
               onClick={() => setShowDeleteQuickSlot(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={handleQuickSlotDeletion}>
-              Proceed
+              <Check/>
             </Button>
           </div>
         </div>
@@ -976,13 +976,13 @@ async function handleQuickSlotDeletion(){
                 variant="secondary"
                 onClick={() => setShowCreateQuickSlotModal(false)}
               >
-                Cancel
+                <X/>
               </Button>
               <Button
                 variant="success"
                 onClick={() => setShowQuickSlotConfirmation(true)}
               >
-                Save
+                <Check/>
               </Button>
             </div>
           )}
@@ -999,10 +999,10 @@ async function handleQuickSlotDeletion(){
                   variant="secondary"
                   onClick={() => setShowQuickSlotConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={createQuickSlot}>
-                  Proceed
+                  <Check/>
                 </Button>
               </div>
             </div>
@@ -1128,13 +1128,13 @@ async function handleQuickSlotDeletion(){
                 variant="secondary"
                 onClick={() => setEditQuickSlotModal(false)}
               >
-                Cancel
+                <X/>
               </Button>
               <Button
                 variant="success"
                 onClick={() => setEditQuickSlotConfirmation(true)}
               >
-                Save
+                <Check/>
               </Button>
             </div>
           )}
@@ -1151,10 +1151,10 @@ async function handleQuickSlotDeletion(){
                   variant="secondary"
                   onClick={() => setEditQuickSlotConfirmation(false)}
                 >
-                  Cancel
+                  <X/>
                 </Button>
                 <Button variant="success" onClick={editQuickSlot}>
-                  Proceed
+                  <Check/>
                 </Button>
               </div>
             </div>

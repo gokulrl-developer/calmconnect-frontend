@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Button from "../../components/UI/Button";
 import Card from "../../components/UI/Card";
 import { format } from "date-fns";
@@ -18,6 +18,7 @@ import type { ListPsychReviewsItem } from "../../types/api/user.types";
 import type paginationData from "../../types/pagination.types";
 import { produce } from "immer";
 import Pagination from "../../components/Pagination";
+import { Check, X } from "lucide-react";
  declare let Razorpay: RazorPayType;
  
 export interface PsychDetails {
@@ -33,7 +34,6 @@ export interface PsychDetails {
 }
 
 const PsychologistDetails: React.FC = () => {
-  const navigate = useNavigate();
   const location = useLocation();
 
   const psychId = new URLSearchParams(location.search).get("psychId");
@@ -196,7 +196,7 @@ const PsychologistDetails: React.FC = () => {
     <div className="min-h-screen bg-gradient-background py-6">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Back Button */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <Button
             size="sm"
             onClick={() => navigate("/user/book")}
@@ -205,7 +205,7 @@ const PsychologistDetails: React.FC = () => {
             ← Back to Browse
           </Button>
         </div>
-
+ */}
         {/* Psychologist Info */}
         {psychologist && (
           <Card className="p-4 mb-4 shadow-glass bg-gradient-glass">
@@ -413,10 +413,10 @@ const PsychologistDetails: React.FC = () => {
               variant="secondary"
               onClick={() => setShowCheckoutModal(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={handleProceedPayment}>
-              Proceed To Payment
+              <Check/>
             </Button>
           </div>
         </div>

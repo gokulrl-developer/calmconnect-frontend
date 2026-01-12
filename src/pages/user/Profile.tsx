@@ -8,6 +8,7 @@ import {
 } from "../../services/userService";
 import { toast } from "sonner";
 import type { ProfileErrors, UserProfile } from "../../types/components/user.types";
+import { Check, PencilIcon } from "lucide-react";
 
 const UserProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -205,7 +206,7 @@ const handleSave = async () => {
               size="sm"
               onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
             >
-              {isEditing ? "Save" : "Edit"}
+              {isEditing ? <><Check/></> : <><PencilIcon/></>}
             </Button>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  EyeIcon,
   MagnifyingGlassIcon,
   AcademicCapIcon,
 } from "@heroicons/react/24/outline";
@@ -19,6 +18,7 @@ import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
 import type { PsychItem } from "../../types/api/admin.types";
+import { Ban, EyeIcon, UserCheck, X } from "lucide-react";
 
 const Psychologists: React.FC = () => {
   const [psychs, setPsychs] = useState<PsychItem[]>([]);
@@ -221,17 +221,16 @@ const Psychologists: React.FC = () => {
                     size="sm"
                     onClick={() => handleView((psych as PsychItem).id!)}
                   >
-                    <EyeIcon className="w-4 h-4 mr-1" />
-                    View
+                    <EyeIcon />
                   </Button>
                   <Button
-                    variant={psych?.status === "active" ? "warning" : "success"}
+                    variant={psych?.status === "active" ? "danger" : "success"}
                     size="sm"
                     onClick={() =>
                       openConfirmationModal((psych as PsychItem).id!, (psych as PsychItem).status!)
                     }
                   >
-                    {psych?.status === "active" ? "Deactivate" : "Activate"}
+                    {psych?.status === "active" ? <><Ban/><p>Block</p></> : <><UserCheck/><p>UnBlock</p></>}
                   </Button>
                 </div>
               ),
@@ -270,7 +269,7 @@ const Psychologists: React.FC = () => {
           </div>
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeConfirmationModal}>
-              Cancel
+              <X/>
             </Button>
             <Button
               variant={
@@ -286,8 +285,8 @@ const Psychologists: React.FC = () => {
               }}
             >
               {confirmationModal.currentStatus === "active"
-                ? "Deactivate Psychologist"
-                : "Activate Psychologist"}
+                ? <><Ban/><p>Block</p></>
+                : <><UserCheck/><p>UnBlock</p></>}
             </Button>
           </div>
         </div>

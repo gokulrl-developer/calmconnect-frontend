@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchDashboard } from "../../services/psychologistService";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
-import { Calendar, Clock, Users, Star, DollarSign } from "lucide-react";
+import { Calendar, Clock, Users, Star, IndianRupee } from "lucide-react";
 import Card from "../../components/UI/Card";
 import {
   LineChart,
@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
     {
       title: "Revenue (₹)",
       value: summary?.revenueSummary.current ?? 0,
-      icon: DollarSign,
+      icon: IndianRupee,
       color: "bg-green-600",
       change: `Last Month: ₹${summary?.revenueSummary.lastMonth ?? 0}`,
     },
