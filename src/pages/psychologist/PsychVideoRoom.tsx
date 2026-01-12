@@ -16,6 +16,7 @@ import type {
 } from "../../types/domain/socket.types";
 import { logOut, refreshTokenAPI } from "../../services/authService";
 import { CallContext } from "../../contexts/CallContext";
+import { Mic, MicOff, Send, Video, VideoOff } from "lucide-react";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 const stunUrls = import.meta.env.VITE_STUN_SERVERS?.split(",") || [
@@ -279,7 +280,7 @@ export const PsychVideoRoom = () => {
       {/* Left: Video Area */}
       <div className="flex flex-col flex-1 p-6 relative">
         <div className="flex items-center gap-3 mb-4">
-          <button
+  {!joined && (<button
             onClick={checkAndJoin}
             disabled={joined}
             className={`px-4 py-2 rounded-lg font-medium text-white transition ${
@@ -288,14 +289,15 @@ export const PsychVideoRoom = () => {
                 : "bg-green-600 hover:bg-green-700"
             }`}
           >
-            Join Call
+            <Video/>
           </button>
+  )}
           {joined && (
             <button
               onClick={handleLeave}
               className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
             >
-              Leave
+              <VideoOff/>
             </button>
           )}
           {joined && (
@@ -307,7 +309,7 @@ export const PsychVideoRoom = () => {
                   : "bg-yellow-500 hover:bg-yellow-600"
               }`}
             >
-              {isMuted ? "Unmute" : "Mute"}
+              {isMuted ? <MicOff/> : <Mic/>}
             </button>
           )}
           <div className="ml-4 text-sm text-gray-600">{info}</div>
@@ -370,7 +372,7 @@ export const PsychVideoRoom = () => {
               onClick={sendMessage}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
             >
-              Send
+              <Send/>
             </button>
           </div>
         </div>

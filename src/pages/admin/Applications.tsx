@@ -251,7 +251,7 @@ const Applications: React.FC = () => {
                       size="sm"
                       onClick={() => handleView(row!.id)}
                     >
-                      <EyeIcon className="w-4 h-4 mr-1" /> View
+                      <EyeIcon className="w-4 h-4 mr-1" /> 
                     </Button>
                     {row!.status === "pending" && (
                       <>
@@ -262,7 +262,7 @@ const Applications: React.FC = () => {
                             openConfirmationModal("approve", row!.id)
                           }
                         >
-                          <CheckIcon className="w-4 h-4 mr-1" /> Approve
+                          <CheckIcon className="w-4 h-4 mr-1 stroke-[2.5]" /> 
                         </Button>
                         <Button
                           variant="danger"
@@ -271,7 +271,7 @@ const Applications: React.FC = () => {
                             openConfirmationModal("reject", row!.id)
                           }
                         >
-                          <XMarkIcon className="w-4 h-4 mr-1" /> Reject
+                          <XMarkIcon className="w-4 h-4 mr-1 stroke-[2.5]" />
                         </Button>
                       </>
                     )}
@@ -343,7 +343,7 @@ const Applications: React.FC = () => {
 
             <div className="flex justify-end space-x-3 pt-4">
               <Button variant="secondary" onClick={closeConfirmationModal}>
-                Cancel
+                    <XMarkIcon className="w-4 h-4 mr-1 stroke-[2.5]" />
               </Button>
               <Button
                 variant={
@@ -352,8 +352,8 @@ const Applications: React.FC = () => {
                 onClick={handleConfirmAction}
               >
                 {confirmationModal.type === "approve"
-                  ? "Approve Application"
-                  : "Reject Application"}
+                  ? <CheckIcon className="w-4 h-4 mr-1 stroke-[2.5]" /> 
+                  : <XMarkIcon className="w-4 h-4 mr-1 stroke-[2.5]" />}
               </Button>
             </div>
           </div>

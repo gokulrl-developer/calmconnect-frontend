@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "./UI/Button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   paginationData: {
@@ -24,7 +25,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
       >
-        Previous
+        <ChevronLeft/>
       </Button>
 
       <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
@@ -36,7 +37,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages || totalPages === 0}
         onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
       >
-        Next
+        <ChevronRight/>
       </Button>
     </div>
   );

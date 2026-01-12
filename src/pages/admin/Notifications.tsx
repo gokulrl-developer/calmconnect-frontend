@@ -6,7 +6,7 @@ import {
 } from "../../services/adminService";
 
 import { produce } from "immer";
-import { BellIcon } from "lucide-react";
+import { BellIcon, Trash2 } from "lucide-react";
 import Pagination from "../../components/Pagination";
 import type paginationData from "../../types/pagination.types";
 import { NotificationContext } from "../../contexts/NotificationContext";
@@ -110,7 +110,7 @@ export default function Notifications() {
             variant="danger"
              onClick={()=>setShowConfirmationModal(true)}
             >
-              Clear Notifications
+              <Trash2/>
             </Button>}
           </div>
 
