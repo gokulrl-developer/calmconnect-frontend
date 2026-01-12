@@ -10,6 +10,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import type PaginationData from "../../types/pagination.types";
 import Pagination from "../../components/Pagination";
+import { EyeIcon, X } from "lucide-react";
 
 const AdminSessions: React.FC = () => {
   const [sessions, setSessions] = useState<SessionListingAdminItem[]>([]);
@@ -186,11 +187,11 @@ const AdminSessions: React.FC = () => {
               header: "Actions",
               render: (_, session) => (
                 <Button
-                  variant="primary"
+                  variant="secondary"
                   size="sm"
                   onClick={() => viewDetails(session!.sessionId)}
                 >
-                  Details
+                  <EyeIcon/>
                 </Button>
               ),
             },
@@ -291,7 +292,7 @@ const AdminSessions: React.FC = () => {
                 size="sm"
                 onClick={() => setShowDetailsModal(false)}
               >
-                Close
+                <X/>
               </Button>
             </div>
           </div>

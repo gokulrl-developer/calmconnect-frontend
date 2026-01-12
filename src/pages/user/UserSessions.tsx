@@ -17,6 +17,7 @@ import Pagination from "../../components/Pagination";
 import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import type PaginationData from "../../types/pagination.types";
+import { AlertTriangle, Check, EyeIcon, Star,VideoIcon, X } from "lucide-react";
 
 const UserSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -285,7 +286,7 @@ const UserSessions: React.FC = () => {
                           setShowConfirmationModal(true);
                         }}
                       >
-                        Cancel
+                       <X/>
                       </Button>
                     )}
                     <Button
@@ -299,21 +300,21 @@ const UserSessions: React.FC = () => {
                       }
                       onClick={() => joinSession(row!.sessionId)}
                     >
-                      Join
+                      <VideoIcon/>
                     </Button>
                     <Button
                       variant="warning"
                       size="sm"
                       onClick={() => reportPsychologist(row!.sessionId)}
                     >
-                      Report
+                      <AlertTriangle/>
                     </Button>
                     <Button
                       variant="primary"
                       size="sm"
                       onClick={() => viewDetails(row!.sessionId)}
                     >
-                      Details
+                      <EyeIcon/>
                     </Button>
                     {row!.status === "ended" && (
                       <Button
@@ -324,7 +325,7 @@ const UserSessions: React.FC = () => {
                           setReviewSessionId(row!.sessionId);
                         }}
                       >
-                        Rate
+                        <Star/>
                       </Button>
                     )}
                   </div>
@@ -367,10 +368,10 @@ const UserSessions: React.FC = () => {
               variant="secondary"
               onClick={() => setShowConfirmationModal(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button variant="danger" onClick={handleCancelSession}>
-              Proceed to Cancel
+              <Check/>
             </Button>
           </div>
         </div>
@@ -428,10 +429,10 @@ const UserSessions: React.FC = () => {
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeReportPsychologistModal}>
-              Cancel
+              <X/>
             </Button>
             <Button variant="danger" onClick={handleReportPsychologist}>
-              Proceed
+              <Check/>
             </Button>
           </div>
         </div>
@@ -512,10 +513,10 @@ const UserSessions: React.FC = () => {
           {/* Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeReviewModal}>
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={handleSubmitReview}>
-              Submit Review
+              <Check/>
             </Button>
           </div>
         </div>
@@ -602,7 +603,7 @@ const UserSessions: React.FC = () => {
                 size="sm"
                 onClick={() => setShowDetailsModal(false)}
               >
-                Close
+                <X/>
               </Button>
             </div>
           </div>

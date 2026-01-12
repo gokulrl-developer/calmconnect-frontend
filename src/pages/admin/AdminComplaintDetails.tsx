@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import type paginationData from "../../types/pagination.types";
 import Table from "../../components/UI/Table";
 import { produce } from "immer";
+import { Ban, CheckCircle, ChevronLeft, ChevronRight, EyeIcon, UserCheck, X } from "lucide-react";
 
 const AdminComplaintDetails: React.FC = () => {
   const { complaintId } = useParams();
@@ -216,13 +217,13 @@ const AdminComplaintDetails: React.FC = () => {
                   {complaint.userEmail}
                 </div>
                 <Button
-                  variant="primary"
+                  variant="secondary"
                   className="mt-2"
                   onClick={() =>
                     navigate(`/admin/user-details/${complaint.userId}`)
                   }
                 >
-                  View User
+                  <EyeIcon />
                 </Button>
               </div>
               <div className="pt-3">
@@ -232,7 +233,7 @@ const AdminComplaintDetails: React.FC = () => {
                   {complaint.psychologistEmail}
                 </div>
                 <Button
-                  variant="primary"
+                  variant="secondary"
                   className="mt-2"
                   onClick={() =>
                     navigate(
@@ -240,7 +241,7 @@ const AdminComplaintDetails: React.FC = () => {
                     )
                   }
                 >
-                  View Psychologist
+                  <EyeIcon />
                 </Button>
               </div>
               {complaint.sessionId && (
@@ -293,7 +294,7 @@ const AdminComplaintDetails: React.FC = () => {
                 className="w-full flex items-center justify-center mb-1"
                 onClick={() => setShowResolveModal(true)}
               >
-                <CheckIcon className="w-4 h-4 mr-2" /> Resolve Complaint
+                <CheckCircle /> 
               </Button>
               <Button
                 variant={
@@ -304,10 +305,10 @@ const AdminComplaintDetails: React.FC = () => {
                 className="w-full flex items-center justify-center mt-1"
                 onClick={() => setShowUpdateStatusModal(true)}
               >
-                <CheckIcon className="w-4 h-4 mr-2" />{" "}
+                
                 {complaint.psychologistStatus === "active"
-                  ? "Block"
-                  : "Unblock"}
+                  ?<><Ban/> <p>Block</p></>
+                  : <><UserCheck/><p>UnBlock</p></>}
               </Button>
             </Card>
           )}
@@ -382,10 +383,10 @@ const AdminComplaintDetails: React.FC = () => {
                 header: "Actions",
                 render: (_, row) => (
                   <Button
-                    variant="primary"
+                    variant="secondary"
                     onClick={() => viewDetails(row!.complaintId)}
                   >
-                    Details
+                   <EyeIcon/>
                   </Button>
                 ),
               },
@@ -400,7 +401,7 @@ const AdminComplaintDetails: React.FC = () => {
             disabled={pagination.currentPage === 1}
             onClick={() => handlePageChange(pagination.currentPage - 1)}
           >
-            Previous
+            <ChevronLeft/>
           </Button>
           <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
             {pagination.currentPage} / {pagination.totalPages || 1}
@@ -410,7 +411,7 @@ const AdminComplaintDetails: React.FC = () => {
             disabled={pagination.currentPage === pagination.totalPages}
             onClick={() => handlePageChange(pagination.currentPage + 1)}
           >
-            Next
+            <ChevronRight/>
           </Button>
         </div>
       </Card>
@@ -463,10 +464,10 @@ const AdminComplaintDetails: React.FC = () => {
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeResolveModal}>
-              Cancel
+              <X/>
             </Button>
             <Button variant="success" onClick={handleResolveComplaint}>
-              Resolve Complaint
+              <CheckCircle/>
             </Button>
           </div>
         </div>
@@ -585,7 +586,7 @@ const AdminComplaintDetails: React.FC = () => {
               variant="secondary"
               onClick={() => setShowUpdateStatusModal(false)}
             >
-              Cancel
+              <X/>
             </Button>
             <Button
               variant={
@@ -598,8 +599,8 @@ const AdminComplaintDetails: React.FC = () => {
               }}
             >
               {complaint.psychologistStatus === "active"
-                ? "Deactivate Psychologist"
-                : "Activate Psychologist"}
+                ? <><Ban/> <p>Block</p></>
+                : <><CheckIcon/> <p>UnBlock</p></>}
             </Button>
           </div>
         </div>

@@ -180,10 +180,10 @@ const ApplicationDetailsPage: React.FC= () => {
             <h3 className="font-medium text-gray-800 dark:text-white mb-4">Documents</h3>
             <div className="space-y-3">
               <a href={`${application.licenseUrl.replace('/upload/', '/upload/fl_attachment:')}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="primary" className="w-full my-1">Download License</Button>
+                <Button variant="primary" className="w-full my-1">License</Button>
               </a>
               <a href={`${application.resume.replace('/upload/', '/upload/fl_attachment:')}`} target="_blank" rel="noopener noreferrer">
-                <Button variant="primary" className="w-full my-1">Download Resume</Button>
+                <Button variant="primary" className="w-full my-1">Resume</Button>
               </a>
             </div>
           </Card>
@@ -194,10 +194,10 @@ const ApplicationDetailsPage: React.FC= () => {
               <h3 className="font-medium text-gray-800 dark:text-white mb-4">Actions</h3>
               <div className="space-y-3">
                 <Button variant="success" className="w-full flex items-center justify-center" onClick={()=>openConfirmationModal('approve')}>
-                  <CheckIcon className="w-4 h-4 mr-2" /> Approve Application
+                  <CheckIcon className="w-4 h-4 mr-2 stroke-[2.5]" /> Approve
                 </Button>
                 <Button variant="danger" className="w-full flex items-center justify-center" onClick={()=>openConfirmationModal('reject')}>
-                  <XMarkIcon className="w-4 h-4 mr-2" /> Reject Application
+                  <XMarkIcon className="w-4 h-4 mr-2 stroke-[2.5]" /> Reject
                 </Button>
               </div>
             </Card>

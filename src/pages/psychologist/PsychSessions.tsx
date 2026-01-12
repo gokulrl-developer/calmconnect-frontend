@@ -14,6 +14,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import { EyeIcon, Video, X } from "lucide-react";
 
 const PsychSessions: React.FC = () => {
   const navigate = useNavigate();
@@ -200,7 +201,7 @@ const PsychSessions: React.FC = () => {
                         setShowConfirmationModal(true);
                       }}
                     >
-                      Cancel
+                      <X/>
                     </Button>
                   )}
                   <Button
@@ -214,14 +215,14 @@ const PsychSessions: React.FC = () => {
                     }
                     onClick={() => joinSession(row!.sessionId)}
                   >
-                    Join
+                   <Video className="w-4 h-4 mr-1" />
                   </Button>
                   <Button
                     variant="primary"
                     size="sm"
                     onClick={() => viewDetails(row!.sessionId)}
                   >
-                    Details
+                    <EyeIcon/>
                   </Button>
                 </div>
               ),
@@ -346,7 +347,7 @@ const PsychSessions: React.FC = () => {
                 size="sm"
                 onClick={() => setShowDetailsModal(false)}
               >
-                Close
+                <X/>
               </Button>
             </div>
           </div>

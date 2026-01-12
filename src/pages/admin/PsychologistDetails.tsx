@@ -204,7 +204,7 @@ const PsychologistDetailsPage: React.FC = () => {
                 rel="noopener noreferrer"
               >
                 <Button variant="primary" className="w-full">
-                  Download License
+                  License
                 </Button>
               </a>
             ) : (

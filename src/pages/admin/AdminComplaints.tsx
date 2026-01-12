@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Card from "../../components/UI/Card";
 import Button from "../../components/UI/Button";
@@ -21,6 +22,7 @@ import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import Pagination from "../../components/Pagination";
 import type PaginationData from "../../types/pagination.types";
+import { CheckCircle, EyeIcon } from "lucide-react";
 
 const AdminComplaints: React.FC = () => {
   const navigate = useNavigate();
@@ -267,16 +269,16 @@ const AdminComplaints: React.FC = () => {
                 render: (_, row) => (
                   <div className="flex gap-1">
                     <Button
-                      variant="primary"
+                      variant="secondary"
                       onClick={() => viewDetails(row!.complaintId)}
                     >
-                      Details
+                      <EyeIcon />
                     </Button>
                     <Button
                       variant="secondary"
                       onClick={() => openResolveModal(row!.complaintId)}
                     >
-                      Resolve
+                      <CheckCircle />
                     </Button>
                   </div>
                 ),
@@ -340,10 +342,10 @@ const AdminComplaints: React.FC = () => {
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="secondary" onClick={closeResolveModal}>
-              Cancel
+               <XMarkIcon className="w-4 h-4 mr-1 stroke-[2.5]" />
             </Button>
             <Button variant="success" onClick={handleResolveComplaint}>
-              Resolve Complaint
+              <CheckCircle/>
             </Button>
           </div>
         </div>

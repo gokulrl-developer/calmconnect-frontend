@@ -16,6 +16,7 @@ import Table from "../../components/UI/Table";
 import { useGetQueryParams } from "../../hooks/useGetQueryParams";
 import { useUpdateQueryParams } from "../../hooks/useUpdateQueryParams";
 import Pagination from "../../components/Pagination";
+import { EyeIcon } from "lucide-react";
 
 const UserComplaints: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -186,7 +187,7 @@ const UserComplaints: React.FC = () => {
                       size="sm"
                       onClick={() => viewComplaintDetails(row!.complaintId)}
                     >
-                      Details
+                      <EyeIcon/>
                     </Button>
                   </div>
                 ),

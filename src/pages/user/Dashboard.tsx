@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Card from "../../components/UI/Card";
-import Button from "../../components/UI/Button";
 import {
   Calendar,
   Clock,
@@ -60,9 +58,6 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold text-gray-800">Welcome back!</h1>
           <p className="text-gray-600 mt-2">Here's a quick overview of your activities</p>
         </div>
-        <Link to="/user/book">
-          <Button>Book New Session</Button>
-        </Link>
       </div>
 
       {/* Summary Cards */}
