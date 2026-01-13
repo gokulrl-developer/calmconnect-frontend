@@ -23,7 +23,7 @@ const UserComplaints: React.FC = () => {
   const [complaints, setComplaints] = useState<ComplaintListingItem[]>([ ]);
 
   const [paginationData, setPaginationData] = useState<paginationData>({
-    totalItems: 2,
+    totalItemCount: 2,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
@@ -69,7 +69,7 @@ const UserComplaints: React.FC = () => {
 
       setComplaints(data.complaints);
       setPaginationData({
-        totalItems: data.paginationData.totalItems,
+        totalItemCount: data.paginationData.totalItemCount,
         totalPages: data.paginationData.totalPages,
         currentPage: data.paginationData.currentPage,
         pageSize: data.paginationData.pageSize,

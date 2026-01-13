@@ -26,7 +26,7 @@ const AdminComplaintDetails: React.FC = () => {
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState<ComplaintListItem[]>([]);
   const [pagination, setPagination] = useState<paginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 5,

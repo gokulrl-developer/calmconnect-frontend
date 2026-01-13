@@ -44,37 +44,37 @@ const Dashboard: React.FC = () => {
   const stats = [
     {
       title: "Today's Sessions",
-      value: summary?.sessionSummary.todaySessions ?? 0,
+      value: summary?.sessionSummary.todaySessionCount ?? 0,
       icon: Calendar,
       color: "bg-blue-500",
     },
     {
       title: "Upcoming Sessions",
-      value: summary?.sessionSummary.upcomingSessions ?? 0,
+      value: summary?.sessionSummary.upcomingSessionCount ?? 0,
       icon: Clock,
       color: "bg-green-500",
       change: `Upcoming: ${summary?.sessionSummary.nextSessionTime || "N/A"}`,
     },
     {
       title: "Total Sessions",
-      value: summary?.sessionSummary.totalSessions ?? 0,
+      value: summary?.sessionSummary.totalSessionCount ?? 0,
       icon: Users,
       color: "bg-purple-500",
-      change: `This Month: ${summary?.sessionSummary.thisMonthSessions ?? 0}`,
+      change: `This Month: ${summary?.sessionSummary.thisMonthSessionCount ?? 0}`,
     },
     {
       title: "Average Rating",
-      value: summary?.ratingSummary.current?.toFixed(1) ?? 0,
+      value: summary?.ratingSummary.currentRating?.toFixed(1) ?? 0,
       icon: Star,
       color: "bg-yellow-500",
-      change: `Last Month: ${summary?.ratingSummary.lastMonth ?? 0}`,
+      change: `Last Month: ${summary?.ratingSummary.lastMonthRating ?? 0}`,
     },
     {
       title: "Revenue (₹)",
-      value: summary?.revenueSummary.current ?? 0,
+      value: summary?.revenueSummary.currentRevenue ?? 0,
       icon: IndianRupee,
       color: "bg-green-600",
-      change: `Last Month: ₹${summary?.revenueSummary.lastMonth ?? 0}`,
+      change: `Last Month: ₹${summary?.revenueSummary.lastMonthRevenue ?? 0}`,
     },
   ];
 
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
         <div className="space-y-4">
           {recentSessions.map((entry: RecentSessionEntry) => (
             <div
-              key={entry.id}
+              key={entry.sessionId}
               className="flex items-center justify-between p-4 glass-card rounded-lg hover:bg-gray-50/50 transition-colors duration-200"
             >
               <div className="flex items-center space-x-3">

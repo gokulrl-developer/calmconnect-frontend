@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   paginationData: {
-    totalItems: number;
+    totalItemCount: number;
     totalPages: number;
     currentPage: number;
     pageSize: number;

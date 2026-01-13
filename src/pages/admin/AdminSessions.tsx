@@ -20,7 +20,7 @@ const AdminSessions: React.FC = () => {
     useState<SessionListingAdminItem | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [paginationData, setPaginationData] = useState<PaginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,

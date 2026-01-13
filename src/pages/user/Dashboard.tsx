@@ -44,10 +44,10 @@ const Dashboard = () => {
   const { sessionSummary, recentSessions, recentTransactions, recentComplaints } = dashboard;
 
   const summaryCards = [
-    { title: "Total Sessions", value: sessionSummary.totalSessions, icon: Clock, color: "bg-blue-500" },
-    { title: "Completed Sessions", value: sessionSummary.completedSessions, icon: Star, color: "bg-green-500" },
-    { title: "Upcoming Sessions", value: sessionSummary.upcomingSessions, icon: Calendar, color: "bg-purple-500" },
-    { title: "Cancelled Sessions", value: sessionSummary.cancelledSessions, icon: AlertTriangle, color: "bg-red-500" },
+    { title: "Total Sessions", value: sessionSummary.totalSessionCount, icon: Clock, color: "bg-blue-500" },
+    { title: "Completed Sessions", value: sessionSummary.completedSessionCount, icon: Star, color: "bg-green-500" },
+    { title: "Upcoming Sessions", value: sessionSummary.upcomingSessionCount, icon: Calendar, color: "bg-purple-500" },
+    { title: "Cancelled Sessions", value: sessionSummary.cancelledSessionCount, icon: AlertTriangle, color: "bg-red-500" },
   ];
 
   return (

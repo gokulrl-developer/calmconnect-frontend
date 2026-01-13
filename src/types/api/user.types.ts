@@ -167,10 +167,10 @@ export interface ListPsychReviewsRequest{
 }
 
 export interface UserSessionSummary{
-    totalSessions:number;
-    completedSessions:number;
-    upcomingSessions:number;
-    cancelledSessions:number;
+    totalSessionCount:number;
+    completedSessionCount:number;
+    upcomingSessionCount:number;
+    cancelledSessionCount:number;
 }
 
 export interface UserRecentSessionsEntry{

@@ -25,7 +25,7 @@ const Psychologists: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [paginationData, setPaginationData] = useState<PaginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
@@ -177,7 +177,7 @@ const Psychologists: React.FC = () => {
         <Table<PsychItem>
           loading={loading}
           data={filteredPsychs}
-          keyField="id"
+          keyField="psychId"
           columns={[
             {
               header: "Psychologist",
@@ -219,7 +219,7 @@ const Psychologists: React.FC = () => {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleView((psych as PsychItem).id!)}
+                    onClick={() => handleView((psych as PsychItem).psychId!)}
                   >
                     <EyeIcon />
                   </Button>
@@ -227,7 +227,7 @@ const Psychologists: React.FC = () => {
                     variant={psych?.status === "active" ? "danger" : "success"}
                     size="sm"
                     onClick={() =>
-                      openConfirmationModal((psych as PsychItem).id!, (psych as PsychItem).status!)
+                      openConfirmationModal((psych as PsychItem).psychId!, (psych as PsychItem).status!)
                     }
                   >
                     {psych?.status === "active" ? <><Ban/><p>Block</p></> : <><UserCheck/><p>UnBlock</p></>}
