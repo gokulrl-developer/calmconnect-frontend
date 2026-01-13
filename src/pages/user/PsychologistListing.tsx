@@ -20,7 +20,7 @@ const BookSession: React.FC = () => {
   const [psychologists, setPsychologists] = useState<ListPsychSummary[]>([]);
   const [search, setSearch] = useState<string>("");
   const [paginationData, setPaginationData] = useState<paginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 0,
     currentPage: 0,
     pageSize: 10, // default page size

@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 interface Notification {
-  id: string;
+  notificationId: string;
   title: string;
   message: string;
   type: string;

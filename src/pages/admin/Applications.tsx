@@ -22,7 +22,7 @@ const Applications: React.FC = () => {
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [search, setSearch] = useState<string>("");
   const [paginationData, setPaginationData] = useState<PaginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
@@ -200,8 +200,8 @@ const Applications: React.FC = () => {
         </div>
 
         <Card>
-          <Table<ApplicationItem, "id">
-            keyField="id"
+          <Table<ApplicationItem, "applicationId">
+            keyField="applicationId"
             data={paginatedApplications}
             columns={[
               {
@@ -249,7 +249,7 @@ const Applications: React.FC = () => {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => handleView(row!.id)}
+                      onClick={() => handleView(row!.applicationId)}
                     >
                       <EyeIcon className="w-4 h-4 mr-1" /> 
                     </Button>
@@ -259,7 +259,7 @@ const Applications: React.FC = () => {
                           variant="success"
                           size="sm"
                           onClick={() =>
-                            openConfirmationModal("approve", row!.id)
+                            openConfirmationModal("approve", row!.applicationId)
                           }
                         >
                           <CheckIcon className="w-4 h-4 mr-1 stroke-[2.5]" /> 
@@ -268,7 +268,7 @@ const Applications: React.FC = () => {
                           variant="danger"
                           size="sm"
                           onClick={() =>
-                            openConfirmationModal("reject", row!.id)
+                            openConfirmationModal("reject", row!.applicationId)
                           }
                         >
                           <XMarkIcon className="w-4 h-4 mr-1 stroke-[2.5]" />

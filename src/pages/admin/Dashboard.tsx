@@ -194,10 +194,10 @@ const Dashboard: React.FC = () => {
                     Total Users
                   </p>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
-                    {summaryCardsData.users.totalValue.toLocaleString()}
+                    {summaryCardsData.userSummary.totalUserCount.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    +{summaryCardsData.users.addedValue.toLocaleString()} in
+                    +{summaryCardsData.userSummary.addedUserCount.toLocaleString()} in
                     selected range
                   </p>
                 </div>
@@ -214,11 +214,11 @@ const Dashboard: React.FC = () => {
                     Total Psychologists
                   </p>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
-                    {summaryCardsData.psychologists.totalValue.toLocaleString()}
+                    {summaryCardsData.psychologistSummary.totalPsychologistCount.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     +
-                    {summaryCardsData.psychologists.addedValue.toLocaleString()}{" "}
+                    {summaryCardsData.psychologistSummary.addedPsychologistCount.toLocaleString()}{" "}
                     in selected range
                   </p>
                 </div>
@@ -235,10 +235,10 @@ const Dashboard: React.FC = () => {
                     Total Sessions
                   </p>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
-                    {summaryCardsData.sessions.totalValue.toLocaleString()}
+                    {summaryCardsData.sessionSummary.totalSessionCount.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    +{summaryCardsData.sessions.addedValue.toLocaleString()} in
+                    +{summaryCardsData.sessionSummary.addedSessionCount.toLocaleString()} in
                     selected range
                   </p>
                 </div>
@@ -255,10 +255,10 @@ const Dashboard: React.FC = () => {
                     Total Revenue
                   </p>
                   <p className="text-2xl font-bold text-gray-800 dark:text-white mt-1">
-                    ₹{summaryCardsData.revenue.totalValue.toLocaleString()}
+                    ₹{summaryCardsData.revenueSummary.totalRevenue.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    +₹{summaryCardsData.revenue.addedValue.toLocaleString()} in
+                    +₹{summaryCardsData.revenueSummary.addedRevenue.toLocaleString()} in
                     selected range
                   </p>
                 </div>
