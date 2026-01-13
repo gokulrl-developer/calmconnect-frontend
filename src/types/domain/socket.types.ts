@@ -22,7 +22,7 @@ export interface ChatMessage {
   senderName: string;
   text: string;
   createdAt: Date;
-  id: string;
+  chatMessageId: string;
 }
 
 export type PeerJoinedPayload = {

@@ -119,18 +119,18 @@ export interface AdminRevenueTrendsEntry {
 
 export interface AdminRegistrationTrendsEntry {
   label: string;       
-  users: number;       
-  psychologists: number; 
+  userCount: number;       
+  psychologistCount: number; 
 }
 
 export interface AdminSessionTrendsEntry {
   label: string;             // day or month
-  sessions: number;          // total booked sessions
-  cancelledSessions: number; // cancelled sessions
+  sessionCount: number;          // total booked sessions
+  cancelledSessionCount: number; // cancelled sessions
 }
 
 export interface AdminTopPsychologistEntry {
-  id: string;
+  psychId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -173,16 +173,28 @@ export interface FetchTopPsychologistRequest {
   limit: number; 
 }
 
-export interface SummaryCardItem{
-    totalValue:number; // all time total
-    addedValue:number; // added in the time range
+export interface UserSummary{
+    totalUserCount:number; // all time total
+    addedUserCount:number; // added in the time range
+}
+export interface PsychSummary{
+    totalPsychologistCount:number; // all time total
+    addedPsychologistCount:number; // added in the time range
+}
+export interface SessionSummary{
+    totalSessionCount:number; // all time total
+    addedSessionCount:number; // added in the time range
+}
+export interface RevenueSummary{
+    totalRevenue:number; // all time total
+    addedRevenue:number; // added in the time range
 }
 
 export interface DashboardSummaryCardResponse{
-    users:SummaryCardItem;
-    psychologists:SummaryCardItem;
-    sessions:SummaryCardItem;
-    revenue:SummaryCardItem;
+   userSummary:UserSummary;
+    psychologistSummary:PsychSummary;
+    sessionSummary:SessionSummary;
+    revenueSummary:RevenueSummary;
 }
 
 export interface ApplicationItem {
@@ -191,7 +203,7 @@ export interface ApplicationItem {
   email: string;
   status: string;
   specializations: string[];
-  id:string
+  applicationId:string
 }
 
 export interface ApplicationList {
@@ -228,7 +240,7 @@ export interface IApplicationResponse {
 }
 
 export interface UserItem {
-  id: string;
+  userId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -246,7 +258,7 @@ export interface IUserResponse {
 }
 
 export interface PsychItem {
-  id: string;
+  psychId: string;
   firstName: string;
   lastName: string;
   email: string;

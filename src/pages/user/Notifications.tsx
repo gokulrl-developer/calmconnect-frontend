@@ -25,7 +25,7 @@ export default function Notifications() {
   const [paginationData, setPaginationData] = useState<paginationData>({
     currentPage: 1,
     totalPages: 1,
-    totalItems: 0,
+    totalItemCount: 0,
     pageSize: 10,
   });
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -58,7 +58,7 @@ export default function Notifications() {
         setPaginationData(
           produce(paginationData,(draft) => {
             draft.currentPage = result.data.paginationData.currentPage;
-            draft.totalItems = result.data.paginationData.totalItems;
+            draft.totalItemCount = result.data.paginationData.totalItemCount;
             draft.totalPages = result.data.paginationData.totalPages;
           })
         );

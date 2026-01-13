@@ -28,7 +28,7 @@ const UserSessions: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [paginationData, setPaginationData] = useState<PaginationData>({
-      totalItems: 0,
+      totalItemCount: 0,
       totalPages: 1,
       currentPage: 1,
       pageSize: 10,

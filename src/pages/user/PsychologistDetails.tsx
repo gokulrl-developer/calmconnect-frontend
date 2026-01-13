@@ -53,7 +53,7 @@ const PsychologistDetails: React.FC = () => {
   const [reviews, setReviews] = useState<ListPsychReviewsItem[]>([]);
   //const [sortReviews, setSortReviews] = useState<"recent" | "top-rated">( "recent" );
   const [pagination, setPagination] = useState<paginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 5,

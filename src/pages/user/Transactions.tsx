@@ -27,7 +27,7 @@ const Transactions: React.FC = () => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [walletBalance, setWalletBalance] = useState<WalletData["balance"]>(0);
   const [paginationData, setPaginationData] = useState<paginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
@@ -75,7 +75,7 @@ const Transactions: React.FC = () => {
         setTransactions(result.data.transactions);
         setPaginationData((prev) =>
           produce(prev, (draft) => {
-            draft.totalItems = result.data.paginationData.totalItems;
+            draft.totalItemCount = result.data.paginationData.totalItemCount;
             draft.totalPages = result.data.paginationData.totalPages;
           })
         );

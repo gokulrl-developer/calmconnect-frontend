@@ -1,5 +1,5 @@
  export default interface PaginationData{
-    totalItems: number;
+    totalItemCount: number;
     totalPages: number;
     currentPage: number;
     pageSize: number;

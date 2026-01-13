@@ -21,7 +21,7 @@ const Users: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [paginationData, setPaginationData] = useState<PaginationData>({
-    totalItems: 0,
+    totalItemCount: 0,
     totalPages: 1,
     currentPage: 1,
     pageSize: 10,
@@ -167,7 +167,7 @@ const Users: React.FC = () => {
         <Table<UserItem>
           loading={loading}
           data={filteredUsers}
-          keyField="id"
+          keyField="userId"
           columns={[
             {
               header: "User",
@@ -209,7 +209,7 @@ const Users: React.FC = () => {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleView(user!.id)}
+                    onClick={() => handleView(user!.userId)}
                   >
                     <EyeIcon />
                   </Button>
@@ -217,7 +217,7 @@ const Users: React.FC = () => {
                     variant={user!.status === "active" ? "danger" : "success"}
                     size="sm"
                     onClick={() =>
-                      openConfirmationModal(user!.id, user!.status)
+                      openConfirmationModal(user!.userId, user!.status)
                     }
                   >
                     {user!.status === "active" ? <><Ban/> <p>Block</p></> : <><UserCheck/> Unblock</>}
