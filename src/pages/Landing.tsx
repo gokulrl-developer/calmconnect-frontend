@@ -143,14 +143,14 @@ const Landing: React.FC = () => {
               <Button 
                 variant="secondary"
                 onClick={() => navigate('/psychologist/login')}
-                className="hidden sm:flex"
+                className="flex"
               >
                 Psychologist Login
               </Button>
               <Button 
                 variant="secondary"
                 onClick={() => navigate('/user/login')}
-                className="hidden sm:flex"
+                className="flex"
               >
                 Sign In
               </Button>

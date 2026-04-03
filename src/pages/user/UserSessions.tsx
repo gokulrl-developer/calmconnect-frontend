@@ -123,16 +123,25 @@ const UserSessions: React.FC = () => {
   };
 
   const formatDateTime = (dateString?: string | Date) => {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  return (
+    <>
+      {date.toLocaleDateString("en-GB", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      })}
+      <br />
+      {date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </>
+  );
+};
 
   const handlePageChange = (newPage: number) => {
     updateQueryParams({ page: newPage });
@@ -276,7 +285,7 @@ const UserSessions: React.FC = () => {
               {
                 header: "Actions",
                 render: (_, row) => (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     {row!.status === "scheduled" && (
                       <Button
                         size="sm"

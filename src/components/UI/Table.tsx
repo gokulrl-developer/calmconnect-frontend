@@ -27,7 +27,7 @@ const Table = <T, K extends keyof T = keyof T>({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto min-w-[700px]">
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-200 dark:border-gray-700">

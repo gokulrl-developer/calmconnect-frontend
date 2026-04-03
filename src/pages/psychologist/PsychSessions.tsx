@@ -145,7 +145,7 @@ const PsychSessions: React.FC = () => {
         </select>
       </div>
 
-      <Card>
+      <Card className="overflow-x-auto">
         <Table<SessionListingPsychItem, "sessionId">
           keyField="sessionId"
           data={sessions}

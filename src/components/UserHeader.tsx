@@ -1,19 +1,45 @@
-import React, { useContext } from "react";
-import { Bell } from "lucide-react";
+import React, { useContext, useState } from "react";
+import { Bell, LogOut, Menu } from "lucide-react";
 import { NotificationContext } from "../contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
-
-const UserHeader: React.FC = () => {
+import { logOut } from '../services/authService';
+import { handleApiError } from '../services/axiosInstance';
+import { useAppDispatch } from "../hooks/customReduxHooks";
+import { logout } from "../features/authentication/authSlice";
+type Props = {
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+const UserHeader: React.FC<Props> = ({setIsSidebarOpen}) => {
   const { unreadNotificationCount } = useContext(NotificationContext);
+  const [isOpen,setIsOpen]=useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+   const handleLogout=async ()=>{
+   try{
+    const result=await logOut();
+    if(result){
+     dispatch(logout());
+     navigate("/")}
+    }catch(error){
+    handleApiError(error)
+    }
+   }
+      
+  const toggleSidebar = function () {
+    setIsSidebarOpen((prev: boolean) => !prev);
+  }
   return (
     <header className="fixed top-0 left-0 right-0 h-16 glass-card border-b border-white/20 z-40">
       <div className="flex items-center justify-between h-full px-6">
-        <div className="flex items-center justify-between h-16 border-b border-gray-200 px-6">
-          <span className="text-xl font-bold text-blue-600">CalmConnect</span>
+        <div className="flex items-center gap-1 h-16 border-b border-gray-200 px-6">
+          <span className="text-xl font-bold text-black md:hidden"><button>
+            <Menu onClick={toggleSidebar} />
+          </button>
+          </span>
         </div>
         <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-800">USER</h2>
+                    <span className="text-xl font-bold text-blue-600">CalmConnect</span>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -34,9 +60,25 @@ const UserHeader: React.FC = () => {
               </button>
             </div>
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-medium text-sm">U</span>
+              <button
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="relative w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center"
+              >
+                <span className="text-white font-medium text-sm">C</span>
+                {isOpen && (
+                  <div className="absolute right-0 top-full w-40 bg-white shadow-lg py-1 z-40 flex flex-col">
+                    <span className="text-md text-blue-600">Client</span>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <LogOut className="w-5 h-5 mr-3" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </button>
             </div>
-            <span className="text-sm font-medium text-gray-700">User</span>
           </div>
         </div>
       </div>
