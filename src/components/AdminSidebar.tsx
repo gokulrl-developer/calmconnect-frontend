@@ -15,9 +15,10 @@ import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '../services/axiosInstance';
 import { logOut } from '../services/authService';
 import { NotificationContext } from '../contexts/NotificationContext';
+import { LogOut } from 'lucide-react';
 
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC= () => {
  const dispatch=useAppDispatch();
  const navigate=useNavigate();
    const { unreadNotificationCount} = useContext(NotificationContext);
@@ -34,7 +35,7 @@ const Sidebar: React.FC = () => {
  }
 
   return (
-    <aside className="fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] md:w-1/5 bg-white dark:bg-gray-900 shadow-lg z-40 flex flex-col">
+    <aside className="fixed left-0 h-full max-h-[calc(100vh-4rem)] w-fit md:w-64 bg-white shadow-lg flex flex-col">
       <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
         <button
           className={`w-full flex items-center px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition`}
@@ -94,10 +95,11 @@ const Sidebar: React.FC = () => {
         </button>
       </nav>
       <div className="p-6 border-t border-gray-200 dark:border-gray-800">
-        <button
-          className="w-full flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 rounded-lg transition"
-          onClick={()=>handleLogout()}
-         >
+         <button
+          className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-5 h-5 mr-3" />
           Logout
         </button>
       </div>
