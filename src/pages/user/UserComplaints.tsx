@@ -90,27 +90,26 @@ const UserComplaints: React.FC = () => {
   };
 
   const formatDateTime = (dateString?: string | Date) => {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
+  if (!dateString) return "-";
 
-    const datePart = date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const date = new Date(dateString);
 
-    const timePart = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  return (
+    <>
+      {date.toLocaleDateString("en-GB", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      })}
+      <br />
+      {date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </>
+  );
+};
 
-    return (
-      <div className="flex flex-col leading-tight">
-        <span>{datePart}</span>
-        <span>{timePart}</span>
-      </div>
-    );
-  };
   const formatDateTimeOneLine = (dateString?: string | Date) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -140,7 +139,7 @@ const UserComplaints: React.FC = () => {
       </h1>
 
       <Card>
-        <div className="overflow-x-auto">
+        <div>
           <Table<ComplaintListingItem, "complaintId">
             keyField="complaintId"
             data={complaints}

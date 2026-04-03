@@ -119,6 +119,27 @@ const Transactions: React.FC = () => {
     updateQueryParams({ page: newPage });
     setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
+  const formatDateTime = (dateString?: string | Date) => {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  return (
+    <>
+      {date.toLocaleDateString("en-GB", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      })}
+      <br />
+      {date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </>
+  );
+};
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -240,14 +261,7 @@ const Transactions: React.FC = () => {
                 header: "Date & Time",
                 accessor: "createdAt",
                 render: (value) =>
-                  new Intl.DateTimeFormat("en-IN", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  }).format(new Date(value!)),
+                 formatDateTime(new Date(value!)),
               },
               {
                 header: "Actions",
