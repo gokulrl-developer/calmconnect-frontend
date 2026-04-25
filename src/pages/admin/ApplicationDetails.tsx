@@ -179,10 +179,10 @@ const ApplicationDetailsPage: React.FC= () => {
           <Card className="p-6">
             <h3 className="font-medium text-gray-800 dark:text-white mb-4">Documents</h3>
             <div className="space-y-3">
-              <a href={`${application.licenseUrl.replace('/upload/', '/upload/fl_attachment:')}`} target="_blank" rel="noopener noreferrer">
+              <a href={`${application.licenseUrl}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="primary" className="w-full my-1">License</Button>
               </a>
-              <a href={`${application.resume.replace('/upload/', '/upload/fl_attachment:')}`} target="_blank" rel="noopener noreferrer">
+              <a href={`${application.resume}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="primary" className="w-full my-1">Resume</Button>
               </a>
             </div>
