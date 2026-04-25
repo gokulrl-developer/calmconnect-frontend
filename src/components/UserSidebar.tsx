@@ -50,9 +50,9 @@ export default function UserSidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <aside className="fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] w-64 bg-white shadow-lg z-40 flex flex-col">
+    <aside className="fixed left-0 top-16 h-full max-h-[calc(100vh-4rem)] w-fit md:w-64 bg-white shadow-lg z-40">
       
-      <nav className="flex-1 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 max-h-[calc(100vh-4rem)] py-6 space-y-2 overflow-y-auto">
         {navItems.map((item) => (
           <button
             key={item.path}
@@ -72,7 +72,7 @@ export default function UserSidebar() {
         ))}
       </nav>
       
-      <div className="border-t p-3 border-gray-200">
+      <div className="border-t p-3 border-gray-200 hidden md:block">
         <div className="flex items-center justify-between ">
           <div className="flex items-center">
             <User className="w-5 h-5 mr-3 text-gray-600" />
