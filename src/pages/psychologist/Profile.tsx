@@ -12,6 +12,7 @@ import type {
   PsychProfile,
 } from "../../types/components/psychologist.types"; 
 import { Check, PencilIcon } from "lucide-react";
+import { ALLOWED_FILE_SIZE, ALLOWED_PROFILE_IMAGE_TYPES } from "../../constants/file-mime-types.constants";
 
 const PsychologistProfile: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -111,6 +112,18 @@ const PsychologistProfile: React.FC = () => {
     if (!data.bio?.trim())
       newErrors.bio = "Bio cannot be empty.";
 
+   let profilePictureErrors=[];
+       if(data.profilePicture && data.profilePicture instanceof File ){
+         if((ALLOWED_PROFILE_IMAGE_TYPES.includes(data.profilePicture.type)===false)){
+         profilePictureErrors.push(`Profile picture should be of any of the following types : ${ALLOWED_PROFILE_IMAGE_TYPES.join(",")}`)
+       }
+       if(data.profilePicture.size>ALLOWED_FILE_SIZE.PROFILE_IMAGE_SIZE){
+         profilePictureErrors.push(`Maximum size of profile picture should be ${(ALLOWED_FILE_SIZE.PROFILE_IMAGE_SIZE)/(1024*1024)} MB`)
+       }
+       if(profilePictureErrors.length>0){
+         newErrors.profilePicture=profilePictureErrors.join(" , ")
+       }
+     }
     return newErrors;
   };
 
@@ -174,6 +187,7 @@ const PsychologistProfile: React.FC = () => {
   return (
     <div className="space-y-6">
       <Card className="p-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+        <div>
         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center relative">
           {previewUrl ? (
             <img
@@ -193,6 +207,12 @@ const PsychologistProfile: React.FC = () => {
               title="Click to upload new profile picture"
             />
           )}
+        </div>
+             {errors.profilePicture && (
+                  <p className="text-red-500 text-sm mt-1 md:max-w-40 break-words ">
+                    {errors.profilePicture}
+                  </p>
+                )}
         </div>
 
         <div className="flex-1 space-y-2">
