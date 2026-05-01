@@ -14,7 +14,7 @@ import type {
 } from "../../types/domain/socket.types";
 import { logOut, refreshTokenAPI } from "../../services/authService";
 import { CallContext } from "../../contexts/CallContext";
-import { Mic, MicOff, Send, Video, VideoOff } from "lucide-react";
+import { MessageSquare, Mic, MicOff, Send, Video, VideoOff, X } from "lucide-react";
 
 const SIGNALING_URL = import.meta.env.VITE_API_URL;
 
@@ -37,6 +37,7 @@ export const UserVideoRoom = () => {
   const [joined, setJoined] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isChatMode, setIsChatMode] = useState(false);
   const { sessionId } = useParams<{ sessionId: string }>();
   const userId = useAppSelector((state: IRootState) => state.auth.accountId);
   const isAuthenticated = useAppSelector(
@@ -48,11 +49,11 @@ export const UserVideoRoom = () => {
     toggleMute();
   }, [isMuted]);
 
-  useEffect(()=>{
-    return ()=>{
+  useEffect(() => {
+    return () => {
       setInCall(false)
     }
-    },[])
+  }, [])
 
   // --- SOCKET SETUP ---
   useEffect(() => {
@@ -245,80 +246,92 @@ export const UserVideoRoom = () => {
     }
   }
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900">
+    <div className="flex h-screen text-gray-900 relative">
       {/* Left side: Video area */}
-      <div className="flex flex-col flex-1 p-6 relative">
-        <div className="flex items-center gap-3 mb-4">
-       {!joined &&   (<button
+      <div className={`flex flex-col flex-1 p-6 w-full ${isChatMode === true ? "md:w-3/4" : ""}`}>
+        <div className={`flex items-center gap-3 mb-4${joined === true ? "hidden" : ""}`}>
+          {!joined && (<button
             onClick={checkAndJoin}
             disabled={joined}
-            className={`px-4 py-2 rounded-lg font-medium text-white transition ${
-              joined
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            }`}
-          
+            className={`px-4 py-2 rounded-lg font-medium text-white transition ${joined
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+              }`}
+
           >
-            <Video/>
+            <Video />
           </button>
           )
           }
-          {joined && (
-            <button
-              onClick={handleLeave}
-              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
-            >
-              <VideoOff/>
-            </button>
+          {!joined && (
+          <p className="hidden">{info}</p>
           )}
-          {joined && (
-            <button
-              onClick={() => setIsMuted((prev) => !prev)}
-              className={`px-4 py-2 rounded-lg font-medium text-white transition ${
-                isMuted
-                  ? "bg-gray-500 hover:bg-gray-600"
-                  : "bg-yellow-500 hover:bg-yellow-600"
-              }`}
-            >
-              {isMuted ? <MicOff/> : <Mic/>}
-            </button>
-          )}
-          <div className="ml-4 text-sm text-gray-600">{info}</div>
         </div>
 
-        <div className="flex justify-center items-center flex-1 relative">
+        {/* Live Videos */}
+        <div className="h-[90%] w-full flex items-center gap-2 relative">
           <video
             ref={remoteRef}
             autoPlay
             playsInline
-            className="w-full h-full rounded-xl bg-black object-cover shadow-md"
+            className="md:w-1/2 w-full h-full bg-black object-cover absolute md:relative top-0 bottom-0 right-0 left-0"
           />
           <video
             ref={localRef}
             autoPlay
             playsInline
             muted
-            className="absolute bottom-6 right-6 w-48 h-32 rounded-lg border border-white/30 shadow-lg bg-black"
+            className="w-1/4 md:w-1/2 h-1/5 md:h-full bg-black border-black border-4 md:border-0 object-cover z-20 md:z-auto absolute md:relative bottom-2 right-2 md:bottom-0 md:right-0"
           />
+        </div>
+        <div className={`h-[10%] w-full flex justify-center items-center gap-3 ${joined===false?"hidden":""}`}>
+          <button
+            onClick={handleLeave}
+            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
+          >
+            <VideoOff />
+          </button>
+          <button
+            onClick={() => setIsMuted((prev) => !prev)}
+            className={`px-4 py-2 rounded-lg font-medium text-white transition ${isMuted
+              ? "bg-gray-500 hover:bg-gray-600"
+              : "bg-yellow-500 hover:bg-yellow-600"
+              }`}
+          >
+            {isMuted ? <MicOff /> : <Mic />}
+          </button>
+          <button
+            onClick={() => setIsChatMode((prev) => !prev)}
+            className={`px-4 py-2 rounded-lg font-medium text-white transition ${isChatMode
+              ? "bg-yellow-500 hover:bg-yellow-600"
+              :"bg-gray-500 hover:bg-gray-600"
+              }`}
+          >
+            <MessageSquare/>
+          </button>
         </div>
       </div>
 
       {/* Right side: Chat */}
-      {joined && (
-        <div className="w-96 border-l border-gray-200 bg-white flex flex-col">
-          <div className="p-4 border-b border-gray-100">
+       {joined && isChatMode===true && (
+        <div className={`md:w-1/4 w-3/4 h-full border-l border-gray-200 bg-white flex flex-col z-20 md:z-auto md:relative absolute right-0 top-0`}>
+          <div className="p-4 border-b border-gray-100 relative">
             <h4 className="font-semibold text-lg">Chat</h4>
+            <button className="absolute right-1 top-1"
+            onClick={()=>setIsChatMode((prev)=>!prev)}
+            >
+              <X/>
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.map((m) => (
               <div
                 key={m.chatMessageId || `${m.senderId}:${m.createdAt}`}
-                className={`max-w-[80%] px-3 py-2 rounded-xl shadow-sm ${
-                  m.senderId === userId
+                className={`max-w-[80%] px-3 py-2 rounded-xl shadow-sm ${m.senderId === userId
                     ? "self-end bg-green-100 text-right ml-auto"
                     : "self-start bg-gray-100"
-                }`}
+                  }`}
               >
                 <div className="text-xs text-gray-500 mb-1">
                   {m.senderId === userId ? "You" : m.senderName}
@@ -331,18 +344,17 @@ export const UserVideoRoom = () => {
             ))}
           </div>
 
-          <div className="p-4 border-t border-gray-100 flex gap-2">
+          <div className="p-1 border-t border-gray-100 flex gap-2">
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Type message..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-sm"
+              className="w-5/6 px-2 py-2 border border-black rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-sm"
             />
             <button
               onClick={sendMessage}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
+              className="w-1/6 px-2 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium flex justify-center items-center"
             >
-              <Send/>
+              <Send size={16}/>
             </button>
           </div>
         </div>

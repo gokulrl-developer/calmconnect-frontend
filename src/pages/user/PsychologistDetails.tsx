@@ -241,7 +241,7 @@ const PsychologistDetails: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-2">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-2 break-all">
                   {psychologist.bio}
                 </p>
                 <p className="text-sm text-foreground mb-1">

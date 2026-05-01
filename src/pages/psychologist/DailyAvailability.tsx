@@ -538,7 +538,7 @@ async function handleQuickSlotDeletion(){
               Type
             </label>
             <select
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentSpecialDay.type || ""}
               onChange={(e) =>
                 setCurrentSpecialDay({
@@ -562,7 +562,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="time"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.startTime || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -579,7 +579,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="time"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.endTime || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -596,7 +596,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="number"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.durationInMins || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -613,7 +613,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="number"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.bufferTimeInMins || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -681,7 +681,7 @@ async function handleQuickSlotDeletion(){
               Type
             </label>
             <select
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentSpecialDay.type || ""}
               onChange={(e) =>
                 setCurrentSpecialDay({
@@ -705,7 +705,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="time"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={isoToHHMM(currentSpecialDay.startTime!) || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -722,7 +722,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="time"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={isoToHHMM(currentSpecialDay.endTime!) || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -739,7 +739,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="number"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.durationInMins || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -756,7 +756,7 @@ async function handleQuickSlotDeletion(){
                 </label>
                 <input
                   type="number"
-                  className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                  className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
                   value={currentSpecialDay.bufferTimeInMins || ""}
                   onChange={(e) =>
                     setCurrentSpecialDay({
@@ -876,7 +876,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="time"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={
                 currentQuickSlot.startTime
                   ? isoToHHMM(currentQuickSlot.startTime)
@@ -903,7 +903,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="time"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={
                 currentQuickSlot.endTime
                   ? isoToHHMM(currentQuickSlot.endTime)
@@ -930,7 +930,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="number"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentQuickSlot.durationInMins || ""}
               onChange={(e) =>
                 setCurrentQuickSlot({
@@ -953,7 +953,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="number"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentQuickSlot.bufferTimeInMins || ""}
               onChange={(e) =>
                 setCurrentQuickSlot({
@@ -1028,7 +1028,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="time"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={
                 currentQuickSlot.startTime
                   ? isoToHHMM(currentQuickSlot.startTime)
@@ -1055,7 +1055,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="time"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={
                 currentQuickSlot.endTime
                   ? isoToHHMM(currentQuickSlot.endTime)
@@ -1082,7 +1082,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="number"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentQuickSlot.durationInMins || ""}
               onChange={(e) =>
                 setCurrentQuickSlot({
@@ -1105,7 +1105,7 @@ async function handleQuickSlotDeletion(){
             </label>
             <input
               type="number"
-              className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              className="p-2 border border-gray-300 rounded-lg dark:bg-gray-800 dark:text-gray-200 text-sm w-full"
               value={currentQuickSlot.bufferTimeInMins || ""}
               onChange={(e) =>
                 setCurrentQuickSlot({
