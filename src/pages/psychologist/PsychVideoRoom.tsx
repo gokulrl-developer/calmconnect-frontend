@@ -292,6 +292,9 @@ export const PsychVideoRoom = () => {
             <Video />
           </button>
           )}
+          {!joined && (
+          <p className="hidden">{info}</p>
+          )}
         </div>
 
         {/* Live Videos */}

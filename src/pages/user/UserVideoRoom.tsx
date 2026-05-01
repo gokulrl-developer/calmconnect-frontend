@@ -263,6 +263,9 @@ export const UserVideoRoom = () => {
           </button>
           )
           }
+          {!joined && (
+          <p className="hidden">{info}</p>
+          )}
         </div>
 
         {/* Live Videos */}
