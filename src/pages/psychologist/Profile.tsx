@@ -410,7 +410,7 @@ const PsychologistProfile: React.FC = () => {
                 )}
               </>
             ) : (
-              <p className="text-gray-800 dark:text-white">
+              <p className="text-gray-800 dark:text-white break-all">
                 {profile.bio || "-"}
               </p>
             )}

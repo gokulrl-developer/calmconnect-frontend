@@ -196,10 +196,7 @@ const PsychologistDetailsPage: React.FC = () => {
             </h3>
             {psychologist.license ? (
               <a
-                href={`${psychologist.license.replace(
-                  "/upload/",
-                  "/upload/fl_attachment:"
-                )}`}
+                href={`${psychologist.license}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

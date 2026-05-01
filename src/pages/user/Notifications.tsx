@@ -95,11 +95,11 @@ export default function Notifications() {
     setPaginationData((prev) => ({ ...prev, currentPage: newPage }));
   };
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
       <div className="max-w-4xl mx-auto flex flex-col gap-5">
         {/* Header */}
-        <section className="glass-card p-6 animate-in">
-          <div className="flex items-center justify-between mb-4">
+        <section className="animate-in">
+          <div className="glass-card p-6 flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-primary-700 dark:text-primary-200 flex items-center gap-2">
               <BellIcon className="w-5 h-5" />
               Notifications
@@ -125,16 +125,16 @@ export default function Notifications() {
                   }`}
                 >
                   <div className="flex flex-col gap-1">
-                    <span className="font-medium text-gray-800 dark:text-gray-100">
+                    <span className="font-medium text-black dark:text-gray-100">
                       {n.title}
                     </span>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                    <p className="text-black dark:text-gray-300 text-sm">
                       {n.message}
                     </p>
                      {n.link && <p className="text-blue-800 dark:text-gray-300 text-sm">
                        <Link to={n.link}> Click here</Link>
                       </p>}
-                    <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <span className="text-xs text-black dark:text-gray-400 mt-1">
                       {new Date(n.createdAt).toLocaleString()}
                     </span>
                   </div>
