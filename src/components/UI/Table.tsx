@@ -27,8 +27,8 @@ const Table = <T, K extends keyof T = keyof T>({
   }
 
   return (
-    <div className="overflow-x-auto min-w-[700px]">
-      <table className="w-full">
+    <div className="overflow-x-auto">
+      <table className="min-w-[700px] w-full">
         <thead>
           <tr className="border-b border-gray-200 dark:border-gray-700">
             {columns.map((col, i) => (

@@ -25,7 +25,7 @@ const UserLayout = () => {
             </aside>
           )}
           {/* Main content*/}
-          <main className={`p-6 flex-1 min-w-0 ${!inCall && "mt-16 md:ml-64"}`}>
+          <main className={`flex-1 min-w-0 ${!inCall && "mt-16 md:ml-64 p-6"}`}>
             <Outlet />
           </main>
         </div>

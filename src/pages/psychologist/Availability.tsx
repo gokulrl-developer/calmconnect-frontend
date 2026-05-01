@@ -382,11 +382,11 @@ export default function Availability() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-8 py-10">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-2 md:px-8 py-10">
       <div className="max-w-6xl mx-auto flex flex-col align-middle gap-5">
         {/* Availability Exceptions */}
         <div className="mx-auto">
-          <section className=" bg-gray-200 p-6 animate-in w-max">
+          <section className=" bg-gray-200 p-2 md:p-6 animate-in w-max">
             <h2 className="text-xl font-semibold text-secondary-1000 dark:text-secondary-200 mb-4">
               Set Availability Exceptions
             </h2>
