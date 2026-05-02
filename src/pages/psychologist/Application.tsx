@@ -6,7 +6,7 @@ import { Upload, Camera, Globe, LogOut, Download } from "lucide-react";
 import {
   fetchLatestApplicationAPI,
   psychologistApply,
- 
+
 } from "../../services/psychologistService";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
 import {
@@ -38,7 +38,7 @@ const PsychologistApplication = () => {
         setExistingApplication(result.data.application);
       }
     } catch (error) {
-      console.log("error on fetching application",error)
+      console.log("error on fetching application", error)
     }
   }
 
@@ -218,12 +218,12 @@ const PsychologistApplication = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 p-4">
       <div className="max-w-4xl mx-auto">
         <Card className="p-8 shadow-xl">
-      <button
-          onClick={handleLogout}
-          className="mt-2 text-red-600 hover:underline flex items-center justify-center gap-2"
-        >
-          <LogOut size={18} /> Logout
-        </button>
+          <button
+            onClick={handleLogout}
+            className="mt-2 text-red-600 hover:underline flex items-center justify-center gap-2"
+          >
+            <LogOut size={18} /> Logout
+          </button>
           <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
             {existingApplication?.status === "rejected"
               ? "Update and Reapply"
@@ -295,9 +295,8 @@ const PsychologistApplication = () => {
                   type="date"
                   value={formData.dob || ""}
                   onChange={(e) => handleInputChange("dob", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                    errors.dob ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.dob ? "border-red-300" : "border-gray-300"
+                    }`}
                 />
                 {errors.dob && (
                   <p className="text-red-500 text-sm">{errors.dob}</p>
@@ -318,9 +317,8 @@ const PsychologistApplication = () => {
                   id="gender"
                   value={formData.gender || ""}
                   onChange={(e) => handleInputChange("gender", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                    errors.gender ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.gender ? "border-red-300" : "border-gray-300"
+                    }`}
                 >
                   <option value="" disabled>
                     Select gender
@@ -350,9 +348,8 @@ const PsychologistApplication = () => {
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   placeholder="Enter your phone number"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                    errors.phone ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.phone ? "border-red-300" : "border-gray-300"
+                    }`}
                 />
                 {errors.phone && (
                   <p className="text-red-500 text-sm">{errors.phone}</p>
@@ -371,10 +368,10 @@ const PsychologistApplication = () => {
               <textarea
                 id="bio"
                 value={formData.bio}
+                spellCheck="false"
                 onChange={(e) => handleInputChange("bio", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${
-                  errors.bio ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${errors.bio ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Tell us about your professional background and experience..."
               />
               {errors.bio && (
@@ -393,14 +390,14 @@ const PsychologistApplication = () => {
               <input
                 id="qualifications"
                 type="text"
+                spellCheck="false"
                 value={formData.qualifications}
                 onChange={(e) =>
                   handleInputChange("qualifications", e.target.value)
                 }
                 placeholder="Enter your qualifications"
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                  errors.qualifications ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.qualifications ? "border-red-300" : "border-gray-300"
+                  }`}
               />
               {errors.qualifications && (
                 <p className="text-red-500 text-sm">{errors.qualifications}</p>
@@ -418,10 +415,10 @@ const PsychologistApplication = () => {
               <textarea
                 id="address"
                 value={formData.address}
+                spellCheck="false"
                 onChange={(e) => handleInputChange("address", e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${
-                  errors.address ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 min-h-32 ${errors.address ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Enter your address"
               />
               {errors.address && (
@@ -444,14 +441,14 @@ const PsychologistApplication = () => {
                 <input
                   id="languages"
                   type="text"
+                  spellCheck="false"
                   value={formData.languages}
                   onChange={(e) =>
                     handleInputChange("languages", e.target.value)
                   }
                   placeholder="e.g., English, Spanish, French"
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                    errors.languages ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.languages ? "border-red-300" : "border-gray-300"
+                    }`}
                 />
               </div>
               {errors.languages && (
@@ -569,10 +566,10 @@ const PsychologistApplication = () => {
           {existingApplication === null
             ? "Become a Verified Psychologist"
             : existingApplication && existingApplication.status === "pending"
-            ? "Your Application is Pending"
-            : existingApplication && existingApplication.status === "rejected"
-            ? "Your Application was Rejected"
-            : ""}
+              ? "Your Application is Pending"
+              : existingApplication && existingApplication.status === "rejected"
+                ? "Your Application was Rejected"
+                : ""}
         </h1>
 
         {existingApplication === null && (
