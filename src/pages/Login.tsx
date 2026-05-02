@@ -6,7 +6,7 @@ import Card from "../components/UI/Card";
 import { loginUserAsync } from "../features/authentication/authThunk";
 import { loginPsychologistAsync } from "../features/authentication/authThunk";
 import { loginAdminAsync } from "../features/authentication/authThunk";
-import { useAppDispatch} from "../hooks/customReduxHooks";
+import { useAppDispatch } from "../hooks/customReduxHooks";
 
 interface LoginProps {
   role: string;
@@ -106,8 +106,8 @@ const Login: React.FC<LoginProps> = ({ role }) => {
             {role === "user"
               ? "User"
               : role === "psychologist"
-              ? "Psychologist"
-              : "Admin"}
+                ? "Psychologist"
+                : "Admin"}
           </p>
         </div>
 
@@ -119,6 +119,16 @@ const Login: React.FC<LoginProps> = ({ role }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
+            {role==="user" &&(
+            <div className="bg-green-300">
+            <p className="text-black text-sm">Testing Email : gokulrlsreepath95@gmail.com</p>
+            <p className="text-black text-sm">Password : Gokul12@</p>
+            </div>)}
+            {role==="psychologist" &&(
+            <div className="bg-green-300">
+            <p className="text-black text-sm">Testing Email : gokulrlsreepath95@gmail.com</p>
+            <p className="text-black text-sm">Password : Gokul12@</p>
+            </div>)}
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
@@ -134,9 +144,8 @@ const Login: React.FC<LoginProps> = ({ role }) => {
                   setEmail(e.target.value)
                 }
                 placeholder="Enter your email"
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.email ? 'border-red-300' : 'border-gray-300'
+                  }`}
               />
             </div>
             {errors.email && (
@@ -160,9 +169,8 @@ const Login: React.FC<LoginProps> = ({ role }) => {
                   setPassword(e.target.value)
                 }
                 placeholder="Enter your password"
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                }`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${errors.password ? 'border-red-300' : 'border-gray-300'
+                  }`}
               />
             </div>
             {errors.password && (
@@ -241,16 +249,16 @@ const Login: React.FC<LoginProps> = ({ role }) => {
           </div>
         ) : null}
         <div className="my-3 text-center space-y-4">
-        {role==="user" || role==="psychologist"?(
+          {role === "user" || role === "psychologist" ? (
             <p className="text-sm text-gray-600">
               <Link
                 to={role === "user" ? "/user/forgot-password" : "/psychologist/forgot-password"}
                 className="text-primary-600 hover:underline font-medium"
               >
-                Forgot Password ? 
+                Forgot Password ?
               </Link>
             </p>
-            ):null}
+          ) : null}
           {role !== "admin" ? (
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
