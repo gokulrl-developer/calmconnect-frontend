@@ -179,16 +179,16 @@ const Landing: React.FC = () => {
                 <Button 
                   variant="primary" 
                   size="lg"
-                  onClick={() => navigate('/auth/signup')}
+                  onClick={() => navigate('/user/sign-up')}
                   className="flex items-center gap-2"
                 >
-                  <Video className="w-4 h-4" />
-                  Start Online Therapy
+                  <Heart className="w-4 h-4" />
+                  Start Your Journey
                 </Button>
                 <Button 
                   variant="secondary" 
                   size="lg"
-                  onClick={() => navigate('/auth/login')}
+                  onClick={() => navigate('/user/login')}
                   className="flex items-center gap-2"
                 >
                   <Users className="w-4 h-4" />
@@ -557,16 +557,16 @@ const Landing: React.FC = () => {
               <Button 
                 variant="primary" 
                 size="lg"
-                onClick={() => navigate('/auth/signup')}
+                onClick={() => navigate('/user/sign-up')}
                 className="flex items-center gap-2"
               >
-                <Monitor className="w-4 h-4" />
-                Start Online Therapy
+                <Heart className="w-4 h-4" />
+                Start Your Journey
               </Button>
               <Button 
                 variant="secondary" 
                 size="lg"
-                onClick={() => navigate('/auth/login')}
+                onClick={() => navigate('/user/login')}
               >
                 Sign In
               </Button>

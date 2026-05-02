@@ -218,6 +218,12 @@ const PsychologistApplication = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 p-4">
       <div className="max-w-4xl mx-auto">
         <Card className="p-8 shadow-xl">
+      <button
+          onClick={handleLogout}
+          className="mt-2 text-red-600 hover:underline flex items-center justify-center gap-2"
+        >
+          <LogOut size={18} /> Logout
+        </button>
           <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
             {existingApplication?.status === "rejected"
               ? "Update and Reapply"
