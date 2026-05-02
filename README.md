@@ -127,7 +127,7 @@ npm run dev
 
 
 ### Sessions :psychologist and user
-<img width="1362" height="604" alt="Screenshot 2026-05-02 170854" src="https://github.com/user-attachments/assets/fe3cfe6b-921e-4337-bfd3-7938c76bc3b4" />
+<img width="1358" height="597" alt="Screenshot 2026-05-02 190855" src="https://github.com/user-attachments/assets/b8fb6adf-7a16-4494-be0c-45a3eb5073e5" />
 
 ### Complaint Resolution by Admin
 <img width="1084" height="1018" alt="www calm-connect site_admin_complaints_699338e7888763632f3e5e25" src="https://github.com/user-attachments/assets/dd4f39d5-e7b9-4369-a265-1cd46d1f2a2a" />
