@@ -25,20 +25,15 @@ CalmConnect frontend provides a seamless user experience for booking therapy ses
 
 ###  User Features
 
-- Browse available psychologists
-- View psychologist profiles and availability
-- Book therapy sessions instantly (slot-based booking)
-- Secure payment integration during booking
-- Join video consultation sessions
-- View session history
-- Rate the psychologist
-- Raise complaints with optional session reference
-- Wallet with transaction history and refund tracking
+- Book sessions
+- Attend sessions (video call)
+- rate psychologist or raise complaints against psychologist
+- Track sessions ,payments etc.
 
 ###  Psychologist Features
 
-- Register and apply to become a verified psychologist
-- View and manage availability slots
+- Apply to become a verified psychologist
+- Manage availability
 - Accept and manage scheduled sessions
 - Conduct video sessions with users
   
@@ -170,6 +165,7 @@ User raises complaint against a psychologist he has consulted → complaint is s
 
 ### 6. Wallet & Refund Flow
 All payments are tracked in wallet → successful sessions remain as transactions → failed/cancelled sessions trigger refunds → refunds are credited back to wallet and visible in transaction history.
+
 ---
 ## 🧠 Project Architecture
 
@@ -190,9 +186,7 @@ All backend communication is centralized through service modules:
 ---
 
 ### 3. Real-Time Communication Layer
-- WebSocket used for notifications and session updates
-- WebRTC used for peer-to-peer video and audio communication
-- STUN servers used for NAT traversal in peer connections
+- Uses Web-socket and Web-RTC
 
 ---
 
