@@ -12,7 +12,6 @@ import {
   Clock,
   Star,
   Phone,
-  Monitor
 } from 'lucide-react';
 
 const Landing: React.FC = () => {
