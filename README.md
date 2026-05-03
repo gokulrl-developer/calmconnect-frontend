@@ -65,7 +65,7 @@ CalmConnect frontend provides a seamless user experience for booking therapy ses
 - **Icons:** Lucide react
 
 ## 📂 Project Structure
-Explain your folder structure briefly.
+```
 src/
 ├── assets/
 ├── components/
@@ -77,7 +77,7 @@ src/
 ├── services/
 ├── types/
 └── utils/
-
+```
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the repository
@@ -166,38 +166,6 @@ User raises complaint against a psychologist he has consulted → complaint is s
 ### 6. Wallet & Refund Flow
 All payments are tracked in wallet → successful sessions remain as transactions → failed/cancelled sessions trigger refunds → refunds are credited back to wallet and visible in transaction history.
 
----
-## 🧠 Project Architecture
-
-### 1. Role-Based UI System
-Single frontend supports 3 roles:
-- User 
-- Psychologist 
-- Admin 
-The project is organized based on user roles to clearly separate responsibilities and UI flows.
----
-
-### 2. API Integration Layer
-All backend communication is centralized through service modules:
-- REST API abstraction layer for all features
-- Axios-based request handling
-- Token-based authentication flow
-
----
-
-### 3. Real-Time Communication Layer
-- Uses Web-socket and Web-RTC
-
----
-
-### 4. State Management Strategy
-- Global state handled using Redux Toolkit / Context API
-
----
-### 5. Routing Layer (SPA)
-- Built using React Router
-- Handles role-based navigation (User, Psychologist, Admin)
-- Protected routes based on authentication and role access
 
 ---
 ## 🔗 API Reference
